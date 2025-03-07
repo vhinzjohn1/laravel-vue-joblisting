@@ -19,6 +19,13 @@ return new class extends Migration
             $table->text('description')->nullable();
         });
 
+        // Insert default roles
+        DB::table('roles')->insert([
+            ['role_name' => 'admin', 'description' => 'Administrator role'],
+            ['role_name' => 'hr', 'description' => 'HR Personnel role'],
+            ['role_name' => 'applicant', 'description' => 'Applicant role'],
+        ]);
+
         Schema::create('users', function (Blueprint $table) {
             $table->id('user_id'); // Change primary key name
             $table->string('username')->nullable();
@@ -57,6 +64,7 @@ return new class extends Migration
             'username' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('admin123'),
+            'role_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

@@ -116,13 +116,18 @@
                         >
                             <template v-if="conditionalColumns[col]">
                                 <span
-                                    :class="getConditionalClass(col, item[col])"
+                                    :class="
+                                        getConditionalClass(
+                                            col,
+                                            getNestedValue(item, col),
+                                        )
+                                    "
                                 >
-                                    {{ item[col] }}
+                                    {{ getNestedValue(item, col) }}
                                 </span>
                             </template>
                             <template v-else>
-                                {{ item[col] }}
+                                {{ getNestedValue(item, col) }}
                             </template>
                         </td>
                         <td class="px-4 py-2 border border-gray-200">
@@ -315,8 +320,19 @@ const errorMessage = computed(() => {
     return null;
 });
 
-// Helper: format header names (capitalize first letter)
-const formatHeader = (key) => key.charAt(0).toUpperCase() + key.slice(1);
+// Helper function to get nested value from an object using dot notation
+const getNestedValue = (obj, path) => {
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+};
+
+// Helper: format header names (capitalize first letter and replace underscores with spaces)
+const formatHeader = (key) => {
+    return key
+        .split(".")
+        .pop()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+};
 
 // Change page function with bounds checking
 const changePage = (page) => {

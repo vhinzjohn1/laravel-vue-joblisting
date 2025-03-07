@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Test;
 use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,8 +15,9 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $tests = Test::all();
-        return Inertia::render('Admin/AdminDashboard', ['tests' => $tests]);
+        // Get all Users with their roles
+        $users = User::with('roles')->get();
+        return Inertia::render('Admin/AdminDashboard', ['users' => $users]);
     }
 
     /**
@@ -34,14 +36,16 @@ class AdminController extends Controller
         try {
             // Validate and automatically retrieve only the validated fields
             $data = $request->validate([
-                'name' => 'required',
-                'status' => 'required',
+                'username' => 'required|string',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|string',
+                'role_id' => 'required|exists:roles,role_id',
             ]);
 
             // Create a new Test instance using mass assignment
-            $test = Test::create($data);
+            $user = User::create($data);
 
-            return response()->json($test, 201);
+            return response()->json($user, 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occurred while creating the test',

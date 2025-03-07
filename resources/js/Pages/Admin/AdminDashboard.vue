@@ -17,7 +17,8 @@
                     <DataTable
                         :data="data"
                         :pageSize="5"
-                        :columns="['test_id', 'name', 'status']"
+                        :columns="['user_id', 'username', 'email']"
+                        :conditionalColumns="['roles.role_name']"
                         @edit="editItem"
                         @delete="deleteItem"
                     />
@@ -52,24 +53,51 @@
                     <div class="modal-body">
                         <form @submit.prevent="saveChanges">
                             <div class="form-group">
-                                <label for="exampleInputName">Name</label>
+                                <label for="exampleInputUsername"
+                                    >Username</label
+                                >
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="exampleInputName"
-                                    v-model="form.name"
-                                    placeholder="Enter name"
+                                    id="exampleInputUsername"
+                                    v-model="form.username"
+                                    placeholder="Enter username"
                                 />
                             </div>
                             <div class="form-group">
-                                <label for="exampleInputStatus">Status</label>
+                                <label for="exampleInputEmail">Email</label>
                                 <input
-                                    type="text"
+                                    type="email"
                                     class="form-control"
-                                    id="exampleInputStatus"
-                                    v-model="form.status"
-                                    placeholder="Enter status"
+                                    id="exampleInputEmail"
+                                    v-model="form.email"
+                                    placeholder="Enter email"
                                 />
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword"
+                                    >Password</label
+                                >
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="exampleInputPassword"
+                                    v-model="form.password"
+                                    placeholder="Enter password"
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exampleInputRole">Role</label>
+                                <select
+                                    class="form-control"
+                                    id="exampleInputRole"
+                                    v-model="form.role_id"
+                                >
+                                    <option value="1">Admin</option>
+                                    <option value="2">HR Personnel</option>
+                                    <option value="3">Applicant</option>
+                                </select>
                             </div>
                             <div class="modal-footer">
                                 <button
@@ -100,11 +128,15 @@ import DataTable from "@/Components/DataTable.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 
 // Fethcing Props that was sent by controller
-const data = ref(usePage().props.tests);
+const data = ref(usePage().props.users);
+
+console.log('This is the data: ',data);
 
 const form = useForm({
-    name: "",
-    status: "",
+    username: "",
+    password: "",
+    email: "",
+    role_id: "",
 });
 
 const editItem = (item) => {
@@ -128,7 +160,7 @@ const saveChanges = () => {
     axios
         .post("admin", form)
         .then((response) => {
-            console.log(response)
+            console.log(response);
             // Add the new item to the data array
             data.value.push(response.data);
             // Reset form
