@@ -9,34 +9,38 @@
 
 # Job Listing & Application Platform
 
-A comprehensive job listing and application platform built with Laravel and Vue.js. This application allows employers to post job listings and job seekers to browse and apply for positions easily.
+A comprehensive job listing and application platform built with Laravel and Vue.js. This application streamlines the recruitment process by connecting HR Personnel with qualified Applicants through an organized job listing system.
 
 ## Features
 
 - **User Authentication**
 
-    - Separate login portals for employers and job seekers
-    - Profile management with resume/company details
+    - Role-based access for HR Personnel, Applicants, and Admin
+    - Secure login and profile management
 
-- **For Employers**
+- **For HR Personnel**
 
     - Create, edit, and manage job listings
     - Review and filter job applications
     - Dashboard with analytics on job posting performance
-    - Company profile management
+    - Track applicant status and communicate with candidates
+    - Schedule interviews and provide feedback
 
-- **For Job Seekers**
+- **For Applicants**
 
     - Browse job listings with advanced search and filtering
     - Save favorite jobs
     - Easy application process with resume attachment
     - Application history tracking
     - Profile and resume management
+    - Receive notifications on application status
 
-- **Admin Dashboard**
-    - User management
-    - Content moderation
+- **For Admin**
+    - User management and role assignment
+    - Content moderation and approval
     - Platform statistics and analytics
+    - System configuration and maintenance
+    - Generate reports on recruitment activities
 
 ## Technologies Used
 
@@ -90,7 +94,6 @@ php artisan key:generate
 
 ```bash
 php artisan migrate
-php artisan db:seed
 ```
 
 ### Step 6: Install JavaScript dependencies
@@ -129,15 +132,15 @@ Your application should now be running at `http://localhost:8000`.
 
 After installation, you can:
 
-1. Register as an employer or job seeker
-2. Log in to access your dashboard
-3. Employers can create job listings
-4. Job seekers can browse and apply for jobs
+1. Log in with your assigned role (HR Personnel, Applicant, or Admin)
+2. HR Personnel can create and manage job listings
+3. Applicants can browse jobs and submit applications
+4. Admin can manage users and monitor system performance
 
 Default admin credentials:
 
-- Email: admin@example.com
-- Password: password
+- Email: admin@gmail.com
+- Password: admin123
 
 (Remember to change these in production)
 
