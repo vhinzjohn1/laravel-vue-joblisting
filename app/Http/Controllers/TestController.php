@@ -12,8 +12,8 @@ class TestController extends Controller
      */
     public function index()
     {
-        $tests = Test::all();
-        return response()->json($tests);
+        // $tests = Test::all();
+        return response()->json();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Test;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,7 +14,8 @@ class AdminController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/AdminDashboard');
+        $tests = Test::all();
+        return Inertia::render('Admin/AdminDashboard', ['tests' => $tests]);
     }
 
     /**
@@ -29,16 +31,30 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            // Validate and automatically retrieve only the validated fields
+            $data = $request->validate([
+                'name' => 'required',
+                'status' => 'required',
+            ]);
+
+            // Create a new Test instance using mass assignment
+            $test = Test::create($data);
+
+            return response()->json($test, 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while creating the test',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 
     /**
      * Display the specified resource.
      */
-    public function show()
-    {
-
-    }
+    public function show() {}
 
     /**
      * Show the form for editing the specified resource.

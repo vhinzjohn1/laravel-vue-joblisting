@@ -95,7 +95,7 @@ const handleLogout = () => {
                         <div class="flex-shrink-0">
                             <span v-if="sidebarOpen" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
                                 <span class="text-sm font-medium leading-none text-gray-600">
-                                    {{ $page.props.auth.user.name.charAt(0) }}
+                                    {{ $page.props.auth.user.username.charAt(0) }}
                                 </span>
                             </span>
                         </div>

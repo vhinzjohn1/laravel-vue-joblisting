@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestController;
 use Illuminate\Foundation\Application;
@@ -39,5 +40,6 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('admin', AdminController::class);
 Route::resource('test', TestController::class);
+Route::resource('position', PositionController::class);
 
 require __DIR__ . '/auth.php';

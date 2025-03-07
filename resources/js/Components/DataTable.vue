@@ -202,7 +202,7 @@ import { ref, computed, watch } from "vue";
 
 // Props definition including conditionalColumns prop
 const props = defineProps({
-    items: { type: Array, required: true },
+    data: { type: Array, required: true },
     pageSize: { type: Number, default: 10 },
     columns: { type: Array, default: null },
     pageSizeOptions: { type: Array, default: () => [5, 10, 20, 50] },
@@ -228,8 +228,8 @@ const sortDirection = ref("asc");
 // Compute filtered items based on search query (case‑insensitive)
 const filteredItems = computed(() => {
     let result = !searchQuery.value.trim()
-        ? props.items
-        : props.items.filter((item) =>
+        ? props.data
+        : props.data.filter((item) =>
               Object.values(item).some((val) =>
                   String(val)
                       .toLowerCase()
@@ -292,21 +292,21 @@ const visiblePages = computed(() => {
     return range;
 });
 
-// Determine which columns to show: use columns prop if provided, otherwise all keys from first item.
+// Determine which columns to show: use columns prop if provided, otherwise all keys from first data item.
 const showColumns = computed(() => {
     if (props.columns && props.columns.length) {
         return props.columns;
     }
-    if (props.items.length) {
-        return Object.keys(props.items[0]);
+    if (props.data.length) {
+        return Object.keys(props.data[0]);
     }
     return [];
 });
 
-// Error handler: if columns prop is provided, check that each column exists in the first item.
+// Error handler: if columns prop is provided, check that each column exists in the first data item.
 const errorMessage = computed(() => {
-    if (props.columns && props.columns.length && props.items.length) {
-        const firstItem = props.items[0];
+    if (props.columns && props.columns.length && props.data.length) {
+        const firstItem = props.data[0];
         const missing = props.columns.filter((col) => !(col in firstItem));
         if (missing.length) {
             return `Error: Column(s) ${missing.join(", ")} do not exist in the data.`;
