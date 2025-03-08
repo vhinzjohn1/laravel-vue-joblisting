@@ -34,6 +34,24 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Assuming each user has one role attached:
+        // $role = $request->user()->roles->first()->role_name ?? null;
+
+        // switch ($role) {
+        //     case 'admin':
+        //         $redirectTo = route('admin.index');
+        //         break;
+        //     case 'hr':
+        //         $redirectTo = route('admin.index');
+        //         break;
+        //     // add other roles as needed
+        //     default:
+        //         $redirectTo = RouteServiceProvider::HOME;
+        //         break;
+        // }
+
+        // return redirect()->intended($redirectTo);
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
