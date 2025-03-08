@@ -5,20 +5,22 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Link, useForm, usePage } from "@inertiajs/vue3";
 
-defineProps({
-    mustVerifyEmail: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
+const props = defineProps({
+    mustVerifyEmail: Boolean,
+    status: String,
+    userDetails: Object,
 });
 
 const user = usePage().props.auth.user;
-
 const form = useForm({
     username: user.username,
     email: user.email,
+    firstname: props.userDetails?.firstname || "",
+    lastname: props.userDetails?.lastname || "",
+    middle_initial: props.userDetails?.middle_initial || "",
+    phone_number: props.userDetails?.phone_number || "",
+    education_attainment: props.userDetails?.education_attainment || "",
+    eligibility: props.userDetails?.eligibility || "",
 });
 </script>
 
@@ -63,10 +65,96 @@ const form = useForm({
                     class="mt-1 block w-full"
                     v-model="form.email"
                     required
-                    autocomplete="username"
+                    autocomplete="email"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <InputLabel for="firstname" value="First Name" />
+                    <TextInput
+                        id="firstname"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.firstname"
+                        required
+                    />
+                    <InputError class="mt-2" :message="form.errors.firstname" />
+                </div>
+
+                <div>
+                    <InputLabel for="lastname" value="Last Name" />
+                    <TextInput
+                        id="lastname"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.lastname"
+                        required
+                    />
+                    <InputError class="mt-2" :message="form.errors.lastname" />
+                </div>
+
+                <div>
+                    <InputLabel for="middle_initial" value="Middle Initial" />
+                    <TextInput
+                        id="middle_initial"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.middle_initial"
+                        maxlength="1"
+                    />
+                    <InputError
+                        class="mt-2"
+                        :message="form.errors.middle_initial"
+                    />
+                </div>
+
+                <div>
+                    <InputLabel for="phone_number" value="Phone Number" />
+                    <TextInput
+                        id="phone_number"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.phone_number"
+                    />
+                    <InputError
+                        class="mt-2"
+                        :message="form.errors.phone_number"
+                    />
+                </div>
+
+                <div>
+                    <InputLabel
+                        for="education_attainment"
+                        value="Education Attainment"
+                    />
+                    <TextInput
+                        id="education_attainment"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.education_attainment"
+                    />
+                    <InputError
+                        class="mt-2"
+                        :message="form.errors.education_attainment"
+                    />
+                </div>
+
+                <div>
+                    <InputLabel for="eligibility" value="Eligibility" />
+                    <TextInput
+                        id="eligibility"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.eligibility"
+                    />
+                    <InputError
+                        class="mt-2"
+                        :message="form.errors.eligibility"
+                    />
+                </div>
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">

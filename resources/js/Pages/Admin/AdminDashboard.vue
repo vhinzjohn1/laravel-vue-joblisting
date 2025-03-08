@@ -1,5 +1,5 @@
 <template>
-    <AuthenticatedLayout>
+    <AdminLayout>
         <Head title="Admin Dashboard" />
         <template #header>
             <Header title="Admin Dashboard" />
@@ -18,12 +18,7 @@
                     <DataTable
                         :data="data"
                         :pageSize="10"
-                        :columns="[
-                            'user_id',
-                            'username',
-                            'email',
-                            'roles.role_name',
-                        ]"
+                        :columns="['user_id', 'username', 'email', 'role_name']"
                         @edit="showEdit"
                         @delete="deleteItem"
                     />
@@ -72,12 +67,12 @@
                     <select
                         class="form-control"
                         id="exampleInputRole"
-                        v-model="form.role_id"
+                        v-model="form.role_name"
                         required
                     >
-                        <option value="1">Admin</option>
-                        <option value="2">HR Personnel</option>
-                        <option value="3">Applicant</option>
+                        <option value="admin">Admin</option>
+                        <option value="hr">HR Personnel</option>
+                        <option value="applicant">Applicant</option>
                     </select>
                 </div>
                 <div class="modal-footer">
@@ -135,12 +130,12 @@
                     <select
                         class="form-control"
                         id="editRole"
-                        v-model="form.role_id"
+                        v-model="form.role_name"
                         required
                     >
-                        <option value="1">Admin</option>
-                        <option value="2">HR Personnel</option>
-                        <option value="3">Applicant</option>
+                        <option value="admin">Admin</option>
+                        <option value="hr">HR Personnel</option>
+                        <option value="applicant">Applicant</option>
                     </select>
                 </div>
                 <div class="modal-footer">
@@ -157,13 +152,14 @@
                 </div>
             </form>
         </Modal>
-    </AuthenticatedLayout>
+    </AdminLayout>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import DataTable from "@/Components/DataTable.vue";
 import { useForm, usePage, Head } from "@inertiajs/vue3";
@@ -176,7 +172,7 @@ const form = useForm({
     username: "",
     password: "",
     email: "",
-    role_id: "",
+    role_name: "",
     user_id: "",
 });
 
@@ -185,7 +181,7 @@ const showEdit = (item) => {
     form.username = item.username;
     form.email = item.email;
     form.password = item.password;
-    form.role_id = item.role_id;
+    form.role_name = item.role_name;
     form.user_id = item.user_id;
     // Set modal to show edit form
     $("#editModal").modal("show");

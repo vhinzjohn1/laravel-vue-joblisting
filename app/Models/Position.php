@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Position extends Model
 {
@@ -25,5 +26,13 @@ class Position extends Model
     public function jobListings(): HasMany
     {
         return $this->hasMany(JobListing::class, 'position_id');
+    }
+
+    /**
+     * Get the salary grade for this position
+     */
+    public function salaryGrade(): BelongsTo
+    {
+        return $this->belongsTo(SalaryGrade::class, 'salary_grade_id');
     }
 }

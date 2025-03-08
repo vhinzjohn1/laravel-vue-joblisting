@@ -5,21 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class Category extends Model
 {
     use HasFactory;
 
-    protected $table = 'roles';
-
-    protected $primaryKey = 'role_id';
+    protected $primaryKey = 'category_id';
 
     protected $fillable = [
-        'role_name',
+        'name',
         'description',
     ];
 
-    public function users()
+    public function jobListings()
     {
-        return $this->hasMany(User::class, 'role_id', 'role_id');
+        return $this->hasMany(JobListing::class, 'category_id');
     }
 }

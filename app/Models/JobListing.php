@@ -14,17 +14,16 @@ class JobListing extends Model
 
     protected $fillable = [
         'position_id',
+        'category_id',
         'title',
         'description',
-        'posting_date',
         'closing_date',
         'status',
         'applicant_limit',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [
-        'posting_date' => 'date',
         'closing_date' => 'date',
     ];
 
@@ -36,5 +35,25 @@ class JobListing extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function minimumRequirements()
+    {
+        return $this->hasMany(MinimumRequirement::class, 'job_listing_id');
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class, 'job_listing_id');
+    }
+
+    public function salaryGrade(): BelongsTo
+    {
+        return $this->belongsTo(SalaryGrade::class, 'salary_grade_id');
     }
 }

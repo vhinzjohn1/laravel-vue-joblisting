@@ -13,58 +13,23 @@ return new class extends Migration
     public function up(): void
     {
 
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id('role_id');
-            $table->string('role_name')->nullable();
-            $table->text('description')->nullable();
-        });
-
-        // Insert default roles
-        DB::table('roles')->insert([
-            ['role_name' => 'admin', 'description' => 'Administrator role'],
-            ['role_name' => 'hr', 'description' => 'HR Personnel role'],
-            ['role_name' => 'applicant', 'description' => 'Applicant role'],
-        ]);
-
         Schema::create('users', function (Blueprint $table) {
             $table->id('user_id'); // Change primary key name
             $table->string('username')->nullable();
             $table->string('password');
             $table->string('email');
-            $table->string('phone_number')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->unsignedBigInteger('role_id')->nullable();
+            $table->string('role_name')->nullable();
             $table->rememberToken(); // Keep this for "remember me" functionality
             $table->timestamps();
-
-            // Add foreign key to roles table
-            $table->foreign('role_id')->references('role_id')->on('roles')->onDelete('set null');
         });
-
-        Schema::create('test', function (Blueprint $table) {
-            $table->id('test_id');
-            $table->string('name');
-            $table->string('status');
-            $table->timestamps();
-        });
-
-        // Dummy seeder for test with 50 records, alternating between 'active' and 'disabled' status
-        for ($i = 1; $i <= 100; $i++) {
-            $status = $i % 2 == 0 ? 'disabled' : 'active';
-            DB::table('test')->insert([
-                'name' => 'Test ' . $i,
-                'status' => $status,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
 
         // Dummy seeder for users with 1 record
         DB::table('users')->insert([
             'username' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('admin123'),
-            'role_id' => 1,
+            'role_name' => 'admin',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -72,11 +37,12 @@ return new class extends Migration
         Schema::create('user_details', function (Blueprint $table) {
             $table->id('detail_id');
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->string('name')->nullable();
+            $table->string('firstname')->nullable();
+            $table->string('lastname')->nullable();
+            $table->string('middle_initial')->nullable();
+            $table->string('phone_number')->nullable();
             $table->string('education_attainment')->nullable();
-            $table->integer('years_experience')->nullable();
             $table->string('eligibility')->nullable();
-            $table->string('training_hours')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
@@ -89,23 +55,47 @@ return new class extends Migration
             $table->timestamp('updated_at')->nullable();
         });
 
+        // Seed data for salary_grades
+        DB::table('salary_grades')->insert([
+            ['amount' => 50000, 'years_experience' => 2, 'updated_at' => now()],
+            ['amount' => 70000, 'years_experience' => 5, 'updated_at' => now()],
+        ]);
+
         Schema::create('positions', function (Blueprint $table) {
             $table->id('position_id');
             $table->string('position_name')->nullable();
             $table->string('item_number')->nullable();
             $table->unsignedBigInteger('salary_grade_id')->nullable();
-            $table->text('minimum_requirements')->nullable();
             $table->timestamps();
 
             $table->foreign('salary_grade_id')->references('salary_grade_id')->on('salary_grades')->onDelete('set null');
         });
 
+        // Seed data for positions
+        DB::table('positions')->insert([
+            ['position_name' => 'UI/UX Designer', 'item_number' => 'DES-001', 'salary_grade_id' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['position_name' => 'Software Engineer', 'item_number' => 'ENG-001', 'salary_grade_id' => 2, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id('category_id');
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
+
+        // Seed data for categories
+        DB::table('categories')->insert([
+            ['name' => 'Design', 'description' => 'Design related jobs', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Engineering', 'description' => 'Engineering related jobs', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
         Schema::create('job_listings', function (Blueprint $table) {
             $table->id('job_listing_id');
             $table->unsignedBigInteger('position_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->date('posting_date')->nullable();
             $table->date('closing_date')->nullable();
             $table->string('status')->nullable();
             $table->bigInteger('applicant_limit');
@@ -114,6 +104,19 @@ return new class extends Migration
 
             $table->foreign('position_id')->references('position_id')->on('positions')->onDelete('cascade');
             $table->foreign('created_by')->references('user_id')->on('users')->onDelete('set null');
+            $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('set null');
+        });
+
+        Schema::create('minimum_requirements', function (Blueprint $table) {
+            $table->id('requirement_id');
+            $table->unsignedBigInteger('job_listing_id')->nullable();
+            $table->string('requirement_type'); // e.g., 'training', 'experience', 'education', 'certification'
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->boolean('is_required')->default(true);
+            $table->timestamps();
+
+            $table->foreign('job_listing_id')->references('job_listing_id')->on('job_listings')->onDelete('cascade');
         });
 
         Schema::create('applications', function (Blueprint $table) {
@@ -121,8 +124,7 @@ return new class extends Migration
             $table->unsignedBigInteger('job_listing_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('status')->nullable();
-            $table->timestamp('applied_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('job_listing_id')->references('job_listing_id')->on('job_listings')->onDelete('cascade');
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
@@ -211,5 +213,7 @@ return new class extends Migration
         Schema::dropIfExists('user_details');
         Schema::dropIfExists('users');
         Schema::dropIfExists('test');
+        Schema::dropIfExists('minimum_requirements');
+        Schema::dropIfExists('categories');
     }
 };

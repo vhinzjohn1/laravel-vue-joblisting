@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller;
 
-use App\Models\Test;
 use App\Models\User;
-use Illuminate\Foundation\Auth\User as AuthUser;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,7 +15,7 @@ class AdminController extends Controller
     public function index()
     {
         // Get all Users with their roles
-        $users = User::with('roles')->get();
+        $users = User::all();
         return Inertia::render('Admin/AdminDashboard', ['users' => $users]);
     }
 
@@ -39,12 +38,12 @@ class AdminController extends Controller
                 'username' => 'required|string',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|string',
-                'role_id' => 'required|exists:roles,role_id',
+                'role_name' => 'required|string',
             ]);
 
             // Create a new Test instance using mass assignment
             $createUser = User::create($data);
-            $users = User::with('roles')->get();
+            $users = User::all();
 
             return response()->json($users, 201);
         } catch (\Exception $e) {
@@ -80,7 +79,7 @@ class AdminController extends Controller
                 'username' => 'required|string',
                 'email' => 'required|email',
                 'password' => 'string|nullable',
-                'role_id' => 'required|exists:roles,role_id',
+                'role_name' => 'required|string',
             ]);
 
             // Find the user by ID
@@ -89,7 +88,7 @@ class AdminController extends Controller
             // Update the user
             $user->update($data);
 
-            $users = User::with('roles')->get();
+            $users = User::all();
 
             return response()->json($users, 200);
         } catch (\Exception $e) {

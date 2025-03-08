@@ -1,9 +1,30 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import DeleteUserForm from './Partials/DeleteUserForm.vue';
-import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
-import { Head } from '@inertiajs/vue3';
+import HRLayout from "@/Layouts/HR/HRLayout.vue";
+import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
+import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import DeleteUserForm from "./Partials/DeleteUserForm.vue";
+import UpdatePasswordForm from "./Partials/UpdatePasswordForm.vue";
+import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm.vue";
+import { Head, usePage } from "@inertiajs/vue3";
+
+const user = usePage().props.auth.user;
+
+// Determine which layout to use based on user role
+const getLayout = () => {
+    switch (user.role_name) {
+        case "hr":
+            return HRLayout;
+        case "applicant":
+            return ApplicantLayout;
+        case "admin":
+            return AdminLayout;
+        default:
+            return AuthenticatedLayout;
+    }
+};
+
+const LayoutComponent = getLayout();
 
 defineProps({
     mustVerifyEmail: {
@@ -12,15 +33,20 @@ defineProps({
     status: {
         type: String,
     },
+    userDetails: {
+        type: Object,
+    },
 });
 </script>
 
 <template>
     <Head title="Profile" />
 
-    <AuthenticatedLayout>
+    <component :is="LayoutComponent">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Profile</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Profile
+            </h2>
         </template>
 
         <div class="py-12">
@@ -29,6 +55,7 @@ defineProps({
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
+                        :user-details="userDetails"
                         class="max-w-xl"
                     />
                 </div>
@@ -42,5 +69,5 @@ defineProps({
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </component>
 </template>

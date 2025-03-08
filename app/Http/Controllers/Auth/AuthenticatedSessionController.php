@@ -8,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,29 +32,36 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        // Assuming each user has one role attached:
-        // $role = $request->user()->roles->first()->role_name ?? null;
+        // Retrieve the authenticated user and ensure the roles relationship is loaded
+        $user = $request->user();
 
-        // switch ($role) {
-        //     case 'admin':
-        //         $redirectTo = route('admin.index');
-        //         break;
-        //     case 'hr':
-        //         $redirectTo = route('admin.index');
-        //         break;
-        //     // add other roles as needed
-        //     default:
-        //         $redirectTo = RouteServiceProvider::HOME;
-        //         break;
-        // }
+        // Retrieve the user's role; assuming each user has one role attached:
+        $role = $user->role_name ?? null;
 
-        // return redirect()->intended($redirectTo);
+        Log::info('User authenticated.', ['role' => $role]);
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // Determine redirection based on the user's role
+        switch ($role) {
+            case 'admin':
+                $redirectTo = route('admin.index');
+                break;
+            case 'hr':
+                $redirectTo = route('hr.index');
+                break;
+           case 'applicant':
+                $redirectTo = route('applicant.index');
+                break;
+            default:
+                $redirectTo = RouteServiceProvider::HOME;
+                break;
+        }
+
+        return redirect()->intended($redirectTo);
     }
+
+
 
     /**
      * Destroy an authenticated session.
