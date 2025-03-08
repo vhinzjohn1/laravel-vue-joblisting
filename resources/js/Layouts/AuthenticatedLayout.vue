@@ -82,8 +82,20 @@ const handleLogout = () => {
                             <span v-if="sidebarOpen" class="flex-1 ms-3 text-sm font-medium whitespace-nowrap">Profile</span>
                         </Link>
                     </li>
+
                     <li>
-                        <Link :href="route('admin.index')">Go to Admin Dashboard</Link>
+                        <Link :href="route('admin.index')"
+                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            :class="{ 'bg-gray-100': route().current('admin.index') }">
+                            <svg class="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 22 21">
+                                <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
+                                <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
+                            </svg>
+                            <span v-if="sidebarOpen" class="ms-3 text-sm font-medium">Admin Dashboard</span>
+                        </Link>
                     </li>
                 </ul>
             </nav>
@@ -142,11 +154,11 @@ const handleLogout = () => {
         <div v-if="showLogoutModal"
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 transition-opacity">
             <div class="relative w-full max-w-sm rounded-lg bg-white p-6 text-center">
-                <h3 class="mb-1 text-xl font-semibold text-black">
+                <h3 class="mb-1 text-lg font-semibold text-black">
                     Are you sure you want to log out?
                 </h3>
                 <p class="mb-4 text-gray-800">
-                    Log out of {{ $page.props.auth.user.email }}?
+                    Log out of <span class="text-black">{{ $page.props.auth.user.email }}?</span>
                 </p>
                 <div class="flex flex-col space-y-2">
                     <button

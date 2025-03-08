@@ -210,7 +210,7 @@ const props = defineProps({
     data: { type: Array, required: true },
     pageSize: { type: Number, default: 10 },
     columns: { type: Array, default: null },
-    pageSizeOptions: { type: Array, default: () => [5, 10, 20, 50] },
+    pageSizeOptions: { type: Array, default: () => [10, 20, 50, 100] },
     enableRowCheckbox: { type: Boolean, default: false },
     sortable: { type: Boolean, default: true },
     // conditionalColumns: an object where keys are column names and values are mappings of cell value to CSS class
@@ -230,34 +230,55 @@ const selectedItems = ref([]);
 const currentSortKey = ref(null);
 const sortDirection = ref("asc");
 
-// Compute filtered items based on search query (case‑insensitive)
+/**
+ * Helper function to recursively flatten an item's values (including nested values)
+ */
+const flattenItem = (item) => {
+    const values = [];
+    const recurse = (obj) => {
+        if (obj && typeof obj === "object") {
+            Object.values(obj).forEach((val) => recurse(val));
+        } else {
+            values.push(obj);
+        }
+    };
+    recurse(item);
+    return values;
+};
+
+/**
+ * Helper function to get nested value from an object using dot notation
+ */
+const getNestedValue = (obj, path) => {
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+};
+
+/**
+ * Helper: format header names (capitalize first letter and replace underscores with spaces)
+ */
+const formatHeader = (key) => {
+    return key
+        .split(".")
+        .pop()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+/**
+ * Compute filtered items based on the search query.
+ * This version searches across every value in the flattened item.
+ */
 const filteredItems = computed(() => {
-    let result = !searchQuery.value.trim()
-        ? props.data
-        : props.data.filter((item) =>
-              Object.values(item).some((val) =>
-                  String(val)
-                      .toLowerCase()
-                      .includes(searchQuery.value.toLowerCase()),
-              ),
-          );
-    if (props.sortable && currentSortKey.value) {
-        result = [...result].sort((a, b) => {
-            const aValue = a[currentSortKey.value];
-            const bValue = b[currentSortKey.value];
-            if (typeof aValue === "number" && typeof bValue === "number") {
-                return sortDirection.value === "asc"
-                    ? aValue - bValue
-                    : bValue - aValue;
-            }
-            const aStr = String(aValue).toLowerCase();
-            const bStr = String(bValue).toLowerCase();
-            if (aStr < bStr) return sortDirection.value === "asc" ? -1 : 1;
-            if (aStr > bStr) return sortDirection.value === "asc" ? 1 : -1;
-            return 0;
-        });
-    }
-    return result;
+    if (!searchQuery.value.trim()) return props.data;
+
+    const query = searchQuery.value.toLowerCase();
+    return props.data.filter((item) => {
+        // Flatten the item to get an array of all values (including nested)
+        const flatValues = flattenItem(item);
+        return flatValues.some((val) =>
+            String(val).toLowerCase().includes(query),
+        );
+    });
 });
 
 // Calculate total pages based on filtered items and current page size
@@ -312,27 +333,15 @@ const showColumns = computed(() => {
 const errorMessage = computed(() => {
     if (props.columns && props.columns.length && props.data.length) {
         const firstItem = props.data[0];
-        const missing = props.columns.filter((col) => !(col in firstItem));
+        const missing = props.columns.filter(
+            (col) => getNestedValue(firstItem, col) === undefined,
+        );
         if (missing.length) {
             return `Error: Column(s) ${missing.join(", ")} do not exist in the data.`;
         }
     }
     return null;
 });
-
-// Helper function to get nested value from an object using dot notation
-const getNestedValue = (obj, path) => {
-    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
-};
-
-// Helper: format header names (capitalize first letter and replace underscores with spaces)
-const formatHeader = (key) => {
-    return key
-        .split(".")
-        .pop()
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (char) => char.toUpperCase());
-};
 
 // Change page function with bounds checking
 const changePage = (page) => {

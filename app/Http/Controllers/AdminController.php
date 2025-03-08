@@ -25,7 +25,7 @@ class AdminController extends Controller
      */
     public function create()
     {
-        return response()->json(User::all());
+
     }
 
     /**
@@ -43,9 +43,10 @@ class AdminController extends Controller
             ]);
 
             // Create a new Test instance using mass assignment
-            $user = User::create($data);
+            $createUser = User::create($data);
+            $users = User::with('roles')->get();
 
-            return response()->json($user, 201);
+            return response()->json($users, 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occurred while creating the test',
@@ -73,7 +74,30 @@ class AdminController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            // Validate and automatically retrieve only the validated fields
+            $data = $request->validate([
+                'username' => 'required|string',
+                'email' => 'required|email',
+                'password' => 'string|nullable',
+                'role_id' => 'required|exists:roles,role_id',
+            ]);
+
+            // Find the user by ID
+            $user = User::findOrFail($id);
+
+            // Update the user
+            $user->update($data);
+
+            $users = User::with('roles')->get();
+
+            return response()->json($users, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while updating the user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -81,6 +105,19 @@ class AdminController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            // Find the user by ID
+            $user = User::findOrFail($id);
+
+            // Delete the user
+            $user->delete();
+
+            return response()->json(['message' => 'User deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while deleting the user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
