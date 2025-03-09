@@ -364,7 +364,7 @@
                             target="_blank"
                             class="inline-flex items-center justify-center rounded-md border border-transparent shadow-sm p-1 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
-                            Open in new tab
+                            Open in new tab-
                         </a>
                     </div>
                 </div>
