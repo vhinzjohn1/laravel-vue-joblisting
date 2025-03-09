@@ -355,10 +355,6 @@ const handleLogout = () => {
     transition-property: all;
 }
 
-/* Add smooth transition for navigation items */
-.router-link-active {
-    @apply bg-indigo-50 text-indigo-600;
-}
 
 /* Add modal animation */
 .modal-enter-active,
