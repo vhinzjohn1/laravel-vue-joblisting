@@ -24,14 +24,32 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Dummy seeder for users with 1 record
+        // Dummy seeder for users with 3 records
         DB::table('users')->insert([
-            'username' => 'admin',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('admin123'),
-            'role_name' => 'admin',
-            'created_at' => now(),
-            'updated_at' => now(),
+            [
+                'username' => 'admin1',
+                'email' => 'admin@gmail.com',
+                'password' => bcrypt('admin123'),
+                'role_name' => 'admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'username' => 'hr',
+                'email' => 'hr@gmail.com',
+                'password' => bcrypt('admin123'),
+                'role_name' => 'hr',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'username' => 'applicant',
+                'email' => 'applicant@gmail.com',
+                'password' => bcrypt('admin123'),
+                'role_name' => 'applicant',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         Schema::create('user_details', function (Blueprint $table) {
@@ -137,7 +155,7 @@ return new class extends Migration
             $table->string('document_type')->nullable();
             $table->string('file_path')->nullable();
             $table->boolean('is_verified')->nullable();
-            $table->timestamp('uploaded_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('application_id')->references('application_id')->on('applications')->onDelete('cascade');
@@ -150,7 +168,7 @@ return new class extends Migration
             $table->string('new_status')->nullable();
             $table->string('remarks')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('application_id')->references('application_id')->on('applications')->onDelete('cascade');
             $table->foreign('updated_by')->references('user_id')->on('users')->onDelete('set null');
@@ -176,7 +194,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('application_id')->nullable();
             $table->string('status')->nullable();
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('schedule_id')->references('schedule_id')->on('schedules')->onDelete('cascade');
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
@@ -189,7 +207,7 @@ return new class extends Migration
             $table->string('type')->nullable();
             $table->string('message')->nullable();
             $table->boolean('is_read')->nullable();
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });

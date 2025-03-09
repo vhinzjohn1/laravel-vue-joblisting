@@ -1,9 +1,12 @@
 <?php
+
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Applicant\ApplicantController;
 use App\Http\Controllers\Applicant\JobApplicationController;
+use App\Http\Controllers\Applicant\MyApplicationsController;
 use App\Http\Controllers\HR\HRController;
 use App\Http\Controllers\HR\JobListingController;
+use App\Http\Controllers\HR\ApplicationsController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestController;
@@ -56,11 +59,13 @@ Route::middleware(['admin'])->group(function () {
 Route::middleware(['hr'])->group(function () {
     Route::resource('hr', HRController::class);
     Route::resource('job-listing', JobListingController::class);
+    Route::resource('applications', ApplicationsController::class);
 });
 
 Route::middleware(['applicant'])->group(function () {
     Route::resource('applicant', ApplicantController::class);
     Route::resource('job-application', JobApplicationController::class);
+    Route::resource('my-applications', MyApplicationsController::class);
 });
 
 Route::resource('test', TestController::class);

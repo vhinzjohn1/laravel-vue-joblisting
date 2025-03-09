@@ -8,17 +8,6 @@
 
         <div class="py-5">
             <div class="container-fluid px-4">
-                <Breadcrumbs
-                    :items="[
-                        { name: 'Home', href: route('applicant.index') },
-                        {
-                            name: 'Job Listings',
-                            href: route('job-application.index'),
-                            active: true,
-                        },
-                    ]"
-                />
-
                 <div
                     class="card shadow-sm rounded-lg overflow-hidden bg-white mb-6"
                 >
@@ -51,8 +40,7 @@
                             <div
                                 v-for="(job, index) in filteredJobs"
                                 :key="index"
-                                class="rounded-lg border border-gray-200 hover:shadow-md transition-shadow overflow-hidden cursor-pointer"
-                                @click="showJobDetails(job)"
+                                class="rounded-lg border border-gray-200 hover:shadow-md transition-shadow overflow-hidden"
                             >
                                 <div class="p-4">
                                     <div class="flex items-start gap-3 mb-4">
@@ -153,11 +141,10 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { usePage, Head, router } from "@inertiajs/vue3";
+import { usePage, Head } from "@inertiajs/vue3";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import axios from "axios";
-import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 
 // Fetching Props that was sent by controller
 const jobs = ref(usePage().props.jobListings);
@@ -188,10 +175,6 @@ const applyForJob = (jobId) => {
             console.error("Error applying for job:", error.response.data);
             // Handle error (e.g., show an error message)
         });
-};
-
-const showJobDetails = (job) => {
-    router.get(route("job-application.show", job.job_listing_id));
 };
 </script>
 

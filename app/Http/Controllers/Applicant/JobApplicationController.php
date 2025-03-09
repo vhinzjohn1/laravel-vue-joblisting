@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\SalaryGrade;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Application;
+use App\Models\ApplicantDocument;
 
 class JobApplicationController extends Controller
 {
@@ -52,21 +53,32 @@ class JobApplicationController extends Controller
             'job_listing_id' => 'required|exists:job_listings,job_listing_id',
             'years_experience' => 'required|numeric|min:0',
             'relevant_training' => 'required|string',
-            'resume' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'application_document' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
-        // Store the resume file
-        $resumePath = $request->file('resume')->store('resumes', 'public');
-
-        // Create the application
+        // Create the application first
         $application = Application::create([
             'job_listing_id' => $request->job_listing_id,
             'user_id' => auth()->id(),
-            'years_experience' => $request->years_experience,
-            'relevant_training' => $request->relevant_training,
-            'resume_path' => $resumePath,
             'status' => 'Pending',
             'applied_at' => now(),
+        ]);
+
+        // Get the original filename without extension
+        $file = $request->file('application_document');
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+        // Store the document file
+        $documentPath = $file->store('application_documents', 'public');
+
+        // Create the document record with the original filename as document_type
+        ApplicantDocument::create([
+            'user_id' => auth()->id(),
+            'application_id' => $application->application_id,
+            'document_type' => $originalName,
+            'file_path' => $documentPath,
+            'is_verified' => false,
+            'uploaded_at' => now(),
         ]);
 
         return redirect()->back()->with('success', 'Application submitted successfully!');

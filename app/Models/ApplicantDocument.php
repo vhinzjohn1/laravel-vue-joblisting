@@ -16,12 +16,7 @@ class ApplicantDocument extends Model
         'application_id',
         'document_type',
         'file_path',
-        'is_verified',
-        'uploaded_at',
-    ];
-
-    protected $casts = [
-        'uploaded_at' => 'datetime',
+        'is_verified'
     ];
 
     public function user()

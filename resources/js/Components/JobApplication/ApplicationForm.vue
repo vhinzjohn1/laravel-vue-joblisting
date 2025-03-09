@@ -109,10 +109,10 @@
                                     Accepted formats: PDF, DOC, DOCX
                                 </p>
                                 <div
-                                    v-if="form.errors.resume"
+                                    v-if="form.errors.application_document"
                                     class="text-red-500 text-sm mt-1"
                                 >
-                                    {{ form.errors.resume }}
+                                    {{ form.errors.application_document }}
                                 </div>
                             </div>
                         </div>
@@ -192,23 +192,14 @@ const form = useForm({
     job_listing_id: props.job.job_listing_id,
     years_experience: "",
     relevant_training: "",
-    resume: null,
+    application_document: null,
 });
 
 const handleFileUpload = (e) => {
-    form.resume = e.target.files[0];
+    form.application_document = e.target.files[0];
 };
 
 const submitApplication = () => {
-    // Create FormData object to properly handle file upload
-    const formData = new FormData();
-    formData.append("job_listing_id", form.job_listing_id);
-    formData.append("years_experience", form.years_experience);
-    formData.append("relevant_training", form.relevant_training);
-    if (form.resume) {
-        formData.append("resume", form.resume);
-    }
-
     form.post(route("job-application.store"), {
         forceFormData: true,
         preserveScroll: true,

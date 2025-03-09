@@ -10,6 +10,7 @@ class ApplicationStatusHistory extends Model
     use HasFactory;
 
     protected $primaryKey = 'history_id';
+    protected $table = 'application_status_history'; // Add this line to specify the table name
 
     protected $fillable = [
         'application_id',

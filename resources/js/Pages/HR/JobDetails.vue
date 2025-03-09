@@ -1,5 +1,5 @@
 <template>
-    <ApplicantLayout>
+    <HRLayout>
         <Head :title="job.title" />
         <template #header>
             <Header :title="job.title" />
@@ -17,7 +17,7 @@
                         href="#"
                         class="text-blue-600 hover:underline"
                         @click.prevent="goBack"
-                        >Job Application</a
+                        >Job Listings</a
                     >
                 </li>
                 <li><span class="mx-2">/</span></li>
@@ -78,14 +78,14 @@
                 </div>
             </div>
         </div>
-    </ApplicantLayout>
+    </HRLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
+import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import { Head } from "@inertiajs/vue3";
 
@@ -119,7 +119,7 @@ const applyForJob = (jobId) => {
 };
 
 const goBack = () => {
-    router.push({ name: "JobApplication" });
+    router.push({ name: "JobListing" });
 };
 </script>
 
