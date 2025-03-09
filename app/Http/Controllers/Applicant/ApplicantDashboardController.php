@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Inertia\Inertia;
 
-class ApplicantController extends Controller
+class ApplicantDashboardController extends Controller
 {
     /**
      * Display a listing of the resource.

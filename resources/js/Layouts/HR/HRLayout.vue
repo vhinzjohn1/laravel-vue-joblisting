@@ -134,7 +134,7 @@ const handleLogout = () => {
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
-                                >Job List</span
+                                >Job Listings</span
                             >
                         </Link>
                     </li>

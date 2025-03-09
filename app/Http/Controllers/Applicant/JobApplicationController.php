@@ -31,7 +31,7 @@ class JobApplicationController extends Controller
         ])->get();
 
 
-        return Inertia::render('Applicant/JobApplication', [
+        return Inertia::render('Applicant/ViewJobs/ViewJobListings', [
             'jobListings' => $jobListings
         ]);
     }
@@ -99,7 +99,7 @@ class JobApplicationController extends Controller
             'applications'
         ])->findOrFail($id);
 
-        return Inertia::render('Applicant/JobDetails', [
+        return Inertia::render('Applicant/ViewJobs/JobDetails', [
             'job' => $job
         ]);
     }

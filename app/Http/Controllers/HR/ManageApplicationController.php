@@ -8,7 +8,7 @@ use App\Models\ApplicationStatusHistory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ApplicationsController extends Controller
+class ManageApplicationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class ApplicationsController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return Inertia::render('HR/Applications', [
+        return Inertia::render('HR/ManageApplication/ManageApplications', [
             'applications' => $applications,
             'statuses' => [
                 'Pending',
@@ -60,7 +60,7 @@ class ApplicationsController extends Controller
         ])
             ->findOrFail($id);
 
-        return Inertia::render('HR/ApplicationDetails', [
+        return Inertia::render('HR/ManageApplication/ApplicationDetails', [
             'application' => $application,
             'statuses' => [
                 'Pending',

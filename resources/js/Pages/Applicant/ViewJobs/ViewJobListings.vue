@@ -1,9 +1,9 @@
 <template>
-    <Head title="Job Application" />
+    <Head title="View Job Listings" />
 
     <ApplicantLayout>
         <template #header>
-            <Header title="Job Application" />
+            <Header title="View Job Listings" />
         </template>
 
         <div class="py-5">

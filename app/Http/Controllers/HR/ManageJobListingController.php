@@ -12,7 +12,7 @@ use App\Models\Position;
 use App\Models\Category;
 use App\Models\SalaryGrade;
 
-class JobListingController extends Controller
+class ManageJobListingController extends Controller
 {
     public function index()
     {
@@ -30,7 +30,7 @@ class JobListingController extends Controller
         $categories = Category::all();
         $salaryGrades = SalaryGrade::all();
 
-        return Inertia::render('HR/JobListing', [
+        return Inertia::render('HR/ManageJobListing/JobListing', [
             'jobListings' => $jobListings,
             'positions' => $positions,
             'categories' => $categories,

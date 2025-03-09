@@ -26,7 +26,7 @@ class MyApplicationsController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return Inertia::render('Applicant/MyApplications', [
+        return Inertia::render('Applicant/MyApplications/MyApplications', [
             'applications' => $applications
         ]);
     }
@@ -50,7 +50,7 @@ class MyApplicationsController extends Controller
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
-        return Inertia::render('Applicant/ApplicationDetails', [
+        return Inertia::render('Applicant/MyApplications/MyApplicationDetails', [
             'application' => $application
         ]);
     }
