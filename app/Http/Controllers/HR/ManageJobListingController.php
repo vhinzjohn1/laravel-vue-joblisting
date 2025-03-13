@@ -83,7 +83,7 @@ class ManageJobListingController extends Controller
         return response()->json($jobListing);
     }
 
-    public function update(Request $request, JobListing $jobListing)
+    public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'position_id' => 'required|exists:positions,position_id',
@@ -92,11 +92,14 @@ class ManageJobListingController extends Controller
             'closing_date' => 'required|date|after_or_equal:today',
             'status' => 'required|string|in:Active,Draft,Closed',
             'applicant_limit' => 'required|integer|min:1',
+            'category_id' => 'nullable|exists:categories,category_id',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        $jobListing = JobListing::findOrFail($id);
 
         $jobListing->update([
             'position_id' => $request->position_id,
@@ -105,7 +108,11 @@ class ManageJobListingController extends Controller
             'closing_date' => $request->closing_date,
             'status' => $request->status,
             'applicant_limit' => $request->applicant_limit,
+            'category_id' => $request->category_id,
         ]);
+
+        // Load the relationships that might be needed in the frontend
+        $jobListing->load(['position.salaryGrade', 'category']);
 
         return response()->json($jobListing);
     }

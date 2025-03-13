@@ -10,7 +10,7 @@
             <div class="container-fluid px-4">
                 <Breadcrumbs
                     :items="[
-                        { name: 'Dashboard', href: route('hr.index') },
+                        { name: 'Home', href: route('applications.index') },
                         {
                             name: 'Manage Applications',
                             href: route('applications.index'),
@@ -56,25 +56,7 @@
                             </h1>
                             <span
                                 class="px-3 py-1 text-sm font-semibold rounded-full"
-                                :class="{
-                                    'bg-yellow-100 text-yellow-800':
-                                        application.status === 'Pending',
-                                    'bg-green-100 text-green-800':
-                                        application.status === 'Approved',
-                                    'bg-red-100 text-red-800':
-                                        application.status === 'Rejected',
-                                    'bg-blue-100 text-blue-800':
-                                        application.status === 'Shortlisted',
-                                    'bg-purple-100 text-purple-800':
-                                        application.status === 'Interview',
-                                    'bg-gray-100 text-gray-800': ![
-                                        'Pending',
-                                        'Approved',
-                                        'Rejected',
-                                        'Shortlisted',
-                                        'Interview',
-                                    ].includes(application.status),
-                                }"
+                                :class="getStatusColor(application.status)"
                             >
                                 {{ application.status }}
                             </span>
@@ -339,7 +321,16 @@
                                                 >Current Status</label
                                             >
                                             <p class="mt-1">
-                                                {{ application.status }}
+                                                <span
+                                                    class="px-3 py-1 text-sm font-semibold rounded-full inline-block"
+                                                    :class="
+                                                        getStatusColor(
+                                                            application.status,
+                                                        )
+                                                    "
+                                                >
+                                                    {{ application.status }}
+                                                </span>
                                             </p>
                                         </div>
                                     </div>
@@ -505,6 +496,20 @@ const props = defineProps({
     },
 });
 
+// Centralized status colors for consistent styling
+const statusColors = {
+    Pending: "bg-yellow-100 text-yellow-800",
+    Approved: "bg-green-100 text-green-800",
+    Rejected: "bg-red-100 text-red-800",
+    Shortlisted: "bg-blue-100 text-blue-800",
+    Interview: "bg-purple-100 text-purple-800",
+    default: "bg-gray-100 text-gray-800",
+};
+
+const getStatusColor = (status) => {
+    return statusColors[status] || statusColors.default;
+};
+
 const form = useForm({
     status: props.application.status,
     remarks: "",
@@ -532,7 +537,9 @@ const closeDocumentModal = () => {
 };
 
 const updateStatus = () => {
-    form.put(route("applications.update", props.application.application_id));
+    form.put(route("applications.update", props.application.application_id), {
+        preserveScroll: true,
+    });
 };
 
 const formatDate = (dateString) => {

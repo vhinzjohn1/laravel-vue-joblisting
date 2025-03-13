@@ -82,44 +82,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref } from "vue";
 import axios from "axios";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, usePage, router } from "@inertiajs/vue3";
 
-const route = useRoute();
-const router = useRouter();
-const job = ref({});
-
-onMounted(() => {
-    const jobId = route.params.id;
-    axios
-        .get(`job-listing/${jobId}`)
-        .then((response) => {
-            job.value = response.data;
-        })
-        .catch((error) => {
-            console.error("Error fetching job details:", error.response.data);
-        });
-});
+const page = usePage();
+const job = ref(page.props.job);
 
 const applyForJob = (jobId) => {
-    axios
-        .post(`job-application/${jobId}`)
-        .then((response) => {
-            console.log("Application successful:", response.data);
+    router.post(`job-application/${jobId}`, {}, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {
             // Handle successful application (e.g., show a success message)
-        })
-        .catch((error) => {
-            console.error("Error applying for job:", error.response.data);
+        },
+        onError: (errors) => {
+            console.error("Error applying for job:", errors);
             // Handle error (e.g., show an error message)
-        });
+        },
+    });
 };
 
 const goBack = () => {
-    router.push({ name: "JobListing" });
+    router.get(route('job-listing.index'));
 };
 </script>
 

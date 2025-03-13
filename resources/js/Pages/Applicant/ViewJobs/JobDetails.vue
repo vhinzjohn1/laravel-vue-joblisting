@@ -11,7 +11,7 @@
                 <!-- Add Breadcrumbs here -->
                 <Breadcrumbs
                     :items="[
-                        { name: 'Home', href: route('applicant.index') },
+                        { name: 'Home', href: route('job-application.index') },
                         {
                             name: 'Job Listings',
                             href: route('job-application.index'),

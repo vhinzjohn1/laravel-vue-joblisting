@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['admin'])->group(function () {
     Route::resource('admin', AdminController::class);
+    Route::resource('test', TestController::class);
 });
 
 Route::middleware(['hr'])->group(function () {
@@ -68,7 +69,14 @@ Route::middleware(['applicant'])->group(function () {
     Route::resource('my-applications', MyApplicationsController::class);
 });
 
-Route::resource('test', TestController::class);
+
 Route::resource('position', PositionController::class);
+
+Route::get('/php-info', function () {
+    return [
+        'upload_max_filesize' => ini_get('upload_max_filesize'),
+        'post_max_size'      => ini_get('post_max_size'),
+    ];
+});
 
 require __DIR__ . '/auth.php';

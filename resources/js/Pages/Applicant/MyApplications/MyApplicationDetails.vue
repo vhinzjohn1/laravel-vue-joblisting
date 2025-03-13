@@ -10,7 +10,7 @@
             <div class="container-fluid px-4">
                 <Breadcrumbs
                     :items="[
-                        { name: 'Home', href: route('applicant.index') },
+                         { name: 'Home', href: route('my-applications.index') },
                         {
                             name: 'My Applications',
                             href: route('my-applications.index'),

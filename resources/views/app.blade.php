@@ -7,13 +7,11 @@
     <title inertia>{{ config('app.name') }}</title>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
 
-    <!-- Bootstrap CSS (required by AdminLTE) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-    <!-- AdminLTE CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- CSS Resources -->
+    <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aos.css') }}">
 
     @routes
     @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
@@ -24,11 +22,15 @@
     @inertia
 
     <!-- jQuery -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
     <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE JS -->
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="{{ asset('js/adminlte.min.js') }}"></script>
+    <script src="{{ asset('js/aos.js') }}"></script>
+    <script>
+        AOS.init();
+    </script>
 </body>
 
 </html>
