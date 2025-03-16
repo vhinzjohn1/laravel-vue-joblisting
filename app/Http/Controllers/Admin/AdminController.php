@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 
 use App\Models\User;
@@ -15,17 +16,14 @@ class AdminController extends Controller
     public function index()
     {
         // Get all Users with their roles
-        $users = User::all();
+        $users = User::select('user_id', 'username', 'email', 'role_name')->get();
         return Inertia::render('Admin/AdminDashboard', ['users' => $users]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -88,7 +86,7 @@ class AdminController extends Controller
             // Update the user
             $user->update($data);
 
-            $users = User::all();
+            $users = User::select('user_id', 'username', 'email', 'role_name')->get();
 
             return response()->json($users, 200);
         } catch (\Exception $e) {

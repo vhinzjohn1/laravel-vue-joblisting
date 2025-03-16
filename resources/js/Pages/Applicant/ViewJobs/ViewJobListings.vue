@@ -122,7 +122,7 @@
                                                 <li v-for="(req, idx) in job.minimum_requirements.slice(0, 2)" :key="idx"
                                                     class="flex items-center">
                                                     <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                                    {{ req.requirement }}
+                                                    {{ req.title }}
                                                 </li>
                                                 <li v-if="job.minimum_requirements.length > 2"
                                                     class="text-blue-600 italic">

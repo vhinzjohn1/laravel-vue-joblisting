@@ -22,7 +22,7 @@ const handleLogout = () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 shadow-md">
         <!-- Mobile hamburger -->
         <div class="lg:hidden">
             <button
@@ -42,17 +42,17 @@ const handleLogout = () => {
                 'w-64': sidebarOpen,
                 'w-20': !sidebarOpen,
             }"
-            class="fixed left-0 top-0 z-40 h-full bg-white shadow-sm transition-all duration-300 ease-in-out lg:translate-x-0"
+            class="fixed left-0 top-0 z-40 h-full sidebar shadow-sm transition-all duration-300 ease-in-out lg:translate-x-0"
         >
             <!-- Sidebar Header -->
             <div class="flex h-16 items-center border-b px-6 mt-2.5">
                 <Link :href="route('hr.index')" class="flex items-center">
                     <ApplicationLogo
-                        class="block h-8 w-auto fill-current text-gray-800"
+                        class="block h-8 w-auto fill-current text-white"
                     />
                     <span
                         v-if="sidebarOpen"
-                        class="ml-3 text-lg font-semibold text-gray-800"
+                        class="ml-3 text-lg font-semibold text-white"
                         >HR Personnel</span
                     >
                 </Link>
@@ -69,7 +69,9 @@ const handleLogout = () => {
                                 'bg-gray-100': route().current('hr.index'),
                             }"
                         >
-                            <i class="fas fa-tachometer-alt w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-tachometer-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
@@ -87,7 +89,9 @@ const handleLogout = () => {
                                     route().current('job-listing.index'),
                             }"
                         >
-                            <i class="fas fa-list-ul w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-list-ul w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
@@ -106,11 +110,34 @@ const handleLogout = () => {
                                     route().current('applications.show'),
                             }"
                         >
-                            <i class="fas fa-file-alt w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-file-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
                                 >Manage Applications</span
+                            >
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link
+                            :href="route('schedules.index')"
+                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            :class="{
+                                'bg-gray-100':
+                                    route().current('schedules.index') ||
+                                    route().current('schedules.show'),
+                            }"
+                        >
+                            <i
+                                class="fas fa-calendar-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                            ></i>
+                            <span
+                                v-if="sidebarOpen"
+                                class="ms-3 text-sm font-medium"
+                                >Schedule Management</span
                             >
                         </Link>
                     </li>
@@ -123,7 +150,9 @@ const handleLogout = () => {
                                 'bg-gray-100': route().current('profile.edit'),
                             }"
                         >
-                            <i class="fas fa-user w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-user w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
@@ -133,9 +162,8 @@ const handleLogout = () => {
                     </li>
                 </ul>
             </nav>
-
             <!-- User Menu -->
-            <div class="absolute bottom-0 w-full border-t bg-white p-2">
+            <div class="absolute bottom-0 w-90 border-t p-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -153,17 +181,17 @@ const handleLogout = () => {
                             </span>
                         </div>
                         <div v-if="sidebarOpen" class="ml-3">
-                            <p class="text-md font-medium text-gray-900">
+                            <p class="text-md font-medium text-white">
                                 {{ $page.props.auth.user.name }}
                             </p>
-                            <p class="text-sm text-gray-900">
+                            <p class="text-sm text-white">
                                 {{ $page.props.auth.user.email }}
                             </p>
                         </div>
                     </div>
                     <button
                         @click="showLogoutModal = true"
-                        class="rounded-lg p-1.5 text-gray-800 transition-colors duration-200 hover:bg-gray-100 hover:text-black"
+                        class="rounded-lg p-1.5 text-white hover:bg-[#ffc001] hover:text-black transition-colors duration-200"
                     >
                         <i class="fas fa-sign-out-alt h-5 w-5"></i>
                     </button>
@@ -211,7 +239,7 @@ const handleLogout = () => {
                 <div class="flex flex-col space-y-2">
                     <button
                         @click="handleLogout"
-                        class="w-full rounded-lg bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        class="w-full rounded-lg logout px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-gray-300"
                     >
                         Log out
                     </button>
@@ -255,9 +283,26 @@ const handleLogout = () => {
     transition-property: all;
 }
 
-/* Add smooth transition for navigation items */
-.router-link-active {
-    @apply bg-indigo-50 text-indigo-600;
+/* New styles for sidebar */
+.sidebar {
+    background-color: #012f12; /* Dark Green */
+}
+
+.sidebar a {
+    color: #ffffff; /* White text for links */
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.bg-gray-100 {
+    background-color: #ffc001;
+    color: black !important; /* Green text on hover */
+}
+.logout {
+    background-color: #012f12;
+}
+
+.sidebar nav a:hover i {
+    color: black !important;
 }
 
 /* Add modal animation */

@@ -22,7 +22,7 @@ const handleLogout = () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 shadow-md">
         <!-- Mobile hamburger -->
         <div class="lg:hidden">
             <button
@@ -42,17 +42,20 @@ const handleLogout = () => {
                 'w-64': sidebarOpen,
                 'w-20': !sidebarOpen,
             }"
-            class="fixed left-0 top-0 z-40 h-full bg-white shadow-sm transition-all duration-300 ease-in-out lg:translate-x-0"
+            class="fixed left-0 top-0 z-40 h-full sidebar shadow-sm transition-all duration-300 ease-in-out lg:translate-x-0"
         >
             <!-- Sidebar Header -->
             <div class="flex h-16 items-center border-b px-6 mt-2.5">
-                <Link :href="route('dashboard')" class="flex items-center">
+                <Link
+                    :href="route('applicant.index')"
+                    class="flex items-center"
+                >
                     <ApplicationLogo
-                        class="block h-8 w-auto fill-current text-gray-800"
+                        class="block h-8 w-auto fill-current text-white"
                     />
                     <span
                         v-if="sidebarOpen"
-                        class="ml-3 text-lg font-semibold text-gray-800"
+                        class="ml-3 text-lg font-semibold text-white"
                         >Applicant</span
                     >
                 </Link>
@@ -70,7 +73,15 @@ const handleLogout = () => {
                                     route().current('applicant.index'),
                             }"
                         >
-                            <i class="fas fa-tachometer-alt w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-tachometer-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                                :class="{
+                                    'text-black':
+                                        route().current('applicant.index'),
+                                    'text-white':
+                                        !route().current('applicant.index'),
+                                }"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
@@ -88,11 +99,21 @@ const handleLogout = () => {
                                 ),
                             }"
                         >
-                            <i class="fas fa-briefcase w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-briefcase w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                                :class="{
+                                    'text-black': route().current(
+                                        'job-application.index',
+                                    ),
+                                    'text-white': !route().current(
+                                        'job-application.index',
+                                    ),
+                                }"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
-                                >View Jobs</span
+                                >View Job Listings</span
                             >
                         </Link>
                     </li>
@@ -106,7 +127,17 @@ const handleLogout = () => {
                                 ),
                             }"
                         >
-                            <i class="fas fa-file-alt w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-file-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                                :class="{
+                                    'text-black': route().current(
+                                        'my-applications.index',
+                                    ),
+                                    'text-white': !route().current(
+                                        'my-applications.index',
+                                    ),
+                                }"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
@@ -123,7 +154,15 @@ const handleLogout = () => {
                                 'bg-gray-100': route().current('profile.edit'),
                             }"
                         >
-                            <i class="fas fa-user w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <i
+                                class="fas fa-user w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                                :class="{
+                                    'text-black':
+                                        route().current('profile.edit'),
+                                    'text-white':
+                                        !route().current('profile.edit'),
+                                }"
+                            ></i>
                             <span
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
@@ -135,7 +174,7 @@ const handleLogout = () => {
             </nav>
 
             <!-- User Menu -->
-            <div class="absolute bottom-0 w-full border-t bg-white p-4">
+            <div class="absolute bottom-0 w-90 border-t p-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -153,17 +192,17 @@ const handleLogout = () => {
                             </span>
                         </div>
                         <div v-if="sidebarOpen" class="ml-3">
-                            <p class="text-md font-medium text-gray-900">
+                            <p class="text-md font-medium text-white">
                                 {{ $page.props.auth.user.name }}
                             </p>
-                            <p class="text-sm text-gray-900">
+                            <p class="text-sm text-white">
                                 {{ $page.props.auth.user.email }}
                             </p>
                         </div>
                     </div>
                     <button
                         @click="showLogoutModal = true"
-                        class="rounded-lg p-1.5 text-gray-800 transition-colors duration-200 hover:bg-gray-100 hover:text-black"
+                        class="rounded-lg p-1.5 text-white hover:bg-[#ffc001] hover:text-black transition-colors duration-200"
                     >
                         <i class="fas fa-sign-out-alt h-5 w-5"></i>
                     </button>
@@ -180,7 +219,8 @@ const handleLogout = () => {
                 'left-20': !sidebarOpen,
             }"
         >
-            <i class="fas fa-bars h-5 w-5"></i>
+            <i class="fas fa-bars h-5 w-5" v-if="sidebarOpen"></i>
+            <i class="fas fa-chevron-right h-5 w-5" v-else></i>
         </button>
 
         <!-- Mobile Overlay -->
@@ -210,7 +250,7 @@ const handleLogout = () => {
                 <div class="flex flex-col space-y-2">
                     <button
                         @click="handleLogout"
-                        class="w-full rounded-lg bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        class="w-full rounded-lg logout px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-gray-300"
                     >
                         Log out
                     </button>
@@ -224,6 +264,13 @@ const handleLogout = () => {
             </div>
         </div>
 
+        <!-- Header -->
+        <header class="bg-white shadow" v-if="$slots.header">
+            <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
+                <slot name="header" />
+            </div>
+        </header>
+
         <!-- Main Content -->
         <div
             :class="{
@@ -232,13 +279,6 @@ const handleLogout = () => {
             }"
             class="transition-all duration-300 ease-in-out"
         >
-            <!-- Page Heading -->
-            <header class="bg-white shadow" v-if="$slots.header">
-                <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
-                    <slot name="header" />
-                </div>
-            </header>
-
             <!-- Page Content -->
             <main class="py-1">
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -252,6 +292,27 @@ const handleLogout = () => {
 <style scoped>
 .transition-all {
     transition-property: all;
+}
+
+/* New styles for sidebar */
+.sidebar {
+    background-color: #012f12; /* Dark Green */
+}
+
+.sidebar a {
+    color: #ffffff; /* White text for links */
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.bg-gray-100 {
+    background-color: #ffc001;
+    color: black !important; /* Green text on hover */
+}
+.sidebar nav a:hover i {
+    color: black !important;
+}
+.logout {
+    background-color: #012f12;
 }
 
 /* Add modal animation */

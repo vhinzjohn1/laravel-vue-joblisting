@@ -55,7 +55,6 @@ class ProfileController extends Controller
                 'lastname' => $request->lastname,
                 'middle_initial' => $request->middle_initial,
                 'phone_number' => $request->phone_number,
-                'education_attainment' => $request->education_attainment,
                 'eligibility' => $request->eligibility,
             ]
         );

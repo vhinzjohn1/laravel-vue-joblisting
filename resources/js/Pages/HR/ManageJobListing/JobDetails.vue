@@ -1,121 +1,74 @@
 <template>
-    <HRLayout>
-        <Head :title="job.title" />
-        <template #header>
-            <Header :title="job.title" />
-        </template>
-
-        <!-- Breadcrumbs -->
-        <nav class="bg-white py-3 px-4 mb-4 rounded-lg shadow-sm">
-            <ol class="list-reset flex text-gray-700">
-                <li>
-                    <a href="#" class="text-blue-600 hover:underline">Home</a>
-                </li>
-                <li><span class="mx-2">/</span></li>
-                <li>
-                    <a
-                        href="#"
-                        class="text-blue-600 hover:underline"
-                        @click.prevent="goBack"
-                        >Job Listings</a
-                    >
-                </li>
-                <li><span class="mx-2">/</span></li>
-                <li>{{ job.title }}</li>
-            </ol>
-        </nav>
-
-        <div class="py-5">
-            <div class="container-fluid px-4">
-                <div
-                    class="card shadow-sm rounded-lg overflow-hidden bg-white mb-6"
-                >
-                    <div class="card-body p-4">
-                        <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-                            {{ job.title }}
-                        </h2>
-                        <div class="text-gray-500 text-sm mb-4">
-                            <span>{{ job.position.position_name }}</span>
-                            <span class="mx-1">•</span>
-                            <span class="inline-flex items-center">
-                                <span
-                                    class="inline-block w-2 h-2 rounded-full mr-1"
-                                    :class="{
-                                        'bg-green-500': job.status === 'Active',
-                                        'bg-yellow-500': job.status === 'Draft',
-                                        'bg-red-500': job.status === 'Closed',
-                                    }"
-                                ></span>
-                                {{ job.status }}
-                            </span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span
-                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                            >
-                                ${{
-                                    job.position.salary_grade.amount.toLocaleString()
-                                }}
-                            </span>
-                            <span
-                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                            >
-                                {{
-                                    job.position.salary_grade.years_experience
-                                }}+ years experience
-                            </span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">
-                            {{ job.description }}
-                        </p>
-                        <button
-                            class="btn text-sm py-1.5 px-3 border border-blue-300 text-blue-600 rounded hover:bg-blue-50 transition-colors"
-                            @click="applyForJob(job.job_listing_id)"
-                        >
-                            <i class="far fa-paper-plane mr-1"></i> Apply
-                        </button>
+    <div class="applicant-details" v-if="selectedApplicant">
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold mb-4">Educational Background</h3>
+            <div v-for="edu in selectedApplicant.educational_backgrounds" :key="edu.education_id" class="mb-4 p-4 border rounded">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="font-medium">Level:</span> {{ edu.level }}
+                    </div>
+                    <div>
+                        <span class="font-medium">School:</span> {{ edu.school_name }}
+                    </div>
+                    <div>
+                        <span class="font-medium">Course:</span> {{ edu.degree_course }}
+                    </div>
+                    <div>
+                        <span class="font-medium">Graduated:</span> {{ edu.year_graduated }}
                     </div>
                 </div>
             </div>
         </div>
-    </HRLayout>
+
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold mb-4">Training & Certifications</h3>
+            <div v-for="training in selectedApplicant.trainings" :key="training.training_id" class="mb-4 p-4 border rounded">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="font-medium">Title:</span> {{ training.title }}
+                    </div>
+                    <div>
+                        <span class="font-medium">Institution:</span> {{ training.institution }}
+                    </div>
+                    <div>
+                        <span class="font-medium">Duration:</span> {{ training.duration_hours }} hours
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold mb-4">Work Experience</h3>
+            <div v-for="exp in selectedApplicant.work_experiences" :key="exp.experience_id" class="mb-4 p-4 border rounded">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="font-medium">Position:</span> {{ exp.position }}
+                    </div>
+                    <div>
+                        <span class="font-medium">Company:</span> {{ exp.company_name }}
+                    </div>
+                    <div>
+                        <span class="font-medium">Duration:</span>
+                        {{ formatDate(exp.start_date) }} - {{ exp.is_current_job ? 'Present' : formatDate(exp.end_date) }}
+                    </div>
+                    <div class="col-span-2">
+                        <span class="font-medium">Responsibilities:</span>
+                        <p class="mt-1">{{ exp.responsibilities }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import axios from "axios";
-import HRLayout from "@/Layouts/HR/HRLayout.vue";
-import Header from "@/Components/Header/Header.vue";
-import { Head, usePage, router } from "@inertiajs/vue3";
+import { ref } from 'vue';
 
-const page = usePage();
-const job = ref(page.props.job);
-
-const applyForJob = (jobId) => {
-    router.post(`job-application/${jobId}`, {}, {
-        preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {
-            // Handle successful application (e.g., show a success message)
-        },
-        onError: (errors) => {
-            console.error("Error applying for job:", errors);
-            // Handle error (e.g., show an error message)
-        },
+const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
     });
 };
-
-const goBack = () => {
-    router.get(route('job-listing.index'));
-};
 </script>
-
-<style>
-/* Adding utility classes */
-.line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-</style>

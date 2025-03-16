@@ -1,215 +1,429 @@
 <template>
-    <div class="modal fade" :id="modalId" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Apply for {{ job.title }}</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
+    <Modal :show="isOpen" @close="closeModal" :max-width="'7xl'">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h5 class="text-xl font-semibold text-gray-800">
+                    {{ job.title }}
+                </h5>
+                <button
+                    type="button"
+                    @click="closeModal"
+                    class="text-gray-500 hover:text-gray-700"
+                >
+                    <svg
+                        class="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+            <form @submit.prevent="submitApplication">
+                <!-- Education Section -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h6 class="text-lg font-semibold">
+                            Educational Background
+                        </h6>
+                        <div class="flex space-x-4">
+                            <CustomSelect
+                                class="w-64"
+                                placeholder="Select from existing education"
+                                :options="educationOptions"
+                                :displayFormat="
+                                    (option) =>
+                                        `${option.degree_course} - ${option.school_name}`
+                                "
+                                valueKey="education_id"
+                                @select="onEducationSelect"
+                            />
+                            <button
+                                type="button"
+                                @click="addEducation"
+                                class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                            >
+                                Add New
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Education form fields here -->
                 </div>
-                <div class="modal-body">
-                    <form @submit.prevent="submitApplication" class="space-y-6">
-                        <!-- Personal Information (Read-only) -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700"
-                                    >Name</label
-                                >
-                                <p class="mt-1 p-2 bg-gray-50 rounded">
-                                    {{ userDetails?.firstname }}
-                                    {{ userDetails?.middle_initial }}.
-                                    {{ userDetails?.lastname }}
-                                </p>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700"
-                                    >Email</label
-                                >
-                                <p class="mt-1 p-2 bg-gray-50 rounded">
-                                    {{ user.email }}
-                                </p>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700"
-                                    >Phone Number</label
-                                >
-                                <p class="mt-1 p-2 bg-gray-50 rounded">
-                                    {{ userDetails?.phone_number }}
-                                </p>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700"
-                                    >Education</label
-                                >
-                                <p class="mt-1 p-2 bg-gray-50 rounded">
-                                    {{ userDetails?.education_attainment }}
-                                </p>
-                            </div>
+
+                <!-- Training Section -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h6 class="text-lg font-semibold">
+                            Training & Certifications
+                        </h6>
+                        <div class="flex space-x-4">
+                            <CustomSelect
+                                class="w-64"
+                                placeholder="Select from existing training"
+                                :options="trainingOptions"
+                                :displayFormat="
+                                    (option) =>
+                                        `${option.title} - ${option.institution}`
+                                "
+                                valueKey="training_id"
+                                @select="onTrainingSelect"
+                            />
+                            <button
+                                type="button"
+                                @click="addTraining"
+                                class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                            >
+                                Add New
+                            </button>
                         </div>
+                    </div>
+                    <!-- Training form fields here -->
+                </div>
 
-                        <!-- Application Specific Information -->
-                        <div class="space-y-4">
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700"
-                                    >Years of Experience</label
-                                >
-                                <input
-                                    type="number"
-                                    v-model="form.years_experience"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    required
-                                    min="0"
-                                />
-                                <div
-                                    v-if="form.errors.years_experience"
-                                    class="text-red-500 text-sm mt-1"
-                                >
-                                    {{ form.errors.years_experience }}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700"
-                                    >Relevant Training</label
-                                >
-                                <textarea
-                                    v-model="form.relevant_training"
-                                    rows="3"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    required
-                                ></textarea>
-                                <div
-                                    v-if="form.errors.relevant_training"
-                                    class="text-red-500 text-sm mt-1"
-                                >
-                                    {{ form.errors.relevant_training }}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700"
-                                    >Resume/CV</label
-                                >
-                                <input
-                                    type="file"
-                                    @change="handleFileUpload"
-                                    class="mt-1 block w-full"
-                                    accept=".pdf,.doc,.docx"
-                                    required
-                                />
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Accepted formats: PDF, DOC, DOCX
-                                </p>
-                                <div
-                                    v-if="form.errors.application_document"
-                                    class="text-red-500 text-sm mt-1"
-                                >
-                                    {{ form.errors.application_document }}
-                                </div>
-                            </div>
+                <!-- Experience Section -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h6 class="text-lg font-semibold">Work Experience</h6>
+                        <div class="flex space-x-4">
+                            <CustomSelect
+                                class="w-64"
+                                placeholder="Select from existing experience"
+                                :options="experienceOptions"
+                                :displayFormat="
+                                    (option) =>
+                                        `${option.position} at ${option.company_name}`
+                                "
+                                valueKey="experience_id"
+                                @select="onExperienceSelect"
+                            />
+                            <button
+                                type="button"
+                                @click="addExperience"
+                                class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                            >
+                                Add New
+                            </button>
                         </div>
+                    </div>
+                    <!-- Experience form fields here -->
+                </div>
 
-                        <!-- Add general error message area -->
-                        <div
-                            v-if="form.errors.error"
-                            class="bg-red-50 border-l-4 border-red-400 p-4"
+                <!-- Application Document -->
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                    <h6 class="text-xl font-semibold text-gray-800 mb-4">
+                        Supporting Documents
+                    </h6>
+                    <div
+                        class="border-2 border-dashed border-gray-300 rounded-lg p-6"
+                    >
+                        <input
+                            type="file"
+                            @change="handleFileUpload"
+                            class="hidden"
+                            id="file-upload"
+                            accept=".pdf,.doc,.docx"
+                        />
+
+                        <!-- Show this when no file is selected -->
+                        <label
+                            v-if="!form.application_document"
+                            for="file-upload"
+                            class="cursor-pointer text-center block"
                         >
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <svg
-                                        class="h-5 w-5 text-red-400"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
+                            <svg
+                                class="mx-auto h-12 w-12 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                />
+                            </svg>
+                            <span
+                                class="mt-2 block text-sm font-medium text-gray-600"
+                            >
+                                Drop your resume here or click to upload
+                            </span>
+                            <span class="mt-1 text-xs text-gray-500">
+                                Supported formats: PDF, DOC, DOCX
+                            </span>
+                        </label>
+
+                        <!-- Show this when a file is selected -->
+                        <div v-else class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <svg
+                                    class="w-8 h-8 text-blue-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
+                                </svg>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-sm font-medium text-gray-900"
                                     >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                            clip-rule="evenodd"
-                                        />
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm text-red-700">
-                                        {{ form.errors.error }}
-                                    </p>
+                                        {{ form.application_document.name }}
+                                    </span>
+                                    <span class="text-xs text-gray-500">
+                                        {{
+                                            formatFileSize(
+                                                form.application_document.size,
+                                            )
+                                        }}
+                                    </span>
                                 </div>
                             </div>
+                            <button
+                                type="button"
+                                @click="removeFile"
+                                class="text-red-500 hover:text-red-700 transition-colors"
+                            >
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
-                <div class="modal-footer">
+
+                <div class="flex justify-end space-x-4">
                     <button
                         type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
+                        @click="closeModal"
+                        class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                     >
-                        Close
+                        Cancel
                     </button>
                     <button
                         type="submit"
-                        class="btn btn-primary"
-                        :disabled="form.processing"
-                        @click="submitApplication"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                     >
-                        <span v-if="form.processing">Submitting...</span>
-                        <span v-else>Submit Application</span>
+                        Submit Application
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
-    </div>
+    </Modal>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { useForm } from "@inertiajs/vue3";
+import Modal from "@/Components/Modal.vue";
+import CustomSelect from "@/Components/CustomSelect.vue";
 
 const props = defineProps({
     job: {
         type: Object,
         required: true,
     },
-    modalId: {
-        type: String,
+    isOpen: {
+        type: Boolean,
         required: true,
+    },
+    existingEducation: {
+        type: Array,
+        default: () => [],
+    },
+    existingTrainings: {
+        type: Array,
+        default: () => [],
+    },
+    existingExperiences: {
+        type: Array,
+        default: () => [],
     },
 });
 
-const user = usePage().props.auth.user;
-const userDetails = usePage().props.auth.userDetails;
-
-console.log("This is the auth detaisl: ", userDetails);
+const emit = defineEmits(["close", "submitted"]);
 
 const form = useForm({
     job_listing_id: props.job.job_listing_id,
-    years_experience: "",
-    relevant_training: "",
+    education: [
+        {
+            education_id: "",
+            level: "",
+            school_name: "",
+            degree_course: "",
+            year_graduated: "",
+        },
+    ],
+    trainings: [
+        { training_id: "", title: "", institution: "", duration_hours: "" },
+    ],
+    experiences: [
+        {
+            experience_id: "",
+            position: "",
+            company_name: "",
+            start_date: "",
+            end_date: "",
+            is_current_job: false,
+            responsibilities: "",
+        },
+    ],
     application_document: null,
 });
 
-const handleFileUpload = (e) => {
-    form.application_document = e.target.files[0];
+// Add methods for handling form sections
+const addEducation = () => {
+    form.education.push({
+        level: "",
+        school_name: "",
+        degree_course: "",
+        year_graduated: "",
+    });
+};
+
+const addTraining = () => {
+    form.trainings.push({
+        title: "",
+        institution: "",
+        duration_hours: "",
+    });
+};
+
+const addExperience = () => {
+    form.experiences.push({
+        position: "",
+        company_name: "",
+        start_date: "",
+        end_date: "",
+        is_current_job: false,
+        responsibilities: "",
+    });
+};
+
+const removeEducation = (index) => {
+    form.education.splice(index, 1);
+};
+
+const removeTraining = (index) => {
+    form.trainings.splice(index, 1);
+};
+
+const removeExperience = (index) => {
+    form.experiences.splice(index, 1);
+};
+
+// Selection handlers
+const onEducationSelect = (selected) => {
+    const lastIndex = form.education.length - 1;
+    form.education[lastIndex] = {
+        education_id: selected.education_id,
+        level: selected.level,
+        school_name: selected.school_name,
+        degree_course: selected.degree_course,
+        year_graduated: selected.year_graduated,
+    };
+};
+
+const onTrainingSelect = (selected) => {
+    const lastIndex = form.trainings.length - 1;
+    form.trainings[lastIndex] = {
+        training_id: selected.training_id,
+        title: selected.title,
+        institution: selected.institution,
+        duration_hours: selected.duration_hours,
+    };
+};
+
+const onExperienceSelect = (selected) => {
+    const lastIndex = form.experiences.length - 1;
+    form.experiences[lastIndex] = {
+        experience_id: selected.experience_id,
+        position: selected.position,
+        company_name: selected.company_name,
+        start_date: selected.start_date,
+        end_date: selected.end_date,
+        is_current_job: selected.is_current_job,
+        responsibilities: selected.responsibilities,
+    };
+};
+
+// Simplified computed properties
+const educationOptions = computed(() => props.existingEducation);
+const trainingOptions = computed(() => props.existingTrainings);
+const experienceOptions = computed(() => props.existingExperiences);
+
+const closeModal = () => {
+    emit("close");
 };
 
 const submitApplication = () => {
     form.post(route("job-application.store"), {
-        forceFormData: true,
-        preserveScroll: true,
-        onSuccess: () => {
-            $(`#${props.modalId}`).modal("hide");
-            form.reset();
+        onSuccess: (response) => {
+            emit("submitted", response);
+            showSuccessAlert("Application Submitted Sucessfully");
         },
         onError: (errors) => {
-            console.log("Validation errors:", errors);
+            console.error("Form submission error: ", errors);
         },
     });
+};
+
+const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        form.application_document = file;
+    }
+};
+
+// Show success alert function
+const showSuccessAlert = (message) => {
+    Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Success!",
+        text: message,
+        iconColor: "#ffffff",
+        showConfirmButton: false,
+        timer: 4000, // Toast will disappear after 4 seconds
+        toast: true, // Enable toast mode
+        customClass: {
+            popup: "bg-green-500 text-white",
+        },
+    });
+};
+
+const formatFileSize = (size) => {
+    if (size === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(size) / Math.log(k));
+    return parseFloat((size / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+};
+
+const removeFile = () => {
+    form.application_document = null;
 };
 </script>

@@ -10,8 +10,7 @@
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <button
                         class="btn btn-success float-right m-3"
-                        data-toggle="modal"
-                        data-target="#addModal"
+                        @click="showAddModal = true"
                     >
                         Add
                     </button>
@@ -26,131 +25,137 @@
             </div>
         </div>
 
-        <Modal modalId="addModal" modalTitle="Add User">
-            <form @submit.prevent="saveChanges">
-                <div class="form-group">
-                    <label for="exampleInputUsername">Username</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="exampleInputUsername"
-                        v-model="form.username"
-                        placeholder="Enter username"
-                        required
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputEmail">Email</label>
-                    <input
-                        type="email"
-                        class="form-control"
-                        id="exampleInputEmail"
-                        v-model="form.email"
-                        placeholder="Enter email"
-                        required
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputPassword">Password</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="exampleInputPassword"
-                        v-model="form.password"
-                        placeholder="Enter password"
-                        required
-                    />
-                </div>
-
-                <div class="form-group">
-                    <label for="exampleInputRole">Role</label>
-                    <select
-                        class="form-control"
-                        id="exampleInputRole"
-                        v-model="form.role_name"
-                        required
-                    >
-                        <option value="admin">Admin</option>
-                        <option value="hr">HR Personnel</option>
-                        <option value="applicant">Applicant</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
-                    >
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        Save changes
-                    </button>
-                </div>
-            </form>
+        <!-- Add User Modal -->
+        <Modal :show="showAddModal" @close="closeAddModal" maxWidth="2xl">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold mb-4">Add User</h2>
+                <form @submit.prevent="saveChanges" class="space-y-4">
+                    <div class="form-group">
+                        <label for="exampleInputUsername">Username</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="exampleInputUsername"
+                            v-model="form.username"
+                            placeholder="Enter username"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail">Email</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="exampleInputEmail"
+                            v-model="form.email"
+                            placeholder="Enter email"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword">Password</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="exampleInputPassword"
+                            v-model="form.password"
+                            placeholder="Enter password"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputRole">Role</label>
+                        <select
+                            class="form-control"
+                            id="exampleInputRole"
+                            v-model="form.role_name"
+                            required
+                        >
+                            <option value="admin">Admin</option>
+                            <option value="hr">HR Personnel</option>
+                            <option value="applicant">Applicant</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            @click="closeAddModal"
+                        >
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
         </Modal>
 
-        <Modal modalId="editModal" modalTitle="Edit User">
-            <!-- Form Submit for Edit User -->
-            <form @submit.prevent="editUser">
-                <div class="form-group">
-                    <label for="editUserName">Username</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="editUserName"
-                        v-model="form.username"
-                        placeholder="Enter username"
-                        required
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="editEmail">Email</label>
-                    <input
-                        type="email"
-                        class="form-control"
-                        id="editEmail"
-                        v-model="form.email"
-                        placeholder="Enter email"
-                        required
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="editPassword">Password</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="editPassword"
-                        v-model="form.password"
-                        placeholder="Enter password"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="editRole">Role</label>
-                    <select
-                        class="form-control"
-                        id="editRole"
-                        v-model="form.role_name"
-                        required
-                    >
-                        <option value="admin">Admin</option>
-                        <option value="hr">HR Personnel</option>
-                        <option value="applicant">Applicant</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                    >
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        Save changes
-                    </button>
-                </div>
-            </form>
+        <!-- Edit User Modal -->
+        <Modal :show="showEditModal" @close="closeEditModal" maxWidth="2xl">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold mb-4">Edit User</h2>
+                <form @submit.prevent="editUser" class="space-y-4">
+                    <div class="form-group">
+                        <label for="editUserName">Username</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editUserName"
+                            v-model="form.username"
+                            placeholder="Enter username"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="editEmail"
+                            v-model="form.email"
+                            placeholder="Enter email"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="editPassword">Password</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="editPassword"
+                            v-model="form.password"
+                            placeholder="Enter password"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="editRole">Role</label>
+                        <select
+                            class="form-control"
+                            id="editRole"
+                            v-model="form.role_name"
+                            required
+                        >
+                            <option value="admin">Admin</option>
+                            <option value="hr">HR Personnel</option>
+                            <option value="applicant">Applicant</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            @click="closeEditModal"
+                        >
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
         </Modal>
     </AdminLayout>
 </template>
@@ -158,16 +163,13 @@
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import DataTable from "@/Components/DataTable.vue";
-import { useForm, usePage, Head } from "@inertiajs/vue3";
-import Modal from "@/Components/Modal/Modal.vue";
+import { useForm, usePage } from "@inertiajs/vue3";
+import Modal from "@/Components/Modal.vue";
 
-// Fethcing Props that was sent by controller
 const data = ref(usePage().props.users);
-
 const form = useForm({
     username: "",
     password: "",
@@ -176,60 +178,99 @@ const form = useForm({
     user_id: "",
 });
 
+const showAddModal = ref(false);
+const showEditModal = ref(false);
+
+const closeAddModal = () => {
+    showAddModal.value = false;
+    form.reset();
+};
+
+const showSuccessAlert = (action) => {
+    let title, text;
+
+    switch (action) {
+        case "add":
+            title = "User Added Successfully!";
+            text = "The user has been added to the system.";
+            break;
+        case "edit":
+            title = "User Updated Successfully!";
+            text = "The user details have been updated.";
+            break;
+        case "delete":
+            title = "User Deleted Successfully!";
+            text = "The user has been removed from the system.";
+            break;
+        default:
+            title = "Action Completed!";
+            text = "The operation was successful.";
+    }
+
+    // Using SweetAlert2 toast with custom styling
+    Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: title,
+        text: text,
+        iconColor: '#ffffff',
+        showConfirmButton: false,
+        timer: 3000, // Toast will disappear after 3 seconds
+        toast: true, // Enable toast mode
+        customClass: {
+            popup: 'bg-green-500 text-white', 
+        },
+    });
+};
+
 const showEdit = (item) => {
-    // Set the form values
     form.username = item.username;
     form.email = item.email;
     form.password = item.password;
     form.role_name = item.role_name;
     form.user_id = item.user_id;
-    // Set modal to show edit form
-    $("#editModal").modal("show");
+    showEditModal.value = true;
 };
 
-const editUser = () => {
-    axios
-        .put(`admin/${form.user_id}`, form)
-        .then((response) => {
-            console.log(response);
-            // Add the new item to the data array
-            data.value = response.data;
-            // Reset form
-            form.reset();
-            // Close modal (assuming you're using bootstrap)
-            $("#editModal").modal("hide");
-        })
-        .catch((error) => {
-            console.error("Error saving item:", error);
-        });
-};
-const deleteItem = (item) => {
-    axios
-        .delete(`admin/${item.user_id}`)
-        .then((response) => {
-            console.log(response.data);
-            // Update the local state by removing the item
-            data.value = data.value.filter((i) => i.user_id !== item.user_id);
-        })
-        .catch((error) => {
-            console.error("Error deleting item:", error);
-        });
+const closeEditModal = () => {
+    showEditModal.value = false;
+    form.reset();
 };
 
 const saveChanges = () => {
-    axios
-        .post("admin", form)
-        .then((response) => {
-            console.log(response);
-            // Add the new item to the data array
-            data.value = response.data;
-            // Reset form
-            form.reset();
-            // Close modal (assuming you're using bootstrap)
-            $("#addModal").modal("hide");
-        })
-        .catch((error) => {
-            console.error("Error saving item:", error);
-        });
+    axios.post("admin", form).then((response) => {
+        data.value = response.data;
+        closeAddModal();
+        showSuccessAlert("add");
+    });
+};
+
+const editUser = () => {
+    axios.put(`admin/${form.user_id}`, form).then((response) => {
+        data.value = response.data;
+        closeEditModal();
+        showSuccessAlert("edit");
+    });
+};
+
+const deleteItem = (item) => {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(`admin/${item.user_id}`).then(() => {
+                data.value = data.value.filter(
+                    (user) => user.user_id !== item.user_id,
+                );
+                showSuccessAlert("delete");
+            });
+        }
+    });
 };
 </script>

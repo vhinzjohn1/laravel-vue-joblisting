@@ -28,6 +28,8 @@
     <!-- AdminLTE JS -->
     <script src="{{ asset('js/adminlte.min.js') }}"></script>
     <script src="{{ asset('js/aos.js') }}"></script>
+    <script src="{{ asset('js/sweetalert2.js') }}"></script>
+
     <script>
         AOS.init();
     </script>

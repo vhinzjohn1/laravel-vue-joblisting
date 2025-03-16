@@ -1,14 +1,13 @@
 <template>
-    <Head :title="job.title" />
-
     <ApplicantLayout>
+        <Head :title="job.title" />
         <template #header>
             <Header :title="job.title" />
         </template>
 
         <div class="py-5">
             <div class="container-fluid px-4">
-                <!-- Add Breadcrumbs here -->
+                <!-- Breadcrumbs -->
                 <Breadcrumbs
                     :items="[
                         { name: 'Home', href: route('job-application.index') },
@@ -27,18 +26,48 @@
                     ]"
                 />
 
-                <div class="card shadow-sm rounded-lg overflow-hidden bg-white">
-                    <!-- Back Button -->
-                    <div class="p-4 border-b">
-                        <button
-                            @click="
-                                $inertia.get(route('job-application.index'))
-                            "
-                            class="flex items-center text-gray-600 hover:text-gray-900"
-                        >
-                            <i class="fas fa-arrow-left mr-2"></i>
-                            Back to Listings
-                        </button>
+                <!-- Success Message -->
+                <div
+                    v-if="$page.props.flash && $page.props.flash.success"
+                    class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+                >
+                    <span class="block sm:inline">{{
+                        $page.props.flash.success
+                    }}</span>
+                </div>
+
+                <!-- Job Details -->
+                <div
+                    class="card shadow-sm rounded-lg overflow-hidden bg-white mb-6 flex flex-col"
+                >
+                    <!-- Back Button and Application Status -->
+                    <div class="p-4 border-b flex items-center">
+                        <div class="flex items-center">
+                            <button
+                                @click="
+                                    $inertia.get(route('job-application.index'))
+                                "
+                                class="flex items-center text-gray-600 hover:text-gray-900"
+                            >
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Listings
+                            </button>
+                        </div>
+                        <div v-if="hasApplied" class="flex-1 ml-4 text-center">
+                            <div
+                                class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-center"
+                            >
+                                <i
+                                    class="fas fa-info-circle text-green-500 mr-2"
+                                ></i>
+                                <h6 class="font-semibold text-green-900 mr-2">
+                                    Application Status
+                                </h6>
+                                <p class="text-green-800">
+                                    You have already applied for this position.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="p-6">
@@ -180,40 +209,79 @@
 
                                 <!-- Apply Button -->
                                 <button
-                                    @click="showApplicationModal"
-                                    class="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                                    @click="openApplicationModal"
+                                    :disabled="hasApplied"
+                                    :class="[
+                                        'w-full py-3 px-4 rounded-lg transition-colors flex items-center justify-center',
+                                        hasApplied
+                                            ? 'bg-gray-400 cursor-not-allowed'
+                                            : 'bg-blue-600 hover:bg-blue-700 text-white',
+                                    ]"
                                 >
                                     <i class="far fa-paper-plane mr-2"></i>
-                                    Apply Now
+                                    {{
+                                        hasApplied
+                                            ? "Already Applied"
+                                            : "Apply Now"
+                                    }}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Application Form Modal -->
+                <ApplicationForm
+                    v-if="!hasApplied"
+                    :job="job"
+                    :is-open="showApplicationModal"
+                    :existing-education="page.props.userData?.education || []"
+                    :existing-trainings="page.props.userData?.trainings || []"
+                    :existing-experiences="
+                        page.props.userData?.experiences || []
+                    "
+                    @close="closeApplicationModal"
+                    @submitted="handleApplicationSubmitted"
+                />
             </div>
         </div>
-
-        <!-- Application Form Modal -->
-        <ApplicationForm :job="job" modalId="applicationModal" />
     </ApplicantLayout>
 </template>
 
 <script setup>
-import { Head } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { Head, usePage } from "@inertiajs/vue3";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
 import Header from "@/Components/Header/Header.vue";
-import axios from "axios";
 import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 import ApplicationForm from "@/Components/JobApplication/ApplicationForm.vue";
 
-const props = defineProps({
-    job: {
-        type: Object,
-        required: true,
-    },
+const page = usePage();
+const job = ref(page.props.job);
+const userApplications = ref(page.props.applications || []);
+
+const hasApplied = computed(() => {
+    return job.value.applications.some(
+        (app) => app.job_listing_id === job.value.job_listing_id,
+    );
 });
 
-const showApplicationModal = () => {
-    $("#applicationModal").modal("show");
+const showApplicationModal = ref(false);
+
+const openApplicationModal = () => {
+    if (hasApplied.value) {
+        return;
+    }
+    showApplicationModal.value = true;
+};
+
+const closeApplicationModal = () => {
+    showApplicationModal.value = false;
+};
+
+const handleApplicationSubmitted = (responseData) => {
+    closeApplicationModal();
+    job.value = responseData.props.job;
+
 };
 </script>

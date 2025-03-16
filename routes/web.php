@@ -10,6 +10,8 @@ use App\Http\Controllers\HR\ManageApplicationController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\ProfileDetailsController;
+use App\Http\Controllers\HR\ScheduleController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +52,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('profile-details/{type}', [ProfileDetailsController::class, 'index'])->name('profile-details.index');
+    Route::post('profile-details/{type}', [ProfileDetailsController::class, 'store'])->name('profile-details.store');
+    Route::delete('profile-details/{type}/{id}', [ProfileDetailsController::class, 'destroy'])->name('profile-details.destroy');
 });
 
 Route::middleware(['admin'])->group(function () {
@@ -69,7 +74,6 @@ Route::middleware(['applicant'])->group(function () {
     Route::resource('my-applications', MyApplicationsController::class);
 });
 
-
 Route::resource('position', PositionController::class);
 
 Route::get('/php-info', function () {
@@ -77,6 +81,10 @@ Route::get('/php-info', function () {
         'upload_max_filesize' => ini_get('upload_max_filesize'),
         'post_max_size'      => ini_get('post_max_size'),
     ];
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('schedules', ScheduleController::class);
 });
 
 require __DIR__ . '/auth.php';

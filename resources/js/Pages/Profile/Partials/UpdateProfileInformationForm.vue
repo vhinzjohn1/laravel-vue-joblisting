@@ -19,9 +19,30 @@ const form = useForm({
     lastname: props.userDetails?.lastname || "",
     middle_initial: props.userDetails?.middle_initial || "",
     phone_number: props.userDetails?.phone_number || "",
-    education_attainment: props.userDetails?.education_attainment || "",
     eligibility: props.userDetails?.eligibility || "",
 });
+
+// Show success alert
+const showSuccessAlert = () => {
+    let title, text;
+
+    title = "Profile Updated Successfully!";
+    text = "Your profile information has been updated.";
+
+    Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: title,
+        text: text,
+        iconColor: "#ffffff",
+        showConfirmButton: false,
+        timer: 3000, // Toast will disappear after 3 seconds
+        toast: true, // Enable toast mode
+        customClass: {
+            popup: "bg-green-500 text-white",
+        },
+    });
+};
 </script>
 
 <template>
@@ -104,6 +125,10 @@ const form = useForm({
                         class="mt-1 block w-full"
                         v-model="form.middle_initial"
                         maxlength="1"
+                        @input="
+                            form.middle_initial =
+                                $event.target.value.toUpperCase()
+                        "
                     />
                     <InputError
                         class="mt-2"
@@ -113,32 +138,24 @@ const form = useForm({
 
                 <div>
                     <InputLabel for="phone_number" value="Phone Number" />
-                    <TextInput
-                        id="phone_number"
-                        type="text"
-                        class="mt-1 block w-full"
-                        v-model="form.phone_number"
-                    />
+                    <div class="relative mt-1 flex">
+                        <div
+                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
+                        >
+                            +63
+                        </div>
+                        <TextInput
+                            id="phone_number"
+                            type="number"
+                            class="block w-full rounded-none rounded-r-md"
+                            v-model="form.phone_number"
+                            maxlength="11"
+                            placeholder="9123 4567"
+                        />
+                    </div>
                     <InputError
                         class="mt-2"
                         :message="form.errors.phone_number"
-                    />
-                </div>
-
-                <div>
-                    <InputLabel
-                        for="education_attainment"
-                        value="Education Attainment"
-                    />
-                    <TextInput
-                        id="education_attainment"
-                        type="text"
-                        class="mt-1 block w-full"
-                        v-model="form.education_attainment"
-                    />
-                    <InputError
-                        class="mt-2"
-                        :message="form.errors.education_attainment"
                     />
                 </div>
 
@@ -187,12 +204,9 @@ const form = useForm({
                     leave-active-class="transition ease-in-out"
                     leave-to-class="opacity-0"
                 >
-                    <p
-                        v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
-                    >
-                        Saved.
-                    </p>
+                <template v-if="form.recentlySuccessful">
+                    {{ showSuccessAlert() }}
+                </template>
                 </Transition>
             </div>
         </form>

@@ -83,7 +83,7 @@ const submit = () => {
                 <button
                     type="button"
                     tabindex="-1"
-                    class="absolute inset-y-0 right-0 top-5 px-3 flex items-center"
+                    class="absolute inset-y-0 right-0 top-7 px-3 flex items-center"
                     @click="togglePasswordVisibility"
                 >
                     <!-- Eye icon when password is hidden -->
@@ -137,7 +137,7 @@ const submit = () => {
                 <button
                     type="button"
                     tabindex="-1"
-                    class="absolute inset-y-0 right-0 top-5 px-3 flex items-center"
+                    class="absolute inset-y-0 right-0 top-7 px-3 flex items-center"
                     @click="toggleConfirmPasswordVisibility"
                 >
                     <!-- Eye icon when confirmation password is hidden -->
