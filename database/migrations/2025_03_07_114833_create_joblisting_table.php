@@ -243,19 +243,19 @@ return new class extends Migration
             $table->foreign('job_listing_id')->references('job_listing_id')->on('job_listings')->onDelete('cascade');
         });
 
-         // Add minimum requirements for the job listing
-         $jobListingId = DB::table('job_listings')->where('title', 'Software Engineer Opportunity')->value('job_listing_id');
-         DB::table('minimum_requirements')->insert([
-             [
-                 'job_listing_id' => $jobListingId,
-                 'requirement_type' => 'experience',
-                 'title' => '2+ years of software development experience',
-                 'description' => 'Candidates should have at least 2 years of experience in software development.',
-                 'is_required' => true,
-                 'created_at' => now(),
-                 'updated_at' => now(),
-             ],
-         ]);
+        // Add minimum requirements for the job listing
+        $jobListingId = DB::table('job_listings')->where('title', 'Software Engineer Opportunity')->value('job_listing_id');
+        DB::table('minimum_requirements')->insert([
+            [
+                'job_listing_id' => $jobListingId,
+                'requirement_type' => 'experience',
+                'title' => '2+ years of software development experience',
+                'description' => 'Candidates should have at least 2 years of experience in software development.',
+                'is_required' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
 
         Schema::create('applications', function (Blueprint $table) {
             $table->id('application_id');
@@ -294,6 +294,19 @@ return new class extends Migration
             $table->foreign('updated_by')->references('user_id')->on('users')->onDelete('set null');
         });
 
+        Schema::create('application_groups', function (Blueprint $table) {
+            $table->id('group_id');
+            $table->string('name');
+            $table->text('notes')->nullable();
+            $table->unsignedBigInteger('job_listing_id');
+            $table->unsignedBigInteger('created_by');
+            $table->string('status')->default('Active'); // Active, Scheduled, Completed
+            $table->timestamps();
+
+            $table->foreign('job_listing_id')->references('job_listing_id')->on('job_listings')->onDelete('cascade');
+            $table->foreign('created_by')->references('user_id')->on('users')->onDelete('cascade');
+        });
+
         Schema::create('schedules', function (Blueprint $table) {
             $table->id('schedule_id');
             $table->string('title')->nullable();
@@ -303,9 +316,11 @@ return new class extends Migration
             $table->string('status')->nullable();
             $table->text('notes')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('group_id')->nullable();
             $table->timestamps();
 
             $table->foreign('created_by')->references('user_id')->on('users')->onDelete('set null');
+            $table->foreign('group_id')->references('group_id')->on('application_groups')->onDelete('set null');
         });
 
         Schema::create('schedule_participants', function (Blueprint $table) {
@@ -330,6 +345,16 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+        });
+
+        Schema::create('application_group_members', function (Blueprint $table) {
+            $table->id('member_id');
+            $table->unsignedBigInteger('group_id');
+            $table->unsignedBigInteger('application_id');
+            $table->timestamps();
+
+            $table->foreign('group_id')->references('group_id')->on('application_groups')->onDelete('cascade');
+            $table->foreign('application_id')->references('application_id')->on('applications')->onDelete('cascade');
         });
     }
 
@@ -356,5 +381,7 @@ return new class extends Migration
         Schema::dropIfExists('work_experiences');
         Schema::dropIfExists('trainings');
         Schema::dropIfExists('educational_backgrounds');
+        Schema::dropIfExists('application_group_members');
+        Schema::dropIfExists('application_groups');
     }
 };

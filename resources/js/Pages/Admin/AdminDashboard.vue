@@ -166,7 +166,7 @@ import axios from "axios";
 import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import DataTable from "@/Components/DataTable.vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { useForm, usePage, Head } from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
 
 const data = ref(usePage().props.users);
@@ -218,7 +218,7 @@ const showSuccessAlert = (action) => {
         timer: 3000, // Toast will disappear after 3 seconds
         toast: true, // Enable toast mode
         customClass: {
-            popup: 'bg-green-500 text-white', 
+            popup: 'bg-green-500 text-white',
         },
     });
 };

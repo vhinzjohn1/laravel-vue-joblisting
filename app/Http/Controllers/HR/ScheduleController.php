@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\Application;
 use App\Models\JobListing;
+use App\Models\ApplicationGroup;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -121,5 +122,53 @@ class ScheduleController extends Controller
     {
         $schedule->delete();
         return redirect()->back()->with('success', 'Schedule deleted successfully');
+    }
+
+    public function createFromGroup($groupId)
+    {
+        $group = ApplicationGroup::with([
+            'applications.user',
+            'jobListing.position'
+        ])->findOrFail($groupId);
+
+        return Inertia::render('HR/Schedule/CreateSchedule', [
+            'group' => $group
+        ]);
+    }
+
+    public function storeFromGroup(Request $request, $groupId)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'schedule_date' => 'required|date',
+            'location' => 'required|string|max:255',
+            'notes' => 'nullable|string'
+        ]);
+
+        $group = ApplicationGroup::with('applications')->findOrFail($groupId);
+
+        $schedule = Schedule::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'schedule_date' => $validated['schedule_date'],
+            'location' => $validated['location'],
+            'status' => 'Scheduled',
+            'notes' => $validated['notes'],
+            'created_by' => auth()->id(),
+            'group_id' => $groupId
+        ]);
+
+        foreach ($group->applications as $application) {
+            $schedule->participants()->create([
+                'user_id' => $application->user_id,
+                'application_id' => $application->application_id,
+                'status' => 'Pending'
+            ]);
+        }
+
+        $group->update(['status' => 'Scheduled']);
+
+        return redirect()->route('schedules.index')->with('success', 'Schedule created successfully');
     }
 }

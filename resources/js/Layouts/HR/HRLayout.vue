@@ -85,8 +85,7 @@ const handleLogout = () => {
                             :href="route('job-listing.index')"
                             class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
                             :class="{
-                                'bg-gray-100':
-                                    route().current('job-listing.index'),
+                                'bg-gray-100': route().current('job-listing.index'),
                             }"
                         >
                             <i
@@ -117,6 +116,25 @@ const handleLogout = () => {
                                 v-if="sidebarOpen"
                                 class="ms-3 text-sm font-medium"
                                 >Manage Applications</span
+                            >
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link
+                            :href="route('groups.index')"
+                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            :class="{
+                                'bg-gray-100': route().current('groups.index'),
+                            }"
+                        >
+                            <i
+                                class="fas fa-users w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                            ></i>
+                            <span
+                                v-if="sidebarOpen"
+                                class="ms-3 text-sm font-medium"
+                                >Group Management</span
                             >
                         </Link>
                     </li>
@@ -184,7 +202,7 @@ const handleLogout = () => {
                             <p class="text-md font-medium text-white">
                                 {{ $page.props.auth.user.name }}
                             </p>
-                            <p class="text-sm text-white">
+                            <p class="text-sm text-white max-w-[150px] truncate" title="{{ $page.props.auth.user.email }}">
                                 {{ $page.props.auth.user.email }}
                             </p>
                         </div>

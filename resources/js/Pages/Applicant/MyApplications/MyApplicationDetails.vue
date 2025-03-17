@@ -387,6 +387,8 @@ const props = defineProps({
     },
 });
 
+console.log("this is the props:", props);
+
 // Document modal state
 const showDocumentModal = ref(false);
 const currentDocument = ref(null);

@@ -55,6 +55,11 @@ const maxWidthClass = computed(() => {
         lg: "sm:max-w-lg",
         xl: "sm:max-w-xl",
         "2xl": "sm:max-w-2xl",
+        "3xl": "sm:max-w-3xl",
+        "4xl": "sm:max-w-4xl",
+        "5xl": "sm:max-w-5xl",
+        "6xl": "sm:max-w-6xl",
+        "7xl": "sm:max-w-7xl",
     }[props.maxWidth];
 });
 </script>
@@ -98,7 +103,10 @@ const maxWidthClass = computed(() => {
                         class="mb-6 bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
                         :class="maxWidthClass"
                     >
-                        <slot v-if="show" />
+                        <!-- Scrollable Content Wrapper -->
+                        <div class="max-h-[90vh] overflow-y-auto">
+                            <slot v-if="show" />
+                        </div>
                     </div>
                 </Transition>
             </div>

@@ -56,33 +56,65 @@
                                             class="flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                                             style="width: 56px; height: 56px"
                                         >
-                                            <span class="text-blue-600 font-semibold text-lg">
-                                                {{ job.position.position_name.substring(0, 2) }}
+                                            <span
+                                                class="text-blue-600 font-semibold text-lg"
+                                            >
+                                                {{
+                                                    job.position.position_name.substring(
+                                                        0,
+                                                        2,
+                                                    )
+                                                }}
                                             </span>
                                         </div>
 
                                         <!-- Title and Position -->
                                         <div class="flex-1">
-                                            <h5 class="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                                            <h5
+                                                class="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors"
+                                            >
                                                 {{ job.title }}
                                             </h5>
-                                            <div class="flex items-center gap-2 text-sm">
-                                                <span class="text-gray-600">{{ job.position.position_name }}</span>
-                                                <span class="text-gray-300">•</span>
-                                                <span class="inline-flex items-center gap-1.5">
+                                            <div
+                                                class="flex items-center gap-2 text-sm"
+                                            >
+                                                <span class="text-gray-600">{{
+                                                    job.position.position_name
+                                                }}</span>
+                                                <span class="text-gray-300"
+                                                    >•</span
+                                                >
+                                                <span
+                                                    class="inline-flex items-center gap-1.5"
+                                                >
                                                     <span
                                                         class="inline-block w-2.5 h-2.5 rounded-full"
                                                         :class="{
-                                                            'bg-green-500': job.status === 'Active',
-                                                            'bg-yellow-500': job.status === 'Draft',
-                                                            'bg-red-500': job.status === 'Closed',
+                                                            'bg-green-500':
+                                                                job.status ===
+                                                                'Active',
+                                                            'bg-yellow-500':
+                                                                job.status ===
+                                                                'Draft',
+                                                            'bg-red-500':
+                                                                job.status ===
+                                                                'Closed',
                                                         }"
                                                     ></span>
-                                                    <span :class="{
-                                                        'text-green-600': job.status === 'Active',
-                                                        'text-yellow-600': job.status === 'Draft',
-                                                        'text-red-600': job.status === 'Closed',
-                                                    }">{{ job.status }}</span>
+                                                    <span
+                                                        :class="{
+                                                            'text-green-600':
+                                                                job.status ===
+                                                                'Active',
+                                                            'text-yellow-600':
+                                                                job.status ===
+                                                                'Draft',
+                                                            'text-red-600':
+                                                                job.status ===
+                                                                'Closed',
+                                                        }"
+                                                        >{{ job.status }}</span
+                                                    >
                                                 </span>
                                             </div>
                                         </div>
@@ -95,24 +127,35 @@
                                             <span
                                                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 group-hover:bg-blue-100 transition-colors"
                                             >
-                                                ${{ job.position.salary_grade.amount.toLocaleString() }}
+                                                ${{
+                                                    job.position.salary_grade.amount.toLocaleString()
+                                                }}
                                             </span>
                                             <span
                                                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 group-hover:bg-gray-100 transition-colors"
                                             >
-                                                {{ job.position.salary_grade.years_experience }}+ years
+                                                {{
+                                                    job.position.salary_grade
+                                                        .years_experience
+                                                }}+ years
                                             </span>
                                         </div>
 
                                         <!-- Description -->
-                                        <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                                        <p
+                                            class="text-gray-600 text-sm leading-relaxed line-clamp-3"
+                                        >
                                             {{ job.description }}
                                         </p>
                                     </div>
 
                                     <!-- Footer Section -->
-                                    <div class="mt-6 pt-4 border-t border-gray-50">
-                                        <div class="flex items-center justify-between">
+                                    <div
+                                        class="mt-6 pt-4 border-t border-gray-50"
+                                    >
+                                        <div
+                                            class="flex items-center justify-between"
+                                        >
                                             <button
                                                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
                                                 @click="editJob(job)"
@@ -122,9 +165,15 @@
                                             </button>
                                             <button
                                                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-all duration-200"
-                                                @click="deleteJob(job.job_listing_id)"
+                                                @click="
+                                                    deleteJob(
+                                                        job.job_listing_id,
+                                                    )
+                                                "
                                             >
-                                                <i class="fas fa-trash-alt mr-2"></i>
+                                                <i
+                                                    class="fas fa-trash-alt mr-2"
+                                                ></i>
                                                 Delete
                                             </button>
                                         </div>
@@ -344,10 +393,7 @@
             aria-labelledby="editModalLabel"
             aria-modal="true"
         >
-            <div
-                class="modal-dialog modal-xl"
-                role="document"
-            >
+            <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content rounded-lg">
                     <div class="modal-header bg-gray-50 px-5 py-4 border-b">
                         <h5
@@ -365,33 +411,49 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <div class="modal-body p-5">
-                        <form @submit.prevent="updateJob">
+                    <form @submit.prevent="updateJob">
+                        <div class="modal-body p-5">
                             <!-- Basic Information Section -->
                             <div class="mb-6">
-                                <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
+                                <h6
+                                    class="font-semibold text-gray-800 mb-4 pb-2 border-b"
+                                >
                                     Basic Information
                                 </h6>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                >
                                     <div class="form-group">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1" for="editPosition">Position</label>
+                                        <label
+                                            class="block text-sm font-medium text-gray-700 mb-1"
+                                            for="editPosition"
+                                            >Position</label
+                                        >
                                         <select
                                             class="form-control block w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                             id="editPosition"
                                             v-model="editingJob.position_id"
                                         >
-                                            <option value="">Select a position</option>
+                                            <option value="">
+                                                Select a position
+                                            </option>
                                             <option
                                                 v-for="position in positions"
                                                 :key="position.position_id"
                                                 :value="position.position_id"
                                             >
-                                                {{ position.position_name }} ({{ position.item_number }})
+                                                {{ position.position_name }} ({{
+                                                    position.item_number
+                                                }})
                                             </option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1" for="editJobTitle">Job Title</label>
+                                        <label
+                                            class="block text-sm font-medium text-gray-700 mb-1"
+                                            for="editJobTitle"
+                                            >Job Title</label
+                                        >
                                         <input
                                             type="text"
                                             id="editJobTitle"
@@ -400,9 +462,14 @@
                                         />
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"
+                                >
                                     <div class="form-group">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Closing Date</label>
+                                        <label
+                                            class="block text-sm font-medium text-gray-700 mb-1"
+                                            >Closing Date</label
+                                        >
                                         <input
                                             type="date"
                                             class="form-control block w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
@@ -410,7 +477,10 @@
                                         />
                                     </div>
                                     <div class="form-group">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Applicant Limit</label>
+                                        <label
+                                            class="block text-sm font-medium text-gray-700 mb-1"
+                                            >Applicant Limit</label
+                                        >
                                         <input
                                             type="number"
                                             class="form-control block w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
@@ -419,23 +489,25 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer border-t p-4 flex gap-2 justify-end">
-                        <button
-                            type="button"
-                            class="btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                            data-dismiss="modal"
+                        </div>
+                        <div
+                            class="modal-footer border-t p-4 flex gap-2 justify-end"
                         >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            class="btn px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            Update Job Listing
-                        </button>
-                    </div>
+                            <button
+                                type="button"
+                                class="btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                                data-dismiss="modal"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="btn px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Update Job Listing
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -488,10 +560,10 @@ const newJob = ref({
 const editingJob = ref({
     job_listing_id: null,
     position_id: null,
-    title: '',
-    description: '',
-    closing_date: '',
-    status: 'Active',
+    title: "",
+    description: "",
+    closing_date: "",
+    status: "Active",
     applicant_limit: 1,
     category_id: null,
 });
@@ -499,15 +571,21 @@ const editingJob = ref({
 const editJob = (job) => {
     editingJob.value = { ...job };
     // Format the date for the input
-    editingJob.value.closing_date = job.closing_date.split('T')[0];
+    editingJob.value.closing_date = job.closing_date.split("T")[0];
     $("#editModal").modal("show");
 };
 
 const updateJob = () => {
-    axios.put(`/job-listing/${editingJob.value.job_listing_id}`, editingJob.value)
+    axios
+        .put(
+            `/job-listing/${editingJob.value.job_listing_id}`,
+            editingJob.value,
+        )
         .then((response) => {
             // Update the jobs list with the updated data
-            const index = jobs.value.findIndex(job => job.job_listing_id === editingJob.value.job_listing_id);
+            const index = jobs.value.findIndex(
+                (job) => job.job_listing_id === editingJob.value.job_listing_id,
+            );
             if (index !== -1) {
                 jobs.value[index] = response.data;
             }
@@ -517,13 +595,15 @@ const updateJob = () => {
             editingJob.value = {
                 job_listing_id: null,
                 position_id: null,
-                title: '',
-                description: '',
-                closing_date: '',
-                status: 'Active',
+                title: "",
+                description: "",
+                closing_date: "",
+                status: "Active",
                 applicant_limit: 1,
                 category_id: null,
             };
+
+            showSuccessAlert("update");
         })
         .catch((error) => {
             console.error("Error updating job listing:", error);
@@ -554,6 +634,7 @@ const saveJob = () => {
             resetForm();
             // Close Add Modal using jQuery
             $("#addModal").modal("hide");
+            showSuccessAlert("add");
         })
         .catch((error) => {
             console.error("Error creating job listing:", error.response.data);
@@ -572,17 +653,80 @@ const resetForm = () => {
     };
 };
 
+// Show success alert function
+const showSuccessAlert = (action) => {
+    let title, text;
+
+    switch (action) {
+        case "add":
+            title = "Job Listing Added Successfully!";
+            text = "Information has been updated.";
+            break;
+        case "update":
+            title = "Job Listing Updated Successfully!";
+            text = "Information has been updated.";
+            break;
+        case "delete":
+            title = "Job Listing Deleted Successfully!";
+            text = "Information has been updated.";
+            break;
+        default:
+            title = "Action Completed!";
+            text = "The operation was successful.";
+    }
+
+    Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: title,
+        text: text,
+        showConfirmButton: false,
+        iconColor: "#ffffff",
+        timer: 3000,
+        toast: true,
+        customClass: {
+            popup: "bg-green-500 text-white",
+        },
+    });
+};
+
 const deleteJob = (jobId) => {
-    axios
-        .delete(`job-listing/${jobId}`)
-        .then(() => {
-            jobs.value = jobs.value.filter(
-                (job) => job.job_listing_id !== jobId,
-            );
-        })
-        .catch((error) => {
-            console.error("Error deleting job listing:", error);
-        });
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios
+                .delete(`job-listing/${jobId}`)
+                .then(() => {
+                    jobs.value = jobs.value.filter(
+                        (job) => job.job_listing_id !== jobId,
+                    );
+
+                   showSuccessAlert("delete");
+                })
+                .catch((error) => {
+                    console.error("Error deleting job listing:", error);
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "error",
+                        title: "Error!",
+                        text: "Failed to delete job listing.",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        toast: true,
+                        customClass: {
+                            popup: "bg-red-500 text-white",
+                        },
+                    });
+                });
+        }
+    });
 };
 </script>
 

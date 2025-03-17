@@ -64,6 +64,7 @@ const showSuccessAlert = (action) => {
         text: text,
         showConfirmButton: false,
         timer: 3000,
+        iconColor: "#ffffff",
         toast: true,
         customClass: {
             popup: "bg-green-500 text-white",

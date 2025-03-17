@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Applicant\ApplicantDashboardController;
 use App\Http\Controllers\Applicant\JobApplicationController;
 use App\Http\Controllers\Applicant\MyApplicationsController;
+use App\Http\Controllers\HR\ApplicationGroupController;
 use App\Http\Controllers\HR\HRController;
 use App\Http\Controllers\HR\ManageJobListingController;
 use App\Http\Controllers\HR\ManageApplicationController;
@@ -66,6 +67,9 @@ Route::middleware(['hr'])->group(function () {
     Route::resource('hr', HRController::class);
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
+
+    // Application Groups
+    Route::resource('groups', ApplicationGroupController::class);
 });
 
 Route::middleware(['applicant'])->group(function () {
@@ -86,5 +90,6 @@ Route::get('/php-info', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('schedules', ScheduleController::class);
 });
+
 
 require __DIR__ . '/auth.php';

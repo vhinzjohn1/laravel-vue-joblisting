@@ -195,7 +195,7 @@ const handleLogout = () => {
                             <p class="text-md font-medium text-white">
                                 {{ $page.props.auth.user.name }}
                             </p>
-                            <p class="text-sm text-white">
+                            <p class="text-sm text-white max-w-[150px] truncate" title="{{ $page.props.auth.user.email }}">
                                 {{ $page.props.auth.user.email }}
                             </p>
                         </div>

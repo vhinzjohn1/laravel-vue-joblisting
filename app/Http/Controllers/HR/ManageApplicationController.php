@@ -20,7 +20,9 @@ class ManageApplicationController extends Controller
             'jobListing' => function ($query) {
                 $query->with(['position', 'category']);
             },
-            'user',
+            'user' => function ($query) {
+                $query->with('userDetail');
+            },
             'documents',
             'statusHistory'
         ])
@@ -100,6 +102,32 @@ class ManageApplicationController extends Controller
             'updated_by' => auth()->id(),
         ]);
 
-        return redirect()->back()->with('success', 'Application status updated successfully');
+        // Get fresh applications data with relationships
+        $applications = Application::with([
+            'jobListing' => function ($query) {
+                $query->with(['position', 'category']);
+            },
+            'user' => function ($query) {
+                $query->with('userDetail');
+            },
+            'documents',
+            'statusHistory'
+        ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'message' => 'Application status updated successfully',
+            'applications' => $applications,
+            'statuses' => [
+                'Pending',
+                'Qualified',
+                'Disqualified',
+                'Competency Exam',
+                'Rejected',
+                'Interview',
+                'Accepted'
+            ]
+        ], 200);
     }
 }
