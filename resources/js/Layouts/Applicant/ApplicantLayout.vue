@@ -195,7 +195,10 @@ const handleLogout = () => {
                             <p class="text-md font-medium text-white">
                                 {{ $page.props.auth.user.name }}
                             </p>
-                            <p class="text-sm text-white max-w-[150px] truncate" title="{{ $page.props.auth.user.email }}">
+                            <p
+                                class="text-sm text-white max-w-[150px] truncate"
+                                title="{{ $page.props.auth.user.email }}"
+                            >
                                 {{ $page.props.auth.user.email }}
                             </p>
                         </div>
@@ -264,13 +267,6 @@ const handleLogout = () => {
             </div>
         </div>
 
-        <!-- Header -->
-        <header class="bg-white shadow" v-if="$slots.header">
-            <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
-                <slot name="header" />
-            </div>
-        </header>
-
         <!-- Main Content -->
         <div
             :class="{
@@ -279,6 +275,13 @@ const handleLogout = () => {
             }"
             class="transition-all duration-300 ease-in-out"
         >
+            <!-- Page Header -->
+            <header class="bg-white shadow" v-if="$slots.header">
+                <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
+                    <slot name="header" />
+                </div>
+            </header>
+
             <!-- Page Content -->
             <main class="py-1">
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

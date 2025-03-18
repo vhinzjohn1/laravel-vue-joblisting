@@ -133,15 +133,13 @@
         </div>
 
         <!-- Create/Edit Schedule Modal -->
-        <Modal :show="showCreateModal" @close="closeModal" maxWidth="2xl">
+        <Modal
+            :title="editingSchedule ? 'Edit Schedule' : 'Create New Schedule'"
+            :show="showCreateModal"
+            @close="closeModal"
+            maxWidth="2xl"
+        >
             <div class="p-6">
-                <h2 class="text-lg font-semibold mb-4">
-                    {{
-                        editingSchedule
-                            ? "Edit Schedule"
-                            : "Create New Schedule"
-                    }}
-                </h2>
                 <form @submit.prevent="handleSubmit" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -421,6 +419,31 @@ const calendarOptions = computed(() => ({
         start: schedule.schedule_date,
         allDay: true,
     })),
+    dayCellDidMount: (info) => {
+        const today = new Date();
+        if (info.date.toDateString() === today.toDateString()) {
+            // Apply custom styles
+            info.el.style.backgroundColor = "#f0f8ff";
+            info.el.style.border = "2px solid #007bff";
+            info.el.style.position = "relative"; // ensure the cell can position absolute children
+
+            // Create a label element
+            const label = document.createElement("div");
+            label.innerText = "Current";
+            // Style the label (adjust as needed)
+            label.style.position = "absolute";
+            label.style.top = "5px";
+            label.style.left = "5px";
+            label.style.backgroundColor = "#007bff";
+            label.style.color = "#fff";
+            label.style.padding = "2px 4px";
+            label.style.fontSize = "10px";
+            label.style.borderRadius = "3px";
+
+            // Append the label to the cell element
+            info.el.appendChild(label);
+        }
+    },
     eventClick: (info) => {
         const schedule = schedules.value.find(
             (s) => s.schedule_id === parseInt(info.event.id),
@@ -551,3 +574,5 @@ const deleteSchedule = (schedule) => {
     }
 };
 </script>
+
+<style scoped></style>

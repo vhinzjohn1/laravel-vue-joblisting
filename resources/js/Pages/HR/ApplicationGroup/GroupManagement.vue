@@ -108,11 +108,12 @@
         </div>
 
         <!-- Create/Edit Group Modal -->
-        <Modal :show="showModal" @close="closeModal">
-            <div class="p-6">
-                <h2 class="text-lg font-semibold mb-4">
-                    {{ editingGroup ? 'Edit Group' : 'Create New Group' }}
-                </h2>
+        <Modal
+         :show="showModal"
+         @close="closeModal"
+         :title="editingGroup ? 'Edit Group' : 'Create New Group'"
+            >
+            <div class="py-4 px-10">
                 <form @submit.prevent="createGroup" class="space-y-4">
                     <div class="space-y-4">
                         <div>
@@ -193,8 +194,6 @@ const props = defineProps({
     jobListings: Array
 });
 
-console.log('props:', props);
-
 const showModal = ref(false);
 const editingGroup = ref(null);
 const processing = ref(false);
@@ -214,13 +213,59 @@ const closeModal = () => {
 const createGroup = () => {
     if (editingGroup.value) {
         form.put(route('groups.update', editingGroup.value.group_id), {
-            onSuccess: () => closeModal()
+            onSuccess: () => {
+                closeModal();
+                showSuccessAlert("update");
+            }
         });
     } else {
         form.post(route('groups.store'), {
-            onSuccess: () => closeModal()
+            onSuccess: () => {
+                closeModal();
+                showSuccessAlert("add");
+            },
+            onError: () => {
+                console.error("Error creating group:", form.errors);
+            }
         });
     }
+};
+
+// Show success alert function
+const showSuccessAlert = (action) => {
+    let title, text;
+
+    switch (action) {
+        case "add":
+            title = "Added Successfully!";
+            text = "Information has been updated.";
+            break;
+        case "update":
+            title = "Updated Successfully!";
+            text = "Information has been updated.";
+            break;
+        case "delete":
+            title = "Deleted Successfully!";
+            text = "Information has been updated.";
+            break;
+        default:
+            title = "Action Completed!";
+            text = "The operation was successful.";
+    }
+
+    // Using SweetAlert2 toast with custom styling
+    Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: title,
+        text: text,
+        iconColor: '#ffffffff',
+        showConfirmButton: false,
+        timer: 3000, // Toast will disappear after 3 seconds
+        toast: true, // Enable toast mode
+        color: '#ffffff',
+        background: '#22c55e'
+    });
 };
 
 const addMembers = (group, applicationIds) => {
@@ -261,12 +306,22 @@ const editGroup = (group) => {
 };
 
 const deleteGroup = (group) => {
-    if (confirm('Are you sure you want to delete this group?')) {
-        router.delete(route('groups.destroy', group.group_id), {
-            onSuccess: () => {
-                // Handle success if needed
-            }
-        });
-    }
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route('groups.destroy', group.group_id), {
+                onSuccess: () => {
+                    showSuccessAlert("delete");
+                }
+            });
+        }
+    });
 };
 </script>

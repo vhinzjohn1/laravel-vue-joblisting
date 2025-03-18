@@ -290,42 +290,9 @@
         :show="showDetailsModal"
         @close="closeDetailsModal"
         :max-width="'7xl'"
+        :title="'Application Details'"
     >
         <div class="p-4">
-            <!-- Success Message -->
-            <div
-                v-if="$page.props.flash && $page.props.flash.success"
-                class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
-            >
-                <span class="block sm:inline">{{
-                    $page.props.flash.success
-                }}</span>
-            </div>
-
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
-                    Application Details
-                </h3>
-                <button
-                    @click="closeDetailsModal"
-                    class="text-gray-400 hover:text-gray-500"
-                >
-                    <span class="sr-only">Close</span>
-                    <svg
-                        class="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"
-                        />
-                    </svg>
-                </button>
-            </div>
 
             <!-- Application Details Content -->
             <div class="mt-2" v-if="selectedApplication">
@@ -555,20 +522,9 @@
         :show="showDocumentModal"
         @close="closeDocumentModal"
         :max-width="'4xl'"
+        :title="'View Document'"
     >
         <div class="p-4">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
-                    {{
-                        currentDocument
-                            ? currentDocument.document_type
-                                  .charAt(0)
-                                  .toUpperCase() +
-                              currentDocument.document_type.slice(1)
-                            : "Document"
-                    }}
-                </h3>
-            </div>
 
             <!-- Document Viewer Content -->
             <div class="mt-2 h-[80vh]" ref="documentContainer">
@@ -745,11 +701,8 @@ const showToast = (config) => {
         timer: 3000,
         toast: true,
         ...config,
-        customClass: {
-            popup: config.success
-                ? "bg-green-500 text-white"
-                : "bg-red-500 text-white",
-        },
+        background: config.success ? "#22c55e" : "#ef4444",
+        color: "#ffffff",
         iconColor: "#ffffff",
     });
 };

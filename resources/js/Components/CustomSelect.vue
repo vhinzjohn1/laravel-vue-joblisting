@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
+import TextInput from "./TextInput.vue";
 
 const props = defineProps({
     options: {
@@ -14,22 +15,18 @@ const props = defineProps({
         type: String,
         default: "Select an option",
     },
-    // New prop for custom display format
     displayFormat: {
         type: [String, Function],
         default: null,
     },
-    // Optional value key - if not provided, use the entire option as value
     valueKey: {
         type: String,
         default: null,
     },
-    // Optional max height for options dropdown
     optionsHeight: {
         type: String,
         default: "15rem",
     },
-    // Optional prop to disable search
     searchable: {
         type: Boolean,
         default: true,
@@ -41,6 +38,7 @@ const emit = defineEmits(["update:modelValue", "select"]);
 const isOpen = ref(false);
 const search = ref("");
 const selectedOption = ref(null);
+const searchInputRef = ref(null);
 
 const filteredOptions = computed(() => {
     if (!search.value || !props.searchable) return props.options;
@@ -59,21 +57,16 @@ const getDisplayText = (option) => {
         if (typeof props.displayFormat === "function") {
             return props.displayFormat(option);
         }
-        // Handle string format with template literals
         return props.displayFormat.replace(/\{([^}]+)\}/g, (_, key) => {
-            return (
-                key.split(".").reduce((obj, key) => obj?.[key], option) ?? ""
-            );
+            return key.split(".").reduce((obj, k) => obj?.[k], option) ?? "";
         });
     }
 
-    // Default display if no format specified
     return typeof option === "object" ? JSON.stringify(option) : String(option);
 };
 
 const getValue = (option) => {
-    if (!option) return "";
-    return props.valueKey ? option[props.valueKey] : option;
+    return props.valueKey ? option?.[props.valueKey] : option;
 };
 
 const selectOption = (option) => {
@@ -88,10 +81,10 @@ const displayValue = computed(() => {
     return selectedOption.value ? getDisplayText(selectedOption.value) : "";
 });
 
-// Close dropdown when clicking outside
+// Handle click outside
 const selectRef = ref(null);
 const handleClickOutside = (event) => {
-    if (selectRef.value && !selectRef.value.contains(event.target)) {
+    if (!selectRef.value.contains(event.target)) {
         isOpen.value = false;
         search.value = "";
     }
@@ -101,23 +94,29 @@ const handleClickOutside = (event) => {
 watch(
     () => props.modelValue,
     (newValue) => {
-        if (newValue) {
-            selectedOption.value = props.options.find(
-                (option) => getValue(option) === newValue,
-            );
-        } else {
-            selectedOption.value = null;
-        }
+        selectedOption.value = props.options.find(
+            (option) => getValue(option) === newValue
+        ) ?? null;
     },
-    { immediate: true },
+    { immediate: true }
 );
 
+// Open dropdown and auto-focus search input
+const toggleDropdown = async () => {
+    isOpen.value = !isOpen.value;
+
+    if (isOpen.value && props.searchable) {
+        await nextTick(); // Wait for DOM updates
+        searchInputRef.value?.focus();
+    }
+};
+
 onMounted(() => {
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
 });
 
 onUnmounted(() => {
-    document.removeEventListener("click", handleClickOutside);
+    document.removeEventListener("pointerdown", handleClickOutside);
 });
 </script>
 
@@ -125,12 +124,10 @@ onUnmounted(() => {
     <div ref="selectRef" class="relative">
         <!-- Main input field -->
         <div
-            @click="isOpen = !isOpen"
+            @click="toggleDropdown"
             tabindex="0"
-            :class="[
-                'w-full px-4 py-2 border rounded-lg cursor-pointer bg-white flex items-center justify-between transition-all duration-200 focus:outline-none',
-                isOpen ? 'border-blue-500 shadow-sm' : 'border-gray-300',
-            ]"
+            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full cursor-pointer bg-white flex items-center justify-between transition-all duration-200 p-2"
+            :class="{ 'ring-2 ring-indigo-500 border-indigo-500': isOpen }"
         >
             <span v-if="selectedOption" class="text-gray-900 truncate">
                 {{ displayValue }}
@@ -139,8 +136,8 @@ onUnmounted(() => {
                 {{ placeholder }}
             </span>
             <svg
-                class="w-5 h-5 text-gray-400 flex-shrink-0"
-                :class="{ 'transform rotate-180': isOpen }"
+                class="w-5 h-5 text-gray-400 flex-shrink-0 ml-2"
+                :class="{ 'rotate-180': isOpen }"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -156,36 +153,36 @@ onUnmounted(() => {
         <!-- Dropdown -->
         <div
             v-if="isOpen"
-            class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg"
+            class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg"
             style="
                 top: 100%;
                 left: 0;
                 right: 0;
-                max-height: none;
+                max-height: v-bind(optionsHeight);
                 overflow-y: auto;
             "
         >
             <!-- Search input -->
             <div v-if="searchable" class="p-2 border-b">
-                <input
-                    type="text"
+                <TextInput
                     v-model="search"
-                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    ref="searchInputRef"
                     placeholder="Search..."
                     @click.stop
+                    class="w-full"
                 />
             </div>
 
             <!-- Options list -->
-            <div class="overflow-y-auto">
+            <div :style="{ maxHeight: optionsHeight }" class="overflow-y-auto">
                 <template v-if="filteredOptions.length">
                     <div
                         v-for="(option, index) in filteredOptions"
                         :key="index"
                         @click="selectOption(option)"
-                        class="px-4 py-2 cursor-pointer hover:bg-blue-50 text-sm"
+                        class="px-4 py-2 cursor-pointer hover:bg-indigo-50 text-sm"
                         :class="{
-                            'bg-blue-50':
+                            'bg-indigo-50 text-indigo-700':
                                 selectedOption &&
                                 getValue(option) === getValue(selectedOption),
                         }"

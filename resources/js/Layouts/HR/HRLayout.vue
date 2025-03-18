@@ -178,6 +178,25 @@ const handleLogout = () => {
                             >
                         </Link>
                     </li>
+
+                    <li>
+                        <Link
+                            :href="route('profile.edit')"
+                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            :class="{
+                                'bg-gray-100': route().current('profile.edit'),
+                            }"
+                        >
+                            <i
+                                class="fas fa-file-pdf w-5 h-5 transition duration-75 group-hover:text-gray-900"
+                            ></i>
+                            <span
+                                v-if="sidebarOpen"
+                                class="ms-3 text-sm font-medium"
+                                >Reports</span
+                            >
+                        </Link>
+                    </li>
                 </ul>
             </nav>
             <!-- User Menu -->

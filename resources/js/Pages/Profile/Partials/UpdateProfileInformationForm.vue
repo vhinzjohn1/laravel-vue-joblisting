@@ -23,24 +23,24 @@ const form = useForm({
 });
 
 // Show success alert
-const showSuccessAlert = () => {
+const showToast = () => {
     let title, text;
 
     title = "Profile Updated Successfully!";
     text = "Your profile information has been updated.";
 
+    // Using SweetAlert2 toast with custom styling
     Swal.fire({
         position: "top-end",
         icon: "success",
         title: title,
         text: text,
-        iconColor: "#ffffff",
+        iconColor: "#ffffffff",
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds
         toast: true, // Enable toast mode
-        customClass: {
-            popup: "bg-green-500 text-white",
-        },
+        color: "#ffffff",
+        background: "#22c55e",
     });
 };
 </script>
@@ -58,7 +58,12 @@ const showSuccessAlert = () => {
         </header>
 
         <form
-            @submit.prevent="form.patch(route('profile.update'))"
+            @submit.prevent="form.patch(route('profile.update'), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    showToast();
+                }
+            })"
             class="mt-6 space-y-6"
         >
             <div>
@@ -197,17 +202,6 @@ const showSuccessAlert = () => {
 
             <div class="flex items-center gap-4">
                 <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
-
-                <Transition
-                    enter-active-class="transition ease-in-out"
-                    enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
-                    leave-to-class="opacity-0"
-                >
-                <template v-if="form.recentlySuccessful">
-                    {{ showSuccessAlert() }}
-                </template>
-                </Transition>
             </div>
         </form>
     </section>

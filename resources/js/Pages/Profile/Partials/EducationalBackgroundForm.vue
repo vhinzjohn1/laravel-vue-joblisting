@@ -29,6 +29,9 @@ const addEducation = async () => {
         const response = await axios.post(
             route("profile-details.store", "education"),
             form.data(),
+            {
+                preserveScroll: true
+            }
         );
         educations.value.push(response.data);
         form.reset();
@@ -51,7 +54,9 @@ const deleteEducation = async (id) => {
     });
 
     if (result.isConfirmed) {
-        await axios.delete(route("profile-details.destroy", ["education", id]));
+        await axios.delete(route("profile-details.destroy", ["education", id]), {
+            preserveScroll: true
+        });
         fetchEducations();
         showSuccessAlert("delete");
     }
@@ -77,18 +82,18 @@ const showSuccessAlert = (action) => {
             text = "The operation was successful.";
     }
 
+    // Using SweetAlert2 toast with custom styling
     Swal.fire({
         position: "top-end",
         icon: "success",
         title: title,
         text: text,
-        iconColor: "#ffffff",
+        iconColor: "#ffffffff",
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds
         toast: true, // Enable toast mode
-        customClass: {
-            popup: "bg-green-500 text-white",
-        },
+        color: "#ffffff",
+        background: "#22c55e",
     });
 };
 
@@ -110,12 +115,16 @@ onMounted(() => {
 
         <PrimaryButton @click="showModal = true">Add Education</PrimaryButton>
 
-        <Modal :show="showModal" @close="showModal = false">
+        <Modal
+            :title="'Add Education'"
+            :show="showModal"
+            @close="showModal = false"
+        >
             <template #default>
-                <form @submit.prevent="addEducation" class="mt-6 space-y-6 p-5">
-                    <h1 class="text-xl font-semibold text-gray-800 text-center">
-                        Add Educational Background
-                    </h1>
+                <form
+                    @submit.prevent="addEducation"
+                    class="space-y-6 px-10 py-4"
+                >
                     <div>
                         <InputLabel for="level" value="Level" />
                         <select

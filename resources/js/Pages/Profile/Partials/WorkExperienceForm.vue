@@ -30,6 +30,9 @@ const addExperience = async () => {
         const response = await axios.post(
             route("profile-details.store", "experience"),
             form.data(),
+            {
+                preserveScroll: true,
+            },
         );
         experiences.value.push(response.data);
         form.reset();
@@ -52,7 +55,12 @@ const deleteExperience = async (id) => {
     });
 
     if (result.isConfirmed) {
-        await axios.delete(route("profile-details.destroy", ["experience", id]));
+        await axios.delete(
+            route("profile-details.destroy", ["experience", id]),
+            {
+                preserveScroll: true,
+            },
+        );
         fetchExperiences();
         showSuccessAlert("delete");
     }
@@ -79,18 +87,18 @@ const showSuccessAlert = (action) => {
             text = "The operation was successful.";
     }
 
+    // Using SweetAlert2 toast with custom styling
     Swal.fire({
         position: "top-end",
         icon: "success",
         title: title,
         text: text,
-        iconColor: "#ffffff",
+        iconColor: "#ffffffff",
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds
         toast: true, // Enable toast mode
-        customClass: {
-            popup: "bg-green-500 text-white",
-        },
+        color: "#ffffff",
+        background: "#22c55e",
     });
 };
 onMounted(() => {
@@ -109,15 +117,16 @@ onMounted(() => {
 
         <PrimaryButton @click="showModal = true">Add Experience</PrimaryButton>
 
-        <Modal :show="showModal" @close="showModal = false">
+        <Modal
+            :title="'Add Experience'"
+            :show="showModal"
+            @close="showModal = false"
+        >
             <template #default>
                 <form
                     @submit.prevent="addExperience"
-                    class="mt-6 space-y-6 p-5"
+                    class="space-y-6 px-10 py-4"
                 >
-                    <h1 class="text-xl font-semibold text-gray-800 text-center">
-                        Add Work Experience
-                    </h1>
                     <div>
                         <InputLabel for="position" value="Position" />
                         <input

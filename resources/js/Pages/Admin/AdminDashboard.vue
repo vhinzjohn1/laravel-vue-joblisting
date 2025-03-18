@@ -26,41 +26,41 @@
         </div>
 
         <!-- Add User Modal -->
-        <Modal :show="showAddModal" @close="closeAddModal" maxWidth="2xl">
+        <Modal :show="showAddModal" @close="closeAddModal" maxWidth="2xl" :title="'Add User'">
             <div class="p-6">
-                <h2 class="text-lg font-semibold mb-4">Add User</h2>
                 <form @submit.prevent="saveChanges" class="space-y-4">
                     <div class="form-group">
                         <label for="exampleInputUsername">Username</label>
-                        <input
+                        <TextInput
                             type="text"
-                            class="form-control"
+                            class="form-control w-full"
                             id="exampleInputUsername"
                             v-model="form.username"
-                            placeholder="Enter username"
                             required
+                            autocomplete="username"
+                            autofocus
                         />
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail">Email</label>
-                        <input
+                        <TextInput
                             type="email"
-                            class="form-control"
+                            class="form-control w-full"
                             id="exampleInputEmail"
                             v-model="form.email"
-                            placeholder="Enter email"
                             required
+                            autocomplete="email"
                         />
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword">Password</label>
-                        <input
+                        <TextInput
                             type="password"
-                            class="form-control"
+                            class="form-control w-full"
                             id="exampleInputPassword"
                             v-model="form.password"
-                            placeholder="Enter password"
                             required
+                            autocomplete="new-password"
                         />
                     </div>
                     <div class="form-group">
@@ -93,40 +93,38 @@
         </Modal>
 
         <!-- Edit User Modal -->
-        <Modal :show="showEditModal" @close="closeEditModal" maxWidth="2xl">
+        <Modal :show="showEditModal" @close="closeEditModal" maxWidth="2xl" :title="'Edit User'">
             <div class="p-6">
-                <h2 class="text-lg font-semibold mb-4">Edit User</h2>
                 <form @submit.prevent="editUser" class="space-y-4">
                     <div class="form-group">
                         <label for="editUserName">Username</label>
-                        <input
+                        <TextInput
                             type="text"
-                            class="form-control"
+                            class="form-control w-full"
                             id="editUserName"
                             v-model="form.username"
-                            placeholder="Enter username"
                             required
+                            autocomplete="username"
+                            autofocus
                         />
                     </div>
                     <div class="form-group">
                         <label for="editEmail">Email</label>
-                        <input
+                        <TextInput
                             type="email"
-                            class="form-control"
+                            class="form-control w-full"
                             id="editEmail"
                             v-model="form.email"
-                            placeholder="Enter email"
                             required
                         />
                     </div>
                     <div class="form-group">
                         <label for="editPassword">Password</label>
-                        <input
+                        <TextInput
                             type="password"
-                            class="form-control"
+                            class="form-control w-full"
                             id="editPassword"
                             v-model="form.password"
-                            placeholder="Enter password"
                         />
                     </div>
                     <div class="form-group">
@@ -168,6 +166,7 @@ import Header from "@/Components/Header/Header.vue";
 import DataTable from "@/Components/DataTable.vue";
 import { useForm, usePage, Head } from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
+import TextInput from "@/Components/TextInput.vue";
 
 const data = ref(usePage().props.users);
 const form = useForm({
@@ -213,20 +212,19 @@ const showSuccessAlert = (action) => {
         icon: "success",
         title: title,
         text: text,
-        iconColor: '#ffffff',
+        iconColor: '#ffffffff',
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds
         toast: true, // Enable toast mode
-        customClass: {
-            popup: 'bg-green-500 text-white',
-        },
+        color: '#ffffff',
+        background: '#22c55e'
     });
 };
 
 const showEdit = (item) => {
     form.username = item.username;
     form.email = item.email;
-    form.password = item.password;
+    form.password = item.password || "";
     form.role_name = item.role_name;
     form.user_id = item.user_id;
     showEditModal.value = true;

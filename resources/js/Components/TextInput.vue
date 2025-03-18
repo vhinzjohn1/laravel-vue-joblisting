@@ -1,15 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, nextTick } from 'vue';
 
 const model = defineModel({
-    type: String,
+    type: [String, Number],
     required: true,
 });
 
 const input = ref(null);
 
-onMounted(() => {
-    if (input.value.hasAttribute('autofocus')) {
+onMounted(async () => {
+    await nextTick(); // Wait for the DOM update
+    if (input.value?.hasAttribute('autofocus')) {
         input.value.focus();
     }
 });
@@ -17,9 +18,10 @@ onMounted(() => {
 defineExpose({ focus: () => input.value.focus() });
 </script>
 
+
 <template>
     <input
-        class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+        class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
         v-model="model"
         ref="input"
     />

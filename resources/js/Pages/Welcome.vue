@@ -2,12 +2,10 @@
 import { Head, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
-// Add this function to handle asset URLs
 const asset = (path) => {
     return `/${path}`;
 };
 
-// Add reactive ref for mobile menu
 const isMobileMenuOpen = ref(false);
 
 defineProps({
@@ -33,10 +31,10 @@ defineProps({
         <title>Welcome</title>
     </Head>
 
-    <div class="min-h-screen bg-white">
+    <div class="relative min-h-screen bg-white overflow-hidden">
         <!-- Navigation -->
         <header class="fixed w-full bg-white shadow-md z-50">
-            <nav class="container mx-auto px-6 py-3">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
                 <div class="flex justify-between items-center">
                     <a href="#" class="flex items-center space-x-3">
                         <img
@@ -151,117 +149,246 @@ defineProps({
             </nav>
         </header>
 
-        <!-- Hero Section -->
-        <section class="h-screen flex items-center justify-center px-6">
-            <div
-                class="container mx-auto flex flex-col lg:flex-row items-center justify-center"
-                data-aos="fade-up"
-                data-aos-duration="1000"
-                data-aos-mirror="true"
-            >
-                <div class="w-full text-center">
-                    <p
-                        class="text-xl text-green-800 mb-4 font-bold"
-                        data-aos="fade-up"
-                        data-aos-delay="200"
-                    >
-                        WELCOME TO
-                    </p>
-                    <h1
-                        class="text-4xl lg:text-6xl font-bold text-green-800 mb-4"
-                        data-aos="fade-up"
-                        data-aos-delay="400"
-                    >
-                        Office of Human Resource Management
-                    </h1>
-                    <h2
-                        class="text-3xl lg:text-4xl text-yellow-500 font-bold"
-                        data-aos="fade-up"
-                        data-aos-delay="600"
-                    >
-                        Job Listing Application
-                    </h2>
-                </div>
-            </div>
-        </section>
+        <!-- Main Content Wrapper -->
+        <div class="relative w-full">
+            <!-- Hero Section -->
+            <section class="relative h-screen">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 h-full items-center pt-20 lg:pt-0 mt-6 sm:mt-8 md:mt-12 lg:mt-0">
 
-        <!-- Mission and Vision Section -->
-        <section
-            id="about"
-            class="min-h-screen py-20 bg-gray-50 flex items-center"
-        >
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-16" data-aos="fade-up">
-                    <p class="text-xl text-green-800 mb-2">DEPARTMENT'S</p>
-                    <h2 class="text-4xl font-bold text-green-800">
-                        MISSION AND VISION
-                    </h2>
-                </div>
+                        <!-- Left Content -->
+                        <div class="space-y-6">
+                            <div data-aos="fade-up" data-aos-duration="800" data-aos-mirror="true">
+                                <h1 class="text-5xl lg:text-7xl font-bold">
+                                    HR Job <span class="text-green-700">Listing</span><br />
+                                    System
+                                </h1>
+                            </div>
+                            <p 
+                                class="text-gray-600 text-lg max-w-md"
+                                data-aos="fade-up"
+                                data-aos-duration="800"
+                                data-aos-delay="200"
+                                data-aos-mirror="true"
+                            >
+                                Streamlined job posting and application management system.
+                                Empowering HR teams with efficient tools while making it easier for applicants
+                                to find and apply for opportunities.
+                            </p>
+                            <div 
+                                class="flex flex-wrap gap-4"
+                                data-aos="fade-up"
+                                data-aos-duration="800"
+                                data-aos-delay="400"
+                                data-aos-mirror="true"
+                            >
+                                <Link
+                                    v-if="canLogin"
+                                    :href="route('login')"
+                                    class="px-8 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors font-medium"
+                                >
+                                    Get Started
+                                </Link>
+                                <a
+                                    href="#jobs"
+                                    class="px-8 py-3 border-2 border-gray-300 rounded-lg hover:border-green-800 transition-colors font-medium"
+                                >
+                                    Explore Jobs
+                                </a>
+                            </div>
+                        </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16">
-                    <div data-aos="fade-right">
-                        <img
-                            :src="asset('img/cmuadmin.png')"
-                            alt="CMU Admin Building"
-                            class="w-full h-80 object-cover rounded-lg shadow-lg"
-                        />
+                        <!-- Right Content - Animated Showcase -->
+                        <div 
+                            class="relative mt-8 lg:mt-0"
+                            data-aos="fade-left"
+                            data-aos-duration="1000"
+                            data-aos-mirror="true"
+                            data-aos-delay="600"
+                        >
+                            <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl transform -rotate-6 scale-95 transition-transform duration-300 hover:rotate-0"></div>
+                            <div class="relative bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-lg font-semibold">Application Process</h3>
+                                    <div class="flex space-x-2">
+                                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-semibold text-sm">1</div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-800">Job Posting</p>
+                                                <p class="text-xs text-gray-500">HR posts detailed job openings</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">2</div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-800">Submit Application</p>
+                                                <p class="text-xs text-gray-500">Apply through user-friendly interface</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-semibold text-sm">3</div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-800">Application Review</p>
+                                                <p class="text-xs text-gray-500">HR reviews and shortlists candidates</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-semibold text-sm">4</div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-800">Schedule Interview</p>
+                                                <p class="text-xs text-gray-500">Selected candidates are contacted</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-shrink-0 w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center font-semibold text-sm">5</div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-800">Offer & Onboarding</p>
+                                                <p class="text-xs text-gray-500">Successful candidates receive offers</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div
-                        class="flex flex-col justify-center"
-                        data-aos="fade-left"
+                </div>
+            </section>
 
-                    >
-                        <h3 class="text-3xl font-bold text-green-800 mb-4">
-                            MISSION
-                        </h3>
-                        <p class="text-gray-700 leading-relaxed">
-                            To advance the frontier of knowledge through
-                            internationalization of education and equitable
-                            access to quality instruction, research, extension
-                            and production for economic prosperity, moral
-                            integrity, social and cultural sensitivity and
-                            environmental consciousness.
-                        </p>
+            <!-- Mission and Vision Section -->
+            <section id="about" class="py-20 bg-gradient-to-b from-gray-50 to-white">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16" data-aos="fade-up">
+                        <span class="inline-block px-4 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-4">DEPARTMENT'S</span>
+                        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                            Mission and Vision
+                        </h2>
+                        <div class="w-24 h-1 bg-green-600 mx-auto rounded-full"></div>
+                    </div>
+
+                    <!-- Mission Card -->
+                    <div class="max-w-6xl mx-auto mb-20">
+                        <div class="relative bg-white rounded-2xl shadow-xl overflow-hidden">
+                            <div class="grid grid-cols-1 lg:grid-cols-2">
+                                <div 
+                                    class="relative p-8 lg:p-12" 
+                                    data-aos="fade-right"
+                                    data-aos-duration="1000"
+                                >
+                                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
+                                    <h3 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                                        <span class="text-green-600 mr-3">01.</span> Our Mission
+                                    </h3>
+                                    <p class="text-gray-600 leading-relaxed text-lg">
+                                        To advance the frontier of knowledge through
+                                        internationalization of education and equitable
+                                        access to quality instruction, research,
+                                        extension and production for economic
+                                        prosperity, moral integrity, social and cultural
+                                        sensitivity and environmental consciousness.
+                                    </p>
+                                </div>
+                                <div 
+                                    class="relative" 
+                                    data-aos="fade-left"
+                                    data-aos-duration="1000"
+                                >
+                                    <img
+                                        :src="asset('img/cmuadmin.png')"
+                                        alt="CMU Admin Building"
+                                        class="w-full h-full object-cover"
+                                    />
+                                    <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vision Card -->
+                    <div class="max-w-6xl mx-auto">
+                        <div class="relative bg-white rounded-2xl shadow-xl overflow-hidden">
+                            <div class="grid grid-cols-1 lg:grid-cols-2">
+                                <div 
+                                    class="relative order-2 lg:order-1" 
+                                    data-aos="fade-right"
+                                    data-aos-duration="1000"
+                                >
+                                    <img
+                                        :src="asset('img/main_gate.png')"
+                                        alt="CMU Main Gate"
+                                        class="w-full h-full object-cover"
+                                    />
+                                    <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
+                                </div>
+                                <div 
+                                    class="relative p-8 lg:p-12 order-1 lg:order-2" 
+                                    data-aos="fade-left"
+                                    data-aos-duration="1000"
+                                >
+                                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
+                                    <h3 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                                        <span class="text-green-600 mr-3">02.</span> Our Vision
+                                    </h3>
+                                    <p class="text-gray-600 leading-relaxed text-lg">
+                                        A leading ASEAN university actively committed to
+                                        the total development of people for a globally
+                                        sustainable environment and a humane society.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                    <div
-                        class="flex flex-col justify-center"
-                        data-aos="fade-right"
-
-                    >
-                        <h3 class="text-3xl font-bold text-green-800 mb-4">
-                            VISION
-                        </h3>
-                        <p class="text-gray-700 leading-relaxed">
-                            A leading ASEAN university actively committed to the
-                            total development of people for a globally
-                            sustainable environment and a humane society.
-                        </p>
-                    </div>
-                    <div data-aos="fade-left">
-                        <img
-                            :src="asset('img/main_gate.png')"
-                            alt="CMU Main Gate"
-                            class="w-full h-80 object-cover rounded-lg shadow-lg"
-                        />
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
         <!-- Footer -->
         <footer class="bg-green-800 text-white py-4 text-center">
-            <p>© Software Development Department 2024. All Rights Reserved.</p>
+            <p> Software Development Department 2025. All Rights Reserved.</p>
         </footer>
     </div>
 </template>
 
-<style scoped>
-/* Remove animation-related styles */
-/* Keep only the scroll margin for sections */
+<style>
+/* Global styles to prevent horizontal scroll */
+html,
+body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
+/* Container styles */
+.container {
+    width: 100%;
+    max-width: 80rem; /* max-w-7xl equivalent */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Section spacing */
 section {
     scroll-margin-top: 5rem;
+    width: 100%;
+}
+
+/* Ensure images don't cause overflow */
+img {
+    max-width: 100%;
+    height: auto;
 }
 </style>

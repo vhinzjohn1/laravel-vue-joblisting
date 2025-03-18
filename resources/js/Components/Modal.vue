@@ -14,6 +14,14 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    title: {
+        type: String,
+        default: "",
+    },
+    showHeader: {
+        type: Boolean,
+        default: true,
+    }
 });
 
 const emit = defineEmits(["close"]);
@@ -103,9 +111,29 @@ const maxWidthClass = computed(() => {
                         class="mb-6 bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
                         :class="maxWidthClass"
                     >
-                        <!-- Scrollable Content Wrapper -->
-                        <div class="max-h-[90vh] overflow-y-auto">
-                            <slot v-if="show" />
+                        <div v-if="show">
+                            <!-- Default Header -->
+                            <div v-if="showHeader" class="modal-header bg-gray-50 px-5 py-4 border-b">
+                                <div class="flex justify-between items-center w-full">
+                                    <h5 class="modal-title font-semibold text-gray-900 text-lg">
+                                        {{ title }}
+                                    </h5>
+                                    <button
+                                        v-if="closeable"
+                                        type="button"
+                                        class="btn-close text-gray-500 hover:text-gray-700"
+                                        @click="close"
+                                        aria-label="Close"
+                                    >
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Scrollable Content Wrapper -->
+                            <div class="max-h-[85vh] overflow-y-auto">
+                                <slot />
+                            </div>
                         </div>
                     </div>
                 </Transition>
