@@ -30,8 +30,8 @@ const addEducation = async () => {
             route("profile-details.store", "education"),
             form.data(),
             {
-                preserveScroll: true
-            }
+                preserveScroll: true,
+            },
         );
         educations.value.push(response.data);
         form.reset();
@@ -54,9 +54,12 @@ const deleteEducation = async (id) => {
     });
 
     if (result.isConfirmed) {
-        await axios.delete(route("profile-details.destroy", ["education", id]), {
-            preserveScroll: true
-        });
+        await axios.delete(
+            route("profile-details.destroy", ["education", id]),
+            {
+                preserveScroll: true,
+            },
+        );
         fetchEducations();
         showSuccessAlert("delete");
     }
@@ -68,15 +71,12 @@ const showSuccessAlert = (action) => {
     switch (action) {
         case "add":
             title = "Educational Background Added Successfully!";
-            text = "Your profile information has been updated.";
             break;
         case "update":
             title = "Profile Updated Successfully!";
-            text = "Your profile information has been updated.";
             break;
         case "delete":
             title = "Education Deleted Successfully!";
-            text = "Your profile information has been updated.";
         default:
             title = "Action Completed!";
             text = "The operation was successful.";
@@ -87,7 +87,6 @@ const showSuccessAlert = (action) => {
         position: "top-end",
         icon: "success",
         title: title,
-        text: text,
         iconColor: "#ffffffff",
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds

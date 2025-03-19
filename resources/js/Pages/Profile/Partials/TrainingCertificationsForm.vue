@@ -63,20 +63,17 @@ const deleteTraining = async (id) => {
 
 // Show success alert function
 const showSuccessAlert = (action) => {
-    let title, text;
+    let title;
 
     switch (action) {
         case "add":
             title = "Training Added Successfully!";
-            text = "Your profile information has been updated.";
             break;
         case "update":
             title = "Training Updated Successfully!";
-            text = "Your profile information has been updated.";
             break;
         case "delete":
             title = "Training Deleted Successfully!";
-            text = "Your profile information has been updated.";
             break;
         default:
             title = "Action Completed!";
@@ -88,7 +85,6 @@ const showSuccessAlert = (action) => {
         position: "top-end",
         icon: "success",
         title: title,
-        text: text,
         iconColor: "#ffffffff",
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds

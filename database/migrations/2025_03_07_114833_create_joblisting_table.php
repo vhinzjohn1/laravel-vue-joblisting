@@ -224,7 +224,7 @@ return new class extends Migration
             'title'           => 'Software Engineer Opportunity',
             'description'     => 'Join our dynamic team to build cutting-edge web applications.',
             'closing_date'    => '2025-04-30',
-            'status'          => 'Open',
+            'status'          => 'Draft',
             'applicant_limit' => 50,
             'created_by'      => 2, // hr user
             'created_at'      => now(),
@@ -342,6 +342,7 @@ return new class extends Migration
             $table->string('type')->nullable();
             $table->string('message')->nullable();
             $table->boolean('is_read')->nullable();
+            $table->json('data')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');

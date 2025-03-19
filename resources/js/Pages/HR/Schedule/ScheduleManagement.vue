@@ -177,6 +177,10 @@
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 required
                             />
+                            <p class="mt-1 text-xs text-gray-500">
+                                Make sure your local timezone is correct. The
+                                system will handle timezone conversion.
+                            </p>
                         </div>
                         <div v-if="editingSchedule">
                             <label
@@ -310,16 +314,106 @@
         <!-- Add this new modal for viewing participants -->
         <Modal
             :show="showParticipantsModal"
+            :title="selectedSchedule ? selectedSchedule.title : ''"
             @close="showParticipantsModal = false"
-            maxWidth="2xl"
+            maxWidth="6xl"
         >
-            <div class="p-6">
-                <h2 class="text-lg font-semibold mb-4">
+            <div v-if="selectedSchedule" class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Left column: Basic details -->
+                    <div class="md:col-span-2">
+                        <div class="prose max-w-none">
+                            <h3 class="text-lg font-semibold mb-3">
+                                Interview Details
+                            </h3>
+
+                            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                                <div class="mb-4">
+                                    <h4
+                                        class="text-sm font-medium text-gray-500"
+                                    >
+                                        Date & Time
+                                    </h4>
+                                    <p class="text-gray-800">
+                                        {{
+                                            formatDate(
+                                                selectedSchedule.schedule_date,
+                                            )
+                                        }}
+                                    </p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h4
+                                        class="text-sm font-medium text-gray-500"
+                                    >
+                                        Location
+                                    </h4>
+                                    <p class="text-gray-800">
+                                        {{ selectedSchedule.location }}
+                                    </p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h4
+                                        class="text-sm font-medium text-gray-500"
+                                    >
+                                        Description
+                                    </h4>
+                                    <p class="text-gray-800">
+                                        {{ selectedSchedule.description }}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <h4
+                                        class="text-sm font-medium text-gray-500"
+                                    >
+                                        Additional Notes
+                                    </h4>
+                                    <p class="text-gray-800">
+                                        {{
+                                            selectedSchedule.notes ||
+                                            "No additional notes"
+                                        }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right column: Admin actions -->
+                    <div class="md:col-span-1">
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <h3 class="text-lg font-semibold mb-3">
+                                Admin Actions
+                            </h3>
+                            <div class="space-y-2">
+                                <button
+                                    @click="editSchedule(selectedSchedule)"
+                                    class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                                >
+                                    <i class="fas fa-edit mr-2"></i> Edit
+                                    Schedule
+                                </button>
+                                <button
+                                    @click="deleteSchedule(selectedSchedule)"
+                                    class="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                                >
+                                    <i class="fas fa-trash mr-2"></i> Delete
+                                    Schedule
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 mt-6">
                     Schedule Participants
-                </h2>
+                </h3>
                 <div class="space-y-4">
                     <div
-                        v-for="participant in selectedSchedule?.participants"
+                        v-for="participant in selectedSchedule.participants"
                         :key="participant.participant_id"
                         class="border rounded-lg p-4"
                     >
@@ -368,14 +462,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { Head, router } from "@inertiajs/vue3";
+import { ref, computed, onMounted } from "vue";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import Modal from "@/Components/Modal.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
 const props = defineProps({
@@ -400,6 +495,8 @@ const processing = ref(false);
 const selectedJobListing = ref("");
 const schedules = ref(props.schedules);
 
+console.log(schedules);
+
 const form = ref({
     title: "",
     description: "",
@@ -411,38 +508,36 @@ const form = ref({
 });
 
 const calendarOptions = computed(() => ({
-    plugins: [dayGridPlugin, interactionPlugin],
+    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     initialView: "dayGridMonth",
-    events: schedules.value.map((schedule) => ({
-        id: schedule.schedule_id,
-        title: schedule.title,
-        start: schedule.schedule_date,
-        allDay: true,
-    })),
-    dayCellDidMount: (info) => {
-        const today = new Date();
-        if (info.date.toDateString() === today.toDateString()) {
-            // Apply custom styles
-            info.el.style.backgroundColor = "#f0f8ff";
-            info.el.style.border = "2px solid #007bff";
-            info.el.style.position = "relative"; // ensure the cell can position absolute children
+    headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+    },
+    timeZone: "local",
+    events: schedules.value.map((schedule) => {
+        const scheduleDate = new Date(schedule.schedule_date);
 
-            // Create a label element
-            const label = document.createElement("div");
-            label.innerText = "Current";
-            // Style the label (adjust as needed)
-            label.style.position = "absolute";
-            label.style.top = "5px";
-            label.style.left = "5px";
-            label.style.backgroundColor = "#007bff";
-            label.style.color = "#fff";
-            label.style.padding = "2px 4px";
-            label.style.fontSize = "10px";
-            label.style.borderRadius = "3px";
-
-            // Append the label to the cell element
-            info.el.appendChild(label);
-        }
+        return {
+            id: schedule.schedule_id,
+            title: schedule.title,
+            start: scheduleDate,
+            allDay: false,
+            extendedProps: {
+                location: schedule.location,
+                description: schedule.description,
+                status: schedule.status,
+            },
+            backgroundColor: getStatusColor(schedule.status),
+            borderColor: getStatusColor(schedule.status),
+            textColor: "#ffffff",
+        };
+    }),
+    eventTimeFormat: {
+        hour: "2-digit",
+        minute: "2-digit",
+        meridiem: "short",
     },
     eventClick: (info) => {
         const schedule = schedules.value.find(
@@ -454,14 +549,65 @@ const calendarOptions = computed(() => ({
     },
 }));
 
+// Get status color for calendar events
+const getStatusColor = (status) => {
+    switch (status) {
+        case "Scheduled":
+            return "#3788d8";
+        case "Completed":
+            return "#28a745";
+        case "Cancelled":
+            return "#dc3545";
+        default:
+            return "#6c757d";
+    }
+};
+
 const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("en-US", {
+    if (!date) return "N/A";
+
+    const formattedDate = new Date(date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit",
+        timeZoneName: "short", // Add timezone information
     });
+
+    return formattedDate;
+};
+
+// Add a helper function to format date for input datetime-local
+const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+
+    // Create a date object in UTC to avoid timezone issues
+    const date = new Date(dateString);
+
+    // Format to YYYY-MM-DDThh:mm
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+// Add a function to properly format the date before submitting
+const prepareFormData = () => {
+    // Create a new object to prevent modifying the original
+    const formData = { ...form.value };
+
+    // If there's a schedule_date, ensure it's in ISO format
+    if (formData.schedule_date) {
+        // This ensures timezone consistency
+        const date = new Date(formData.schedule_date);
+        formData.schedule_date = date.toISOString();
+    }
+
+    return formData;
 };
 
 const getStatusClass = (status) => {
@@ -517,9 +663,10 @@ const handleSubmit = () => {
             schedules.value = response.props.schedules;
             closeModal();
             processing.value = false;
+            showToast("add");
         },
         onError: (error) => {
-            console.error("Error updating schedule:", error); // Log the error for debugging
+            showToast("add", false);
             processing.value = false;
         },
         preserveScroll: true, // Preserve scroll position
@@ -528,11 +675,11 @@ const handleSubmit = () => {
     if (editingSchedule.value) {
         router.put(
             route("schedules.update", editingSchedule.value.schedule_id),
-            form.value,
+            prepareFormData(),
             options,
         );
     } else {
-        router.post(route("schedules.store"), form.value, options);
+        router.post(route("schedules.store"), prepareFormData(), options);
     }
 };
 
@@ -545,7 +692,7 @@ const editSchedule = (schedule) => {
     form.value = {
         title: schedule.title,
         description: schedule.description,
-        schedule_date: schedule.schedule_date,
+        schedule_date: formatDateForInput(schedule.schedule_date),
         location: schedule.location,
         status: schedule.status,
         notes: schedule.notes,
@@ -561,18 +708,108 @@ const viewParticipants = (schedule) => {
     showParticipantsModal.value = true;
 };
 
-const deleteSchedule = (schedule) => {
-    if (confirm("Are you sure you want to delete this schedule?")) {
-        router.delete(route("schedules.destroy", schedule.schedule_id), {
-            onSuccess: () => {
-                schedules.value = schedules.value.filter(
-                    (s) => s.schedule_id !== schedule.schedule_id,
-                );
-            },
-            preserveScroll: true, // Preserve scroll position
-        });
+const showToast = (action, isSuccess = true) => {
+    let title;
+    let icon = isSuccess ? "success" : "error";
+    let background = isSuccess ? "#22c55e" : "#ef4444";
+
+    switch (action) {
+        case "add":
+            title = isSuccess
+                ? "Schedule Added Successfully!"
+                : "Failed to Add Schedule.";
+            break;
+        case "update":
+            title = isSuccess
+                ? "Schedule Updated Successfully!"
+                : "Failed to Update Schedule.";
+            break;
+        case "delete":
+            title = isSuccess
+                ? "Schedule Deleted Successfully!"
+                : "Failed to Delete Schedule.";
+            break;
+        default:
+            title = isSuccess ? "Action Completed!" : "Action Failed!";
     }
+
+    Swal.fire({
+        position: "top-end",
+        icon: icon,
+        title: title,
+        iconColor: "#ffffff",
+        showConfirmButton: false,
+        timer: 3000,
+        toast: true,
+        color: "#ffffff",
+        background: background,
+    });
+};
+
+const deleteSchedule = (schedule) => {
+    Swal.fire({
+        title: "Are you sure?",
+        text: `You are about to delete the schedule "${schedule.title}"`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route("schedules.destroy", schedule.schedule_id), {
+                onSuccess: (response) => {
+                    schedules.value = response.props.schedules;
+                    showToast("delete");
+                },
+                onError: () => {
+                    showToast("delete", false);
+                },
+                preserveScroll: true,
+            });
+        }
+    });
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Calendar View Styling */
+:deep(.fc) {
+    --fc-border-color: #e5e7eb;
+    --fc-button-bg-color: #3b82f6;
+    --fc-button-border-color: #3b82f6;
+    --fc-button-hover-bg-color: #2563eb;
+    --fc-button-hover-border-color: #2563eb;
+    --fc-button-active-bg-color: #1d4ed8;
+    --fc-button-active-border-color: #1d4ed8;
+    --fc-event-border-color: transparent;
+    --fc-today-bg-color: #eff6ff;
+}
+
+:deep(.fc-toolbar-title) {
+    font-size: 1.25rem !important;
+    font-weight: 600;
+}
+
+:deep(.fc-button) {
+    text-transform: capitalize !important;
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+:deep(.fc-event) {
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+:deep(.fc-daygrid-day-top) {
+    padding: 0.25rem;
+}
+
+:deep(.fc-day-today) {
+    background: var(--fc-today-bg-color) !important;
+}
+</style>

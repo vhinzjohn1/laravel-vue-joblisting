@@ -28,9 +28,9 @@
                         >
                             <div class="relative w-full md:w-1/2 max-w-xl">
                                 <div class="flex">
-                                    <input
+                                    <TextInput
                                         type="text"
-                                        class="form-control block w-full px-4 py-2.5 text-sm border border-gray-300 rounded-l-lg focus:ring-blue-500 focus:border-blue-500"
+                                        class="w-full rounded-r-none"
                                         placeholder="Search applications..."
                                         v-model="searchQuery"
                                     />
@@ -42,23 +42,18 @@
                                 </div>
                             </div>
                             <div class="flex gap-2">
-                                <select
+
+                                <CustomSelect
                                     v-model="statusFilter"
-                                    class="form-control px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option
-                                        v-for="status in statuses"
-                                        :key="status"
-                                        :value="status"
-                                    >
-                                        {{ status }}
-                                    </option>
-                                </select>
+                                    :options="statuses"
+                                    :displayFormat="(option) => option"
+                                    placeholder="All Statuses"
+                                    class="w-72"
+                                />
 
                                 <CustomSelect
                                     v-model="jobTitleFilter"
-                                    :options="jobListingOptions"
+                                    :options="jobListings"
                                     :displayFormat="
                                         (option) =>
                                             option.job_listing_id === ''
@@ -69,6 +64,7 @@
                                     placeholder="All Job Titles"
                                     class="w-72"
                                 />
+
                             </div>
                         </div>
                     </div>
@@ -269,7 +265,7 @@
                                                             application.application_id,
                                                         )
                                                     "
-                                                    class="text-blue-600 hover:text-blue-900"
+                                                    class="text-green-800 hover:text-green-900"
                                                 >
                                                     View Details
                                                 </button>
@@ -402,7 +398,7 @@
                                     }}</span>
                                     <button
                                         @click="openDocumentModal(doc)"
-                                        class="text-blue-600 hover:text-blue-800 text-sm"
+                                        class="text-green-800 hover:text-green-900 text-sm"
                                     >
                                         View
                                     </button>
@@ -458,7 +454,7 @@
                                 </div>
                                 <button
                                     type="submit"
-                                    class="w-full bg-blue-600 text-white py-1.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    class="w-full bg-green-800 text-white py-1.5 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
 
                                 >
                                     Update Status
@@ -551,7 +547,7 @@
                     v-if="documentUrl"
                     :href="documentUrl"
                     target="_blank"
-                    class="inline-flex items-center justify-center rounded-md border border-transparent shadow-sm px-3 py-1.5 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    class="inline-flex items-center justify-center rounded-md border border-transparent shadow-sm px-3 py-1.5 bg-green-800 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
                     Open in new tab
                 </a>
@@ -568,6 +564,7 @@ import Header from "@/Components/Header/Header.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
 import Modal from "@/Components/Modal.vue";
+import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
     applications: {
@@ -580,13 +577,13 @@ const props = defineProps({
     },
 });
 
-console.log('this is hte props', props)
 
 const applications = ref(props.applications);
 const searchQuery = ref("");
 const statusFilter = ref("");
 const jobTitleFilter = ref("");
 const statuses = ref(props.statuses);
+const jobListings = ref(props.applications.map(app => app.job_listing));
 
 const showDetailsModal = ref(false);
 const selectedApplication = ref(null);
@@ -603,7 +600,6 @@ const viewDetails = (applicationId) => {
     selectedApplication.value = applications.value.find(
         (app) => app.application_id === applicationId,
     );
-    console.log(selectedApplication.value);
     form.status = selectedApplication.value.status;
     form.remarks = "";
     showDetailsModal.value = true;
@@ -637,8 +633,7 @@ const updateStatus = () => {
         showToast({
             icon: "warning",
             title: "No changes made",
-            text: "The selected status is the same as the current status",
-            success: false,
+            text: "The selected status is the same as the current status"
         });
         return;
     }
@@ -678,7 +673,6 @@ const updateStatus = () => {
             showToast({
                 icon: "success",
                 title: "Status updated successfully",
-                text: `Application status has been changed to ${form.status}`,
                 success: true,
             });
         })
@@ -758,22 +752,6 @@ const filteredApplications = computed(() => {
     }
 
     return filtered;
-});
-
-const jobListingOptions = computed(() => {
-    const uniqueJobListings = new Map();
-    applications.value.forEach((app) => {
-        const jobListing = app.job_listing;
-        if (!uniqueJobListings.has(jobListing.job_listing_id)) {
-            uniqueJobListings.set(jobListing.job_listing_id, jobListing);
-        }
-    });
-
-    // Convert Map to array and add "All" option at the beginning
-    return [
-        { job_listing_id: "", title: "All Job Titles" },
-        ...Array.from(uniqueJobListings.values()),
-    ];
 });
 
 const formatDate = (dateString) => {

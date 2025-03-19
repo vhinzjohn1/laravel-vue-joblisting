@@ -191,8 +191,8 @@ const checkScreenSize = () => {
             <section id="home" class="min-h-screen flex items-center pt-16">
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center py-12 lg:py-0">
-                        <!-- Left Content - Centered on medium screens -->
-                        <div class="space-y-6 md:mx-auto md:text-center lg:text-left lg:mx-0">
+                        <!-- Left Content - Centered on medium and smaller screens -->
+                        <div class="space-y-6 text-center mx-auto sm:mx-auto md:mx-auto lg:text-left lg:mx-0">
                             <div data-aos="fade-up" data-aos-duration="800" data-aos-mirror="true">
                                 <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold">
                                     HR Job <span class="text-green-700">Listing</span><br />
@@ -211,7 +211,7 @@ const checkScreenSize = () => {
                                 to find and apply for opportunities.
                             </p>
                             <div
-                                class="flex flex-wrap gap-4 md:justify-center lg:justify-start"
+                                class="flex flex-wrap gap-4 justify-center sm:justify-center md:justify-center lg:justify-start"
                                 data-aos="fade-up"
                                 data-aos-duration="800"
                                 data-aos-delay="400"
@@ -253,7 +253,8 @@ const checkScreenSize = () => {
                                     </div>
                                 </div>
                                 <div class="space-y-3">
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100">
+                                    <!-- Application Process Steps -->
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
                                         <div class="flex items-center space-x-3">
                                             <div class="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-semibold text-sm">1</div>
                                             <div>
@@ -262,7 +263,7 @@ const checkScreenSize = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100">
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
                                         <div class="flex items-center space-x-3">
                                             <div class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">2</div>
                                             <div>
@@ -271,7 +272,7 @@ const checkScreenSize = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100">
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
                                         <div class="flex items-center space-x-3">
                                             <div class="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-semibold text-sm">3</div>
                                             <div>
@@ -280,7 +281,7 @@ const checkScreenSize = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100">
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
                                         <div class="flex items-center space-x-3">
                                             <div class="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-semibold text-sm">4</div>
                                             <div>
@@ -289,7 +290,7 @@ const checkScreenSize = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100">
+                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
                                         <div class="flex items-center space-x-3">
                                             <div class="flex-shrink-0 w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center font-semibold text-sm">5</div>
                                             <div>
@@ -297,6 +298,16 @@ const checkScreenSize = () => {
                                                 <p class="text-xs text-gray-500">Successful candidates receive offers</p>
                                             </div>
                                         </div>
+                                    </div>
+                                    <!-- Get Started Button -->
+                                    <div class="mt-6 flex justify-center" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
+                                        <Link
+                                            v-if="canLogin"
+                                            :href="route('login')"
+                                            class="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors font-medium"
+                                        >
+                                            Get Started
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

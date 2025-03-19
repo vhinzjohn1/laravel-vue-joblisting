@@ -5,11 +5,14 @@ namespace App\Http\Controllers\HR;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\ApplicationStatusHistory;
+use App\Traits\NotificationTrait;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ManageApplicationController extends Controller
 {
+    use NotificationTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -39,6 +42,7 @@ class ManageApplicationController extends Controller
                 'Rejected',
                 'Interview',
                 'Accepted'
+
             ]
         ]);
     }
@@ -71,7 +75,7 @@ class ManageApplicationController extends Controller
                 'Competency Exam',
                 'Rejected',
                 'Interview',
-                'Accepted'
+                'Accepted',
             ]
         ]);
     }
@@ -102,6 +106,9 @@ class ManageApplicationController extends Controller
             'updated_by' => auth()->id(),
         ]);
 
+        // Notify applicant about status change
+        $this->notifyApplicantStatusChange($application);
+
         // Get fresh applications data with relationships
         $applications = Application::with([
             'jobListing' => function ($query) {
@@ -129,5 +136,18 @@ class ManageApplicationController extends Controller
                 'Accepted'
             ]
         ], 200);
+    }
+
+    public function store(Request $request)
+    {
+        // ... existing validation and creation code ...
+
+        $application = Application::create($validated);
+
+        // Notify HR about new application
+        $this->notifyHRNewApplication($application);
+
+        return redirect()->route('applications.index')
+            ->with('message', 'Application created successfully');
     }
 }

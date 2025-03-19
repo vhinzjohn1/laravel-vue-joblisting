@@ -7,11 +7,15 @@ use App\Models\Schedule;
 use App\Models\Application;
 use App\Models\JobListing;
 use App\Models\ApplicationGroup;
+use App\Models\ScheduleParticipant;
+use App\Traits\NotificationTrait;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ScheduleController extends Controller
 {
+    use NotificationTrait;
+
     public function index()
     {
         $schedules = Schedule::with([
@@ -58,16 +62,27 @@ class ScheduleController extends Controller
             'created_by' => auth()->id()
         ]);
 
-        foreach ($validated['participants'] as $participant) {
-            $application = Application::find($participant['application_id']);
-            $schedule->participants()->create([
-                'user_id' => $application->user_id,
-                'application_id' => $application->application_id,
-                'status' => 'Pending'
-            ]);
+        // Create participants and send notifications in a single loop
+        if ($request->has('participants')) {
+            foreach ($request->participants as $participant) {
+                // Get the application to retrieve the user_id
+                $application = Application::findOrFail($participant['application_id']);
+
+                // Create the participant
+                $scheduleParticipant = ScheduleParticipant::create([
+                    'schedule_id' => $schedule->schedule_id,
+                    'user_id' => $application->user_id,
+                    'application_id' => $application->application_id,
+                    'status' => 'Pending'
+                ]);
+
+                // Notify the applicant
+                $this->notifyApplicantScheduled($schedule, $application);
+            }
         }
 
-        return redirect()->back()->with('success', 'Schedule created successfully');
+        return redirect()->route('schedules.index')
+            ->with('success', 'Schedule created successfully');
     }
 
     public function update(Request $request, Schedule $schedule)
@@ -99,23 +114,37 @@ class ScheduleController extends Controller
             $schedule->participants()->update(['status' => 'Cancelled']);
         }
 
-        // Update participants if provided
-        if (isset($validated['participants'])) {
-            // Remove existing participants
+        // If participants are updated, notify them
+        if ($request->has('participants')) {
+            // Remove old participants
             $schedule->participants()->delete();
 
-            // Add new participants
-            foreach ($validated['participants'] as $participant) {
-                $application = Application::find($participant['application_id']);
-                $schedule->participants()->create([
+            // Keep track of which users we've already notified to prevent duplicates
+            $notifiedUsers = [];
+
+            // Add new participants and notify them
+            foreach ($request->participants as $participant) {
+                // Get the application to retrieve the user_id
+                $application = Application::findOrFail($participant['application_id']);
+
+                $scheduleParticipant = ScheduleParticipant::create([
+                    'schedule_id' => $schedule->schedule_id,
                     'user_id' => $application->user_id,
                     'application_id' => $application->application_id,
                     'status' => 'Pending'
                 ]);
+
+                // Only send notification if we haven't notified this user yet
+                if (!in_array($application->user_id, $notifiedUsers)) {
+                    $this->notifyApplicantScheduled($schedule, $application, true);
+                    // Add user to notified list so we don't send duplicate notifications
+                    $notifiedUsers[] = $application->user_id;
+                }
             }
         }
 
-        return redirect()->back()->with('success', 'Schedule updated successfully');
+        return redirect()->route('schedules.index')
+            ->with('success', 'Schedule updated successfully');
     }
 
     public function destroy(Schedule $schedule)
@@ -159,12 +188,22 @@ class ScheduleController extends Controller
             'group_id' => $groupId
         ]);
 
+        // Keep track of which users we've already notified to prevent duplicates
+        $notifiedUsers = [];
+
         foreach ($group->applications as $application) {
             $schedule->participants()->create([
                 'user_id' => $application->user_id,
                 'application_id' => $application->application_id,
                 'status' => 'Pending'
             ]);
+
+            // Only send notification if we haven't notified this user yet
+            if (!in_array($application->user_id, $notifiedUsers)) {
+                $this->notifyApplicantScheduled($schedule, $application);
+                // Add user to notified list so we don't send duplicate notifications
+                $notifiedUsers[] = $application->user_id;
+            }
         }
 
         $group->update(['status' => 'Scheduled']);

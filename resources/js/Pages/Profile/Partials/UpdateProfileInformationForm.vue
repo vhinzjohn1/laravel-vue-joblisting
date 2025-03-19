@@ -24,17 +24,15 @@ const form = useForm({
 
 // Show success alert
 const showToast = () => {
-    let title, text;
+    let title;
 
     title = "Profile Updated Successfully!";
-    text = "Your profile information has been updated.";
 
     // Using SweetAlert2 toast with custom styling
     Swal.fire({
         position: "top-end",
         icon: "success",
         title: title,
-        text: text,
         iconColor: "#ffffffff",
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds

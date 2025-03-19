@@ -6,18 +6,17 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\JobListing;
 use Inertia\Inertia;
-use App\Models\Position;
-use App\Models\Category;
-use App\Models\SalaryGrade;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Application;
 use App\Models\ApplicantDocument;
 use App\Models\EducationalBackground;
 use App\Models\Training;
 use App\Models\WorkExperience;
+use App\Traits\NotificationTrait;
 
 class JobApplicationController extends Controller
 {
+    use NotificationTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -177,11 +176,12 @@ class JobApplicationController extends Controller
             'is_verified' => false,
         ]);
 
-        // return redirect()->back()->with('success', 'Application submitted successfully!');
-        return redirect()->back()->withInput(['success' => 'Application submitted successfully!']);
+        // Notify HR about new application
+        $this->notifyHRNewApplication($application);
+
+        return redirect()->route('my-applications.index')
+            ->with('message', 'Application submitted successfully');
     }
-
-
 
     /**
      * Show the form for editing the specified resource.

@@ -76,9 +76,6 @@
                                                 <span class="text-gray-600 text-sm">
                                                     {{ job.position.position_name }}
                                                 </span>
-                                                <span class="text-gray-500 text-sm">
-                                                    {{ job.category.category_name }}
-                                                </span>
                                             </div>
                                         </div>
                                     </div>

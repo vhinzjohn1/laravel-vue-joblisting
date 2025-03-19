@@ -1,12 +1,49 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import { Link } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
+import NotificationBell from "@/Components/NotificationBell.vue";
 
 const showMobileMenu = ref(false);
 const sidebarOpen = ref(true);
 const showLogoutModal = ref(false);
+const activeDropdown = ref(null);
+const hoveredItem = ref(null);
+
+// Handle dropdown toggle
+const toggleDropdown = (name) => {
+    if (activeDropdown.value === name) {
+        activeDropdown.value = null;
+    } else {
+        activeDropdown.value = name;
+    }
+};
+
+// Auto-open schedule dropdown if a schedule-related route is active
+onMounted(() => {
+    if (
+        route().current("schedules.index") ||
+        route().current("schedules.show") ||
+        route().current("groups.index")
+    ) {
+        activeDropdown.value = "schedule";
+    }
+});
+
+// Track route changes to update active dropdown
+watch(
+    () => route().current(),
+    (newRoute) => {
+        if (
+            newRoute === "schedules.index" ||
+            newRoute === "schedules.show" ||
+            newRoute === "groups.index"
+        ) {
+            activeDropdown.value = "schedule";
+        }
+    },
+);
 
 const toggleSidebar = () => {
     sidebarOpen.value = !sidebarOpen.value;
@@ -19,188 +56,427 @@ const toggleMobileMenu = () => {
 const handleLogout = () => {
     router.post(route("logout"));
 };
+
+const setHoveredItem = (item) => {
+    hoveredItem.value = item;
+};
+
+const clearHoveredItem = () => {
+    hoveredItem.value = null;
+};
+
+const isActive = (routeName) => {
+    return route().current(routeName);
+};
+
+const isActiveGroup = (routeNames) => {
+    return routeNames.some((name) => route().current(name));
+};
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100 shadow-md">
-        <!-- Mobile hamburger -->
-        <div class="lg:hidden">
-            <button
-                @click="toggleMobileMenu"
-                class="fixed top-4 right-4 z-50 rounded-lg bg-white p-2 text-gray-600 shadow-lg hover:bg-gray-50 focus:outline-none"
-            >
-                <i class="fas fa-bars h-6 w-6" v-if="!showMobileMenu"></i>
-                <i class="fas fa-times h-6 w-6" v-else></i>
-            </button>
-        </div>
+    <div class="min-h-screen bg-gray-100">
+        <!-- Mobile toggle button -->
+        <button
+            @click="toggleMobileMenu"
+            class="fixed top-4 right-4 z-50 lg:hidden rounded-full w-10 h-10 flex items-center justify-center bg-white shadow-lg text-gray-700 hover:bg-gray-50 focus:outline-none transition-all duration-300"
+        >
+            <i
+                :class="[
+                    showMobileMenu ? 'fa-times' : 'fa-bars',
+                    'fas text-lg',
+                ]"
+            ></i>
+        </button>
+
+        <!-- Backdrop overlay for mobile -->
+        <div
+            v-if="showMobileMenu"
+            @click="toggleMobileMenu"
+            class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden transition-opacity duration-300"
+        ></div>
 
         <!-- Sidebar -->
-        <div
+        <aside
             :class="{
                 'translate-x-0': showMobileMenu,
                 '-translate-x-full': !showMobileMenu,
                 'w-64': sidebarOpen,
                 'w-20': !sidebarOpen,
             }"
-            class="fixed left-0 top-0 z-40 h-full sidebar shadow-sm transition-all duration-300 ease-in-out lg:translate-x-0"
+            class="fixed left-0 top-0 h-full z-40 bg-[#012f12] shadow-xl transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col"
         >
-            <!-- Sidebar Header -->
-            <div class="flex h-16 items-center border-b px-6 mt-2.5">
+            <!-- Logo and header -->
+            <div class="flex items-center h-16 px-4 border-b border-[#023d17]">
                 <Link :href="route('hr.index')" class="flex items-center">
-                    <ApplicationLogo
-                        class="block h-8 w-auto fill-current text-white"
-                    />
+                    <ApplicationLogo class="h-9 w-9 text-[#ffc001]" />
                     <span
                         v-if="sidebarOpen"
-                        class="ml-3 text-lg font-semibold text-white"
+                        class="ml-3 text-lg font-bold text-white transition-opacity duration-300"
                         >HR Personnel</span
                     >
                 </Link>
             </div>
 
-            <!-- Navigation Links -->
-            <nav class="mt-4 px-3">
-                <ul class="space-y-2">
+            <!-- Navigation -->
+            <nav class="flex-1 px-3 py-4 overflow-y-auto">
+                <ul class="space-y-1">
+                    <!-- Dashboard -->
                     <li>
                         <Link
                             :href="route('hr.index')"
-                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-gray-100': route().current('hr.index'),
+                                'bg-[#ffc001] text-black': isActive('hr.index'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('hr.index'),
                             }"
+                            @mouseenter="setHoveredItem('dashboard')"
+                            @mouseleave="clearHoveredItem()"
                         >
-                            <i
-                                class="fas fa-tachometer-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
-                            ></i>
-                            <span
-                                v-if="sidebarOpen"
-                                class="ms-3 text-sm font-medium"
-                                >HR Dashboard</span
-                            >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActive('hr.index'),
+                                    }"
+                                >
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    :class="{
+                                        'font-semibold': isActive('hr.index'),
+                                    }"
+                                    >HR Dashboard</span
+                                >
+                            </div>
+                            <div
+                                v-if="
+                                    hoveredItem === 'dashboard' &&
+                                    !isActive('hr.index')
+                                "
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
                         </Link>
                     </li>
 
+                    <!-- Job Listings -->
                     <li>
                         <Link
                             :href="route('job-listing.index')"
-                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-gray-100': route().current('job-listing.index'),
+                                'bg-[#ffc001] text-black':
+                                    isActive('job-listing.index'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('job-listing.index'),
                             }"
+                            @mouseenter="setHoveredItem('jobs')"
+                            @mouseleave="clearHoveredItem()"
                         >
-                            <i
-                                class="fas fa-list-ul w-5 h-5 transition duration-75 group-hover:text-gray-900"
-                            ></i>
-                            <span
-                                v-if="sidebarOpen"
-                                class="ms-3 text-sm font-medium"
-                                >Job Listings</span
-                            >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black':
+                                            isActive('job-listing.index'),
+                                    }"
+                                >
+                                    <i class="fas fa-list-ul"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    :class="{
+                                        'font-semibold':
+                                            isActive('job-listing.index'),
+                                    }"
+                                    >Job Listings</span
+                                >
+                            </div>
+                            <div
+                                v-if="
+                                    hoveredItem === 'jobs' &&
+                                    !isActive('job-listing.index')
+                                "
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
                         </Link>
                     </li>
 
+                    <!-- Applications -->
                     <li>
                         <Link
                             :href="route('applications.index')"
-                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-gray-100':
-                                    route().current('applications.index') ||
-                                    route().current('applications.show'),
+                                'bg-[#ffc001] text-black': isActiveGroup([
+                                    'applications.index',
+                                    'applications.show',
+                                ]),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActiveGroup([
+                                        'applications.index',
+                                        'applications.show',
+                                    ]),
                             }"
+                            @mouseenter="setHoveredItem('applications')"
+                            @mouseleave="clearHoveredItem()"
                         >
-                            <i
-                                class="fas fa-file-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
-                            ></i>
-                            <span
-                                v-if="sidebarOpen"
-                                class="ms-3 text-sm font-medium"
-                                >Manage Applications</span
-                            >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActiveGroup([
+                                            'applications.index',
+                                            'applications.show',
+                                        ]),
+                                    }"
+                                >
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    :class="{
+                                        'font-semibold': isActiveGroup([
+                                            'applications.index',
+                                            'applications.show',
+                                        ]),
+                                    }"
+                                    >Manage Applications</span
+                                >
+                            </div>
+                            <div
+                                v-if="
+                                    hoveredItem === 'applications' &&
+                                    !isActiveGroup([
+                                        'applications.index',
+                                        'applications.show',
+                                    ])
+                                "
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
                         </Link>
                     </li>
 
-                    <li>
-                        <Link
-                            :href="route('groups.index')"
-                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                    <!-- Schedule Management with Dropdown -->
+                    <li class="relative">
+                        <div
+                            @click="toggleDropdown('schedule')"
+                            class="flex items-center justify-between px-3 py-3 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-gray-100': route().current('groups.index'),
+                                'text-white': isActiveGroup([
+                                    'schedules.index',
+                                    'schedules.show',
+                                    'groups.index',
+                                ]),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActiveGroup([
+                                        'schedules.index',
+                                        'schedules.show',
+                                        'groups.index',
+                                    ]),
                             }"
+                            @mouseenter="setHoveredItem('schedule')"
+                            @mouseleave="clearHoveredItem()"
                         >
-                            <i
-                                class="fas fa-users w-5 h-5 transition duration-75 group-hover:text-gray-900"
-                            ></i>
-                            <span
+                            <div class="flex items-center">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-white': isActiveGroup([
+                                            'schedules.index',
+                                            'schedules.show',
+                                            'groups.index',
+                                        ]),
+                                    }"
+                                >
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    :class="{
+                                        'font-semibold': isActiveGroup([
+                                            'schedules.index',
+                                            'schedules.show',
+                                            'groups.index',
+                                        ]),
+                                    }"
+                                    >Schedule Management</span
+                                >
+                            </div>
+                            <div
                                 v-if="sidebarOpen"
-                                class="ms-3 text-sm font-medium"
-                                >Group Management</span
+                                class="transition-transform duration-300"
+                                :class="{
+                                    'rotate-180': activeDropdown === 'schedule',
+                                }"
                             >
-                        </Link>
+                                <i
+                                    class="fas fa-chevron-down text-xs"
+                                    :class="{
+                                        'text-black': isActiveGroup([
+                                            'schedules.index',
+                                            'schedules.show',
+                                            'groups.index',
+                                        ]),
+                                    }"
+                                ></i>
+                            </div>
+                            <div
+                                v-if="
+                                    hoveredItem === 'schedule' &&
+                                    !isActiveGroup([
+                                        'schedules.index',
+                                        'schedules.show',
+                                        'groups.index',
+                                    ])
+                                "
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
+                        </div>
+
+                        <!-- Dropdown menu -->
+                        <transition
+                            enter-active-class="transition duration-200 ease-out"
+                            enter-from-class="transform scale-95 opacity-0"
+                            enter-to-class="transform scale-100 opacity-100"
+                            leave-active-class="transition duration-100 ease-in"
+                            leave-from-class="transform scale-100 opacity-100"
+                            leave-to-class="transform scale-95 opacity-0"
+                        >
+                            <ul
+                                v-show="activeDropdown === 'schedule'"
+                                class="mt-1 space-y-1 pl-7"
+                            >
+                                <li>
+                                    <Link
+                                        :href="route('schedules.index')"
+                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('schedules.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('schedules.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="fas fa-calendar-check mr-2"
+                                            :class="{
+                                                'text-black':
+                                                    isActive('schedules.index'),
+                                            }"
+                                        ></i>
+                                        <span>Individual Schedule</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        :href="route('groups.index')"
+                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('groups.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('groups.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="fas fa-users-cog mr-2"
+                                            :class="{
+                                                'text-black':
+                                                    isActive('groups.index'),
+                                            }"
+                                        ></i>
+                                        <span>Group Schedule</span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </transition>
                     </li>
 
-                    <li>
-                        <Link
-                            :href="route('schedules.index')"
-                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
-                            :class="{
-                                'bg-gray-100':
-                                    route().current('schedules.index') ||
-                                    route().current('schedules.show'),
-                            }"
-                        >
-                            <i
-                                class="fas fa-calendar-alt w-5 h-5 transition duration-75 group-hover:text-gray-900"
-                            ></i>
-                            <span
-                                v-if="sidebarOpen"
-                                class="ms-3 text-sm font-medium"
-                                >Schedule Management</span
-                            >
-                        </Link>
-                    </li>
-
+                    <!-- Profile -->
                     <li>
                         <Link
                             :href="route('profile.edit')"
-                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-gray-100': route().current('profile.edit'),
+                                'bg-[#ffc001] text-black':
+                                    isActive('profile.edit'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('profile.edit'),
                             }"
+                            @mouseenter="setHoveredItem('profile')"
+                            @mouseleave="clearHoveredItem()"
                         >
-                            <i
-                                class="fas fa-user w-5 h-5 transition duration-75 group-hover:text-gray-900"
-                            ></i>
-                            <span
-                                v-if="sidebarOpen"
-                                class="ms-3 text-sm font-medium"
-                                >Profile</span
-                            >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActive('profile.edit'),
+                                    }"
+                                >
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    :class="{
+                                        'font-semibold':
+                                            isActive('profile.edit'),
+                                    }"
+                                    >Profile</span
+                                >
+                            </div>
+                            <div
+                                v-if="
+                                    hoveredItem === 'profile' &&
+                                    !isActive('profile.edit')
+                                "
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
                         </Link>
                     </li>
 
+                    <!-- Reports -->
                     <li>
                         <Link
                             :href="route('profile.edit')"
-                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-gray-100': route().current('profile.edit'),
+                                'bg-[#ffc001] text-black': false,
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white': true,
                             }"
+                            @mouseenter="setHoveredItem('reports')"
+                            @mouseleave="clearHoveredItem()"
                         >
-                            <i
-                                class="fas fa-file-pdf w-5 h-5 transition duration-75 group-hover:text-gray-900"
-                            ></i>
-                            <span
-                                v-if="sidebarOpen"
-                                class="ms-3 text-sm font-medium"
-                                >Reports</span
-                            >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                >
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    >Reports</span
+                                >
+                            </div>
+                            <div
+                                v-if="hoveredItem === 'reports'"
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
                         </Link>
                     </li>
                 </ul>
             </nav>
-            <!-- User Menu -->
-            <div class="absolute bottom-0 w-90 border-t p-2">
+
+            <!-- User profile section -->
+            <div class="border-t border-[#023d17] p-4 mt-auto">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -211,9 +487,7 @@ const handleLogout = () => {
                                 <span
                                     class="text-sm font-medium leading-none text-gray-600"
                                 >
-                                    {{
-                                        $page.props.auth.user.username.charAt(0)
-                                    }}
+                                    {{ $page.props.auth.user.name.charAt(0) }}
                                 </span>
                             </span>
                         </div>
@@ -221,11 +495,15 @@ const handleLogout = () => {
                             <p class="text-md font-medium text-white">
                                 {{ $page.props.auth.user.name }}
                             </p>
-                            <p class="text-sm text-white max-w-[150px] truncate" title="{{ $page.props.auth.user.email }}">
+                            <p
+                                class="text-sm text-white max-w-[150px] truncate"
+                                title="{{ $page.props.auth.user.email }}"
+                            >
                                 {{ $page.props.auth.user.email }}
                             </p>
                         </div>
                     </div>
+
                     <button
                         @click="showLogoutModal = true"
                         class="rounded-lg p-1.5 text-white hover:bg-[#ffc001] hover:text-black transition-colors duration-200"
@@ -234,63 +512,9 @@ const handleLogout = () => {
                     </button>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- Toggle Sidebar Button -->
-        <button
-            @click="toggleSidebar"
-            class="fixed left-0 top-4 z-40 hidden rounded-r-lg p-2 m-2 text-gray-600 transition-all duration-200 hover:bg-gray-50 hover:text-gray-600 lg:block"
-            :class="{
-                'left-64': sidebarOpen,
-                'left-20': !sidebarOpen,
-            }"
-        >
-            <i class="fas fa-bars h-5 w-5" v-if="sidebarOpen"></i>
-            <i class="fas fa-chevron-right h-5 w-5" v-else></i>
-        </button>
-
-        <!-- Mobile Overlay -->
-        <div
-            v-if="showMobileMenu"
-            class="fixed inset-0 z-30 bg-gray-600 bg-opacity-50 transition-opacity lg:hidden"
-            @click="toggleMobileMenu"
-        ></div>
-
-        <!-- Logout Modal -->
-        <div
-            v-if="showLogoutModal"
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 transition-opacity"
-        >
-            <div
-                class="relative w-full max-w-sm rounded-lg bg-white p-6 text-center"
-            >
-                <h3 class="mb-1 text-lg font-semibold text-black">
-                    Are you sure you want to log out?
-                </h3>
-                <p class="mb-4 text-gray-800">
-                    Log out of
-                    <span class="text-black"
-                        >{{ $page.props.auth.user.email }}?</span
-                    >
-                </p>
-                <div class="flex flex-col space-y-2">
-                    <button
-                        @click="handleLogout"
-                        class="w-full rounded-lg logout px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    >
-                        Log out
-                    </button>
-                    <button
-                        @click="showLogoutModal = false"
-                        class="w-full rounded-lg border border-gray-600 px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
+        <!-- Main content wrapper -->
         <div
             :class="{
                 'lg:ml-64': sidebarOpen,
@@ -298,58 +522,151 @@ const handleLogout = () => {
             }"
             class="transition-all duration-300 ease-in-out"
         >
-            <!-- Page Heading -->
-            <header class="bg-white shadow" v-if="$slots.header">
-                <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
-                    <slot name="header" />
+            <!-- Page Header -->
+            <header class="bg-white shadow-sm" v-if="$slots.header">
+                <div
+                    class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5"
+                >
+                    <button
+                        @click="toggleSidebar"
+                        class="hidden lg:flex rounded-full w-8 h-8 items-center justify-center text-gray-600 hover:bg-[#034b1c] hover:text-white transition-colors duration-200 ml-4 flex-shrink-0"
+                    >
+                        <i
+                            :class="[
+                                sidebarOpen
+                                    ? 'fa-chevron-left'
+                                    : 'fa-chevron-right',
+                                'fas text-xs',
+                            ]"
+                        ></i>
+                    </button>
+                    <div class="flex-grow">
+                        <slot name="header" />
+                    </div>
+
+                    <NotificationBell
+                        class="mr-10"
+                        :notifications="$page.props.notifications"
+                    />
                 </div>
             </header>
 
             <!-- Page Content -->
-            <main class="py-1">
-                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <main class="py-3">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <slot />
                 </div>
             </main>
         </div>
+
+        <!-- Logout Modal -->
+        <transition
+            enter-active-class="ease-out duration-300"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="ease-in duration-200"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div
+                v-if="showLogoutModal"
+                class="fixed inset-0 z-50 overflow-y-auto"
+                aria-labelledby="modal-title"
+                role="dialog"
+                aria-modal="true"
+            >
+                <div
+                    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+                >
+                    <!-- Background overlay -->
+                    <div
+                        class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
+                        @click="showLogoutModal = false"
+                    ></div>
+
+                    <!-- Modal panel -->
+                    <div
+                        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6"
+                    >
+                        <div class="text-center">
+                            <h3
+                                class="text-lg leading-6 font-medium text-gray-900"
+                                id="modal-title"
+                            >
+                                Confirm Logout
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    Are you sure you want to log out from
+                                    <span class="font-semibold text-gray-700">{{
+                                        $page.props.auth.user.email
+                                    }}</span
+                                    >?
+                                </p>
+                            </div>
+                            <div class="mt-5 sm:mt-6 space-y-2">
+                                <button
+                                    type="button"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#012f12] text-base font-medium text-white hover:bg-[#034b1c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#012f12] transition-colors duration-200 sm:text-sm"
+                                    @click="handleLogout"
+                                >
+                                    Logout
+                                </button>
+                                <button
+                                    type="button"
+                                    class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffc001] transition-colors duration-200 sm:text-sm"
+                                    @click="showLogoutModal = false"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
     </div>
 </template>
 
 <style scoped>
+/* Base styling for transitions */
 .transition-all {
     transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* New styles for sidebar */
-.sidebar {
-    background-color: #012f12; /* Dark Green */
+/* Focus styles */
+button:focus,
+a:focus {
+    outline: 2px solid #ffc001;
+    outline-offset: 2px;
 }
 
-.sidebar a {
-    color: #ffffff; /* White text for links */
+/* Custom scrollbar for the sidebar */
+nav::-webkit-scrollbar {
+    width: 4px;
 }
 
-.sidebar nav a:hover,
-.sidebar nav a.bg-gray-100 {
+nav::-webkit-scrollbar-track {
+    background: #012f12;
+}
+
+nav::-webkit-scrollbar-thumb {
+    background-color: #034b1c;
+    border-radius: 20px;
+}
+
+/* Active item indicator animation */
+.sidebar-item-active-indicator {
+    width: 4px;
     background-color: #ffc001;
-    color: black !important; /* Green text on hover */
-}
-.logout {
-    background-color: #012f12;
-}
-
-.sidebar nav a:hover i {
-    color: black !important;
+    position: absolute;
+    left: 0;
+    height: 0;
+    transition: height 0.3s ease;
 }
 
-/* Add modal animation */
-.modal-enter-active,
-.modal-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-    opacity: 0;
+.group:hover .sidebar-item-active-indicator {
+    height: 100%;
 }
 </style>

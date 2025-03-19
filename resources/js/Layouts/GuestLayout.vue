@@ -4,9 +4,7 @@ import { Link } from "@inertiajs/vue3";
 </script>
 
 <template>
-    <div
-        class="p-3 shadow-xl min-h-screen flex flex-col items-center justify-center bg-gray-100"
-    >
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 p-3">
         <div>
             <Link href="/">
                 <ApplicationLogo class="w-20 h-20 fill-current text-gray-500" />
@@ -20,3 +18,4 @@ import { Link } from "@inertiajs/vue3";
         </div>
     </div>
 </template>
+

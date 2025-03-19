@@ -31,7 +31,7 @@
                                 </div>
                             </div>
                             <button
-                                class="btn px-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                                class="btn px-2 bg-green-800 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center"
                                 @click="showAddModal = true"
                             >
                                 <i class="fas fa-plus mr-2"></i> Add Job Listing
@@ -53,11 +53,11 @@
                                     <div class="flex items-start gap-4 mb-5">
                                         <!-- Position Icon -->
                                         <div
-                                            class="flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
+                                            class="flex-shrink-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                                             style="width: 56px; height: 56px"
                                         >
                                             <span
-                                                class="text-blue-600 font-semibold text-lg"
+                                                class="text-green-600 font-semibold text-lg"
                                             >
                                                 {{
                                                     job.position.position_name.substring(
@@ -71,7 +71,7 @@
                                         <!-- Title and Position -->
                                         <div class="flex-1">
                                             <h5
-                                                class="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors"
+                                                class="font-bold text-gray-900 text-lg mb-2 group-hover:text-green-800 transition-colors"
                                             >
                                                 {{ job.title }}
                                             </h5>
@@ -125,7 +125,7 @@
                                         <!-- Tags -->
                                         <div class="flex flex-wrap gap-2 mb-4">
                                             <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 group-hover:bg-blue-100 transition-colors"
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-green-50 text-green-900 group-hover:bg-green-100 transition-colors"
                                             >
                                                 ${{
                                                     job.position.salary_grade.amount.toLocaleString()
@@ -302,7 +302,7 @@
                     </button>
                     <button
                         type="submit"
-                        class="btn px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        class="btn px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
                     >
                         Save Job Listing
                     </button>
@@ -361,6 +361,18 @@
                                     v-model="editingJob.applicant_limit"
                                 />
                             </div>
+
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Status
+                                </label>
+                                <CustomSelect
+                                    :options="['Active', 'Draft', 'Closed']"
+                                    v-model="editingJob.status"
+                                    placeholder="Select a status"
+                                    :display-format="(status) => status"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -374,7 +386,7 @@
                     </button>
                     <button
                         type="submit"
-                        class="btn px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        class="btn px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
                     >
                         Update Job Listing
                     </button>
@@ -454,6 +466,8 @@ const editJob = (job) => {
 };
 
 const updateJob = () => {
+
+    console.log('this is hte editingjob : ', editingJob.value)
     axios
         .put(
             `/job-listing/${editingJob.value.job_listing_id}`,
@@ -475,7 +489,6 @@ const updateJob = () => {
                 position_id: null,
                 title: "",
                 description: "",
-                closing_date: "",
                 status: "Active",
                 applicant_limit: 1,
                 category_id: null,
@@ -533,24 +546,20 @@ const resetForm = () => {
 
 // Show success alert function
 const showSuccessAlert = (action) => {
-    let title, text;
+    let title;
 
     switch (action) {
         case "add":
             title = "Job Listing Added Successfully!";
-            text = "Information has been updated.";
             break;
         case "update":
             title = "Job Listing Updated Successfully!";
-            text = "Information has been updated.";
             break;
         case "delete":
             title = "Job Listing Deleted Successfully!";
-            text = "Information has been updated.";
             break;
         default:
             title = "Action Completed!";
-            text = "The operation was successful.";
     }
 
     // Using SweetAlert2 toast with custom styling
@@ -558,7 +567,6 @@ const showSuccessAlert = (action) => {
         position: "top-end",
         icon: "success",
         title: title,
-        text: text,
         iconColor: "#ffffffff",
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds

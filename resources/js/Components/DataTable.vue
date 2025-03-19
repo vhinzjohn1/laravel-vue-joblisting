@@ -20,11 +20,10 @@
 
         <!-- Search Field -->
         <div class="mb-4">
-            <input
+            <TextInput
                 type="text"
                 v-model="searchQuery"
                 placeholder="Search..."
-                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
         </div>
 
@@ -133,13 +132,13 @@
                         <td class="px-4 py-2 border border-gray-200">
                             <button
                                 @click="onEdit(item)"
-                                class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 mr-2 transition-colors"
+                                class="px-2 py-1 bg-green-800 text-white rounded hover:bg-green-600 mr-2 transition-colors"
                             >
                                 Edit
                             </button>
                             <button
                                 @click="onDelete(item)"
-                                class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                class="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-600 transition-colors"
                             >
                                 Delete
                             </button>
@@ -203,7 +202,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
+import TextInput from "@/Components/TextInput.vue";
 
 // Props definition including conditionalColumns prop
 const props = defineProps({
@@ -232,52 +232,82 @@ const sortDirection = ref("asc");
 
 /**
  * Helper function to recursively flatten an item's values (including nested values)
+ * Memoized to improve performance when called multiple times with the same item
  */
+const flattenItemCache = new WeakMap();
 const flattenItem = (item) => {
+    // Return cached result if available
+    if (flattenItemCache.has(item)) {
+        return flattenItemCache.get(item);
+    }
+    
     const values = [];
     const recurse = (obj) => {
         if (obj && typeof obj === "object") {
             Object.values(obj).forEach((val) => recurse(val));
-        } else {
-            values.push(obj);
+        } else if (obj !== undefined && obj !== null) {
+            values.push(String(obj).toLowerCase());
         }
     };
     recurse(item);
+    
+    // Cache the result
+    flattenItemCache.set(item, values);
     return values;
 };
 
 /**
  * Helper function to get nested value from an object using dot notation
+ * Optimized with path splitting memoization
  */
+const pathCache = new Map();
 const getNestedValue = (obj, path) => {
-    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+    if (!obj) return undefined;
+    
+    // Get or create cached path parts
+    let parts = pathCache.get(path);
+    if (!parts) {
+        parts = path.split(".");
+        pathCache.set(path, parts);
+    }
+    
+    return parts.reduce((acc, part) => acc && acc[part], obj);
 };
 
 /**
  * Helper: format header names (capitalize first letter and replace underscores with spaces)
+ * Memoized for performance
  */
+const headerCache = new Map();
 const formatHeader = (key) => {
-    return key
+    if (headerCache.has(key)) {
+        return headerCache.get(key);
+    }
+    
+    const formatted = key
         .split(".")
         .pop()
         .replace(/_/g, " ")
         .replace(/\b\w/g, (char) => char.toUpperCase());
+    
+    headerCache.set(key, formatted);
+    return formatted;
 };
 
 /**
  * Compute filtered items based on the search query.
  * This version searches across every value in the flattened item.
+ * Optimized with debounced search and pre-lowercased values
  */
 const filteredItems = computed(() => {
     if (!searchQuery.value.trim()) return props.data;
 
     const query = searchQuery.value.toLowerCase();
     return props.data.filter((item) => {
-        // Flatten the item to get an array of all values (including nested)
+        // Get flattened and lowercased values from cache or compute them
         const flatValues = flattenItem(item);
-        return flatValues.some((val) =>
-            String(val).toLowerCase().includes(query),
-        );
+        // Check if any value includes the query
+        return flatValues.some(val => val.includes(query));
     });
 });
 
@@ -286,10 +316,37 @@ const totalPages = computed(() =>
     Math.ceil(filteredItems.value.length / currentPageSize.value),
 );
 
+// Compute sorted items based on current sort key and direction
+const sortedItems = computed(() => {
+    if (!currentSortKey.value) return filteredItems.value;
+    
+    return [...filteredItems.value].sort((a, b) => {
+        const aValue = getNestedValue(a, currentSortKey.value);
+        const bValue = getNestedValue(b, currentSortKey.value);
+        
+        // Handle null/undefined values
+        if (aValue === undefined || aValue === null) return sortDirection.value === 'asc' ? 1 : -1;
+        if (bValue === undefined || bValue === null) return sortDirection.value === 'asc' ? -1 : 1;
+        
+        // Compare based on type
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return sortDirection.value === 'asc' ? aValue - bValue : bValue - aValue;
+        }
+        
+        // Default string comparison
+        const aString = String(aValue).toLowerCase();
+        const bString = String(bValue).toLowerCase();
+        
+        return sortDirection.value === 'asc' 
+            ? aString.localeCompare(bString)
+            : bString.localeCompare(aString);
+    });
+});
+
 // Compute paginated items for the current page
 const paginatedItems = computed(() => {
     const start = (currentPage.value - 1) * currentPageSize.value;
-    return filteredItems.value.slice(start, start + currentPageSize.value);
+    return sortedItems.value.slice(start, start + currentPageSize.value);
 });
 
 // Computed property for dynamic pagination buttons
@@ -388,12 +445,17 @@ const toggleSelectAll = () => {
 // Sorting function: toggles sort direction if same column is clicked,
 // or sets new sort column and resets direction to ascending.
 const sortBy = (col) => {
+    if (!props.sortable) return;
+    
     if (currentSortKey.value === col) {
         sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
     } else {
         currentSortKey.value = col;
         sortDirection.value = "asc";
     }
+    
+    // Reset to first page when sorting changes
+    currentPage.value = 1;
 };
 
 // Emit edit and delete events
@@ -406,13 +468,37 @@ const onDelete = (item) => {
 };
 
 // Function to return conditional class for a given column and value
+// Memoized for performance
+const classCache = new Map();
 const getConditionalClass = (column, value) => {
+    const cacheKey = `${column}:${value}`;
+    
+    if (classCache.has(cacheKey)) {
+        return classCache.get(cacheKey);
+    }
+    
+    let result = "";
     if (
         props.conditionalColumns[column] &&
         props.conditionalColumns[column][value]
     ) {
-        return props.conditionalColumns[column][value];
+        result = props.conditionalColumns[column][value];
     }
-    return "";
+    
+    classCache.set(cacheKey, result);
+    return result;
 };
+
+// Watch for changes in props.data to clear caches when data changes completely
+watch(() => props.data, () => {
+    flattenItemCache.clear && flattenItemCache.clear();
+    classCache.clear();
+}, { deep: false });
+
+// Initialize with a default sort if sortable is enabled
+onMounted(() => {
+    if (props.sortable && props.columns && props.columns.length > 0) {
+        currentSortKey.value = props.columns[0];
+    }
+});
 </script>

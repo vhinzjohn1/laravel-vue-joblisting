@@ -383,7 +383,7 @@ const submitApplication = () => {
     form.post(route("job-application.store"), {
         onSuccess: (response) => {
             emit("submitted", response);
-            showSuccessAlert("Application Submitted Sucessfully");
+            showToast("Application Submitted Sucessfully");
         },
         onError: (errors) => {
             console.error("Form submission error: ", errors);
@@ -399,19 +399,17 @@ const handleFileUpload = (event) => {
 };
 
 // Show success alert function
-const showSuccessAlert = (message) => {
+const showToast = (message) => {
     Swal.fire({
         position: "top-end",
         icon: "success",
-        title: "Success!",
-        text: message,
+        title: message,
         iconColor: "#ffffff",
         showConfirmButton: false,
         timer: 4000, // Toast will disappear after 4 seconds
         toast: true, // Enable toast mode
-        customClass: {
-            popup: "bg-green-500 text-white",
-        },
+        color: "#ffffff",
+        background: "#22c55e",
     });
 };
 
