@@ -4,7 +4,9 @@
             @click="toggleDropdown"
             class="relative p-2 text-gray-600 hover:text-gray-800 focus:outline-none"
         >
-            <i class="fas fa-bell text-xl"></i>
+        <i class="fas fa-bell text-2xl sm:text-xl xs:text-sm"></i>
+
+
             <span
                 v-if="unreadCount > 0"
                 class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center"

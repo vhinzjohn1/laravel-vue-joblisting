@@ -77,9 +77,7 @@ const maxWidthClass = computed(() => {
         <Transition leave-active-class="duration-150">
             <div
                 v-show="show"
-                class="fixed inset-0 px-4 py-6 sm:px-0 z-50"
-                style="overflow: visible"
-                scroll-region
+                class="fixed inset-0 px-4 py-6 sm:px-0 z-50 flex items-center justify-center"
             >
                 <Transition
                     enter-active-class="ease-out duration-150"
@@ -91,11 +89,9 @@ const maxWidthClass = computed(() => {
                 >
                     <div
                         v-show="show"
-                        class="fixed inset-0 transform transition-all"
+                        class="fixed inset-0 bg-gray-500 opacity-75"
                         @click="close"
-                    >
-                        <div class="absolute inset-0 bg-gray-500 opacity-75" />
-                    </div>
+                    ></div>
                 </Transition>
 
                 <Transition
@@ -108,11 +104,11 @@ const maxWidthClass = computed(() => {
                 >
                     <div
                         v-show="show"
-                        class="mb-6 bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="maxWidthClass"
+                        class="bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
+                        :class="[maxWidthClass, 'min-h-[75vh] max-h-[90vh] overflow-y-auto']"
                     >
                         <div v-if="show">
-                            <!-- Default Header -->
+                            <!-- Modal Header -->
                             <div v-if="showHeader" class="modal-header bg-gray-50 px-5 py-4 border-b">
                                 <div class="flex justify-between items-center w-full">
                                     <h5 class="modal-title font-semibold text-gray-900 text-lg">
@@ -130,8 +126,8 @@ const maxWidthClass = computed(() => {
                                 </div>
                             </div>
 
-                            <!-- Scrollable Content Wrapper -->
-                            <div class="max-h-[85vh] overflow-y-auto">
+                            <!-- Modal Content (Scrollable) -->
+                            <div>
                                 <slot />
                             </div>
                         </div>

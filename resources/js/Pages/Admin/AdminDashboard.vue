@@ -79,12 +79,15 @@
                     <div class="modal-footer">
                         <button
                             type="button"
-                            class="btn btn-secondary"
+                            class="btn bg-gray-200 text-gray-800 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
                             @click="closeAddModal"
                         >
                             Close
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button
+                            type="submit"
+                            class="btn bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                        >
                             Save changes
                         </button>
                     </div>
@@ -143,12 +146,15 @@
                     <div class="modal-footer">
                         <button
                             type="button"
-                            class="btn btn-secondary"
+                            class="btn bg-gray-200 text-gray-800 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
                             @click="closeEditModal"
                         >
                             Close
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button
+                            type="submit"
+                            class="btn bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                        >
                             Save changes
                         </button>
                     </div>
@@ -185,40 +191,45 @@ const closeAddModal = () => {
     form.reset();
 };
 
-const showSuccessAlert = (action) => {
-    let title, text;
+const showToast = (action, isSuccess = true, message = '') => {
+    let title, icon, background, toastOptions;
 
     switch (action) {
         case "add":
-            title = "User Added Successfully!";
-            text = "The user has been added to the system.";
+            title = isSuccess ? "User Added Successfully!" : "Failed to Add User.";
             break;
         case "edit":
-            title = "User Updated Successfully!";
-            text = "The user details have been updated.";
+            title = isSuccess ? "User Updated Successfully!" : "Failed to Update User.";
             break;
         case "delete":
-            title = "User Deleted Successfully!";
-            text = "The user has been removed from the system.";
+            title = isSuccess ? "User Deleted Successfully!" : "Failed to Delete User.";
             break;
         default:
-            title = "Action Completed!";
-            text = "The operation was successful.";
+            title = isSuccess ? "Action Completed!" : "Action Failed!";
+            break;
     }
 
-    // Using SweetAlert2 toast with custom styling
-    Swal.fire({
+    icon = isSuccess ? "success" : "error";
+    background = isSuccess ? "#22c55e" : "#ef4444";
+
+    toastOptions = {
         position: "top-end",
-        icon: "success",
+        icon: icon,
         title: title,
-        text: text,
-        iconColor: '#ffffffff',
+        iconColor: '#ffffff',
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds
         toast: true, // Enable toast mode
         color: '#ffffff',
-        background: '#22c55e'
-    });
+        background: background,
+    };
+
+    if (message) {
+        toastOptions.text = message;
+    }
+
+    // Using SweetAlert2 toast with custom styling
+    Swal.fire(toastOptions);
 };
 
 const showEdit = (item) => {
@@ -239,15 +250,20 @@ const saveChanges = () => {
     axios.post("admin", form).then((response) => {
         data.value = response.data;
         closeAddModal();
-        showSuccessAlert("add");
+        showToast("add");
+    }).catch((error) => {
+        showToast("add", false, error.response.data.error);
     });
 };
 
 const editUser = () => {
     axios.put(`admin/${form.user_id}`, form).then((response) => {
         data.value = response.data;
+        console.log(response.data);
         closeEditModal();
-        showSuccessAlert("edit");
+        showToast("edit");
+    }).catch((error) => {
+        showToast("edit", false, error.response.data.error);
     });
 };
 
@@ -266,7 +282,9 @@ const deleteItem = (item) => {
                 data.value = data.value.filter(
                     (user) => user.user_id !== item.user_id,
                 );
-                showSuccessAlert("delete");
+                showToast("delete");
+            }).catch((error) => {
+                showToast("delete", false, error.response.data.error);
             });
         }
     });

@@ -369,11 +369,11 @@ const isActiveGroup = (routeNames) => {
                         ></i>
                     </button>
                     <div class="flex-grow">
-                        <slot name="header" />
+                        <slot name="header"/>
                     </div>
 
                     <NotificationBell
-                        class="mr-10"
+                        class="mr-20"
                         :notifications="$page.props.notifications"
                     />
                 </div>
@@ -388,71 +388,38 @@ const isActiveGroup = (routeNames) => {
         </div>
 
         <!-- Logout Modal -->
-        <transition
-            enter-active-class="ease-out duration-300"
-            enter-from-class="opacity-0"
-            enter-to-class="opacity-100"
-            leave-active-class="ease-in duration-200"
-            leave-from-class="opacity-100"
-            leave-to-class="opacity-0"
+        <div
+            v-if="showLogoutModal"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 transition-opacity"
         >
             <div
-                v-if="showLogoutModal"
-                class="fixed inset-0 z-50 overflow-y-auto"
-                aria-labelledby="modal-title"
-                role="dialog"
-                aria-modal="true"
+                class="relative w-full max-w-sm rounded-lg bg-white p-6 text-center"
             >
-                <div
-                    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
-                >
-                    <!-- Background overlay -->
-                    <div
-                        class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
-                        @click="showLogoutModal = false"
-                    ></div>
-
-                    <!-- Modal panel -->
-                    <div
-                        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6"
+                <h3 class="mb-1 text-lg font-semibold text-black">
+                    Are you sure you want to log out?
+                </h3>
+                <p class="mb-4 text-gray-800">
+                    Log out of
+                    <span class="text-black"
+                        >{{ $page.props.auth.user.email }}?</span
                     >
-                        <div class="text-center">
-                            <h3
-                                class="text-lg leading-6 font-medium text-gray-900"
-                                id="modal-title"
-                            >
-                                Confirm Logout
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Are you sure you want to log out from
-                                    <span class="font-semibold text-gray-700">{{
-                                        $page.props.auth.user.email
-                                    }}</span
-                                    >?
-                                </p>
-                            </div>
-                            <div class="mt-5 sm:mt-6 space-y-2">
-                                <button
-                                    type="button"
-                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#012f12] text-base font-medium text-white hover:bg-[#034b1c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#012f12] transition-colors duration-200 sm:text-sm"
-                                    @click="handleLogout"
-                                >
-                                    Logout
-                                </button>
-                                <button
-                                    type="button"
-                                    class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffc001] transition-colors duration-200 sm:text-sm"
-                                    @click="showLogoutModal = false"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                </p>
+                <div class="flex flex-col space-y-2">
+                    <button
+                        @click="handleLogout"
+                        class="w-full rounded-lg logout px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    >
+                        Log out
+                    </button>
+                    <button
+                        @click="showLogoutModal = false"
+                        class="w-full rounded-lg border border-gray-600 px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
-        </transition>
+        </div>
     </div>
 </template>
 

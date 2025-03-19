@@ -35,23 +35,22 @@ class AdminController extends Controller
             $data = $request->validate([
                 'username' => 'required|string',
                 'email' => 'required|email|unique:users',
-                'password' => 'required|string',
+                'password' => 'required|string|min:6|max:20',
                 'role_name' => 'required|string',
             ]);
 
-            // Create a new Test instance using mass assignment
+            // Create a new User instance using mass assignment
             $createUser = User::create($data);
             $users = User::all();
 
             return response()->json($users, 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'An error occurred while creating the test',
+                'message' => 'An error occurred while creating the user',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
-
 
     /**
      * Display the specified resource.
@@ -72,13 +71,18 @@ class AdminController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            // Validate and automatically retrieve only the validated fields
+            // Get data without password first
             $data = $request->validate([
-                'username' => 'required|string',
+                'username' => 'required',
                 'email' => 'required|email',
-                'password' => 'string|nullable',
                 'role_name' => 'required|string',
+                // other fields...
             ]);
+
+            // Only add password to update data if it's provided
+            if ($request->filled('password')) {
+                $data['password'] = bcrypt($request->password);
+            }
 
             // Find the user by ID
             $user = User::findOrFail($id);

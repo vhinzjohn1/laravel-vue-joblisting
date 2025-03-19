@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
+import NotificationBell from "@/Components/NotificationBell.vue";   
 
 const showMobileMenu = ref(false);
 const sidebarOpen = ref(true);
@@ -301,12 +302,33 @@ const isActive = (routeName) => {
             class="transition-all duration-300 ease-in-out"
         >
             <!-- Page Heading -->
-            <header class="bg-white shadow" v-if="$slots.header">
-                <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
-                    <slot name="header" />
+            <header class="bg-white shadow-sm" v-if="$slots.header">
+                <div
+                    class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5"
+                >
+                    <button
+                        @click="toggleSidebar"
+                        class="hidden lg:flex rounded-full w-8 h-8 items-center justify-center text-gray-600 hover:bg-[#034b1c] hover:text-white transition-colors duration-200 ml-4 flex-shrink-0"
+                    >
+                        <i
+                            :class="[
+                                sidebarOpen
+                                    ? 'fa-chevron-left'
+                                    : 'fa-chevron-right',
+                                'fas text-xs',
+                            ]"
+                        ></i>
+                    </button>
+                    <div class="flex-grow">
+                        <slot name="header"/>
+                    </div>
+
+                    <NotificationBell
+                        class="mr-20"
+                        :notifications="$page.props.notifications"
+                    />
                 </div>
             </header>
-
             <!-- Page Content -->
             <main class="py-1">
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

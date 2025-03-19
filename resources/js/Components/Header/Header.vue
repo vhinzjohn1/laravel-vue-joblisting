@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ props.title }}</h2>
+  <h2 class="font-semibold text-[20px] px-5 sm:text-[30px] text-gray-800 leading-tight">{{ props.title }}</h2>
 </template>
 
 <style scoped>
