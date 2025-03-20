@@ -15,6 +15,8 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\ProfileDetailsController;
 use App\Http\Controllers\HR\ScheduleController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\HR\JobCategoryController;
+use App\Http\Controllers\HR\JobPositionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -51,9 +53,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -73,7 +75,8 @@ Route::middleware(['hr'])->group(function () {
     Route::resource('hr', HRController::class);
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
-
+    Route::resource('job-category', JobCategoryController::class);
+    Route::resource('job-position', JobPositionController::class);
     // Application Groups
     Route::resource('groups', ApplicationGroupController::class);
 });

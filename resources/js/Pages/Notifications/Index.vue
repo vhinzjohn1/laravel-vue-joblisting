@@ -1,4 +1,8 @@
 <template>
+    <Head title="View Job Listings" />
+    <component :is="layouts[userRole]">
+        <template #header>
+            <Header title="Notifications" /></template>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -60,12 +64,20 @@
             </div>
         </div>
     </div>
+    </component>
 </template>
 
 <script setup>
 import { router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import axios from "axios";
+import { computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
+import HRLayout from "@/Layouts/HR/HRLayout.vue";
+import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
+import Header from "@/Components/Header/Header.vue";
+import { Head } from "@inertiajs/vue3";
 
 const props = defineProps({
     notifications: {
@@ -73,6 +85,15 @@ const props = defineProps({
         required: true,
     },
 });
+
+const page = usePage()
+const userRole = computed(() => page.props.auth.user.role_name)
+
+const layouts = {
+  admin: AdminLayout,
+  hr: HRLayout,
+  applicant: ApplicantLayout
+}
 
 // Create a local copy of notifications to manipulate
 const localNotifications = ref([...props.notifications]);

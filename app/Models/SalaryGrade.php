@@ -13,13 +13,6 @@ class SalaryGrade extends Model
     protected $fillable = [
         'amount',
         'years_experience',
-        'updated_at'
-    ];
-
-    protected $casts = [
-        'amount' => 'float',
-        'years_experience' => 'integer',
-        'updated_at' => 'datetime'
     ];
 
     /**

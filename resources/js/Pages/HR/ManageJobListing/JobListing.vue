@@ -127,7 +127,7 @@
                                             <span
                                                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-green-50 text-green-900 group-hover:bg-green-100 transition-colors"
                                             >
-                                                ${{
+                                                &#x20B1;{{
                                                     job.position.salary_grade.amount.toLocaleString()
                                                 }}
                                             </span>
@@ -186,129 +186,178 @@
             </div>
         </div>
 
-        <!-- Add Job Modal -->
-        <Modal :show="showAddModal" @close="showAddModal = false" title="Create New Job Listing" max-width="6xl">
-            <form @submit.prevent="saveJob">
-                <div class="p-5">
-                    <!-- Basic Information Section -->
-                    <div class="mb-6">
-                        <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
-                            Basic Information
-                        </h6>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1" for="position">
-                                    Position *
-                                </label>
-                                <CustomSelect
-                                    :options="positions"
-                                    v-model="newJob.position_id"
-                                    placeholder="Select a position"
-                                    :value-key="'position_id'"
-                                    :display-format="(position) => `${position.position_name} (${position.item_number})`"
-                                    required
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1" for="jobTitle">
-                                    Job Title *
-                                </label>
-                                <TextInput
-                                    id="jobTitle"
-                                    v-model="newJob.title"
-                                    required
-                                />
-                            </div>
-                        </div>
+<!-- Add Job Modal -->
+<Modal :show="showAddModal" @close="showAddModal = false" title="Create New Job Listing" max-width="6xl">
+    <form @submit.prevent="saveJob">
+        <div class="p-5">
+            <!-- Basic Information Section -->
+            <div class="mb-6">
+                <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
+                    Basic Information
+                </h6>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Closing Date *
-                                </label>
-                                <TextInput
-                                    type="date"
-                                    v-model="newJob.closing_date"
-                                    required
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Applicant Limit *
-                                </label>
-                                <TextInput
-                                    type="number"
-                                    v-model="newJob.applicant_limit"
-                                    min="1"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Status *
-                                </label>
-                                <CustomSelect
-                                    :options="[{value: 'Active'}, {value: 'Draft'}, {value: 'Closed'}]"
-                                    v-model="newJob.status"
-                                    :value-key="'value'"
-                                    :display-format="(option) => option.value"
-                                    required
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1" for="category">
-                                    Category *
-                                </label>
-                                <CustomSelect
-                                    :options="categories"
-                                    v-model="newJob.category_id"
-                                    placeholder="Select a category"
-                                    :value-key="'category_id'"
-                                    :display-format="(category) => category.name"
-                                    required
-                                />
-                            </div>
-                        </div>
+                <!-- Job Title and Position -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Job Title -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="jobTitle">
+                            Job Title *
+                        </label>
+                        <TextInput
+                            id="jobTitle"
+                            v-model="newJob.title"
+                            required
+                        />
                     </div>
 
-                    <!-- Job Description Section -->
-                    <div class="mb-4">
-                        <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
-                            Job Description
-                        </h6>
+                    <!-- Position -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="position">
+                            Position *
+                        </label>
+                        <CustomSelect
+                            :options="positions"
+                            v-model="newJob.position_id"
+                            placeholder="Select a position"
+                            :value-key="'position_id'"
+                            :display-format="(position) => `${position.position_name} (${position.item_number})`"
+                            required
+                            @update:modelValue="handlePositionSelect"
+                        />
+                    </div>
+                </div>
+
+                <!-- Salary Grade and Item Number -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- Salary Grade -->
                         <div class="form-group">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                Description *
+                                Salary Grade
                             </label>
-                            <TextArea
-                                v-model="newJob.description"
-                                rows="4"
-                                placeholder="Enter job description"
-                                required
+                            <TextInput
+                                :value="selectedPosition?.salary_grade?.amount ? `₱${selectedPosition.salary_grade.amount.toLocaleString()}` : ''"
+                                disabled
+                                class="bg-gray-50"
+                            />
+                        </div>
+
+                        <!-- Item Number -->
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Item Number
+                            </label>
+                            <TextInput
+                                :value="selectedPosition?.item_number || ''"
+                                disabled
+                                class="bg-gray-50"
                             />
                         </div>
                     </div>
+                      <!-- Category -->
+                      <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="category">
+                            Category *
+                        </label>
+                        <CustomSelect
+                            :options="categories"
+                            v-model="newJob.category_id"
+                            placeholder="Select a category"
+                            :value-key="'category_id'"
+                            :display-format="(category) => category.name"
+                            required
+                        />
+                    </div>
                 </div>
-                <div class="border-t p-4 flex gap-2 justify-end">
-                    <button
-                        type="button"
-                        class="btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                        @click="showAddModal = false"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        class="btn px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                        Save Job Listing
-                    </button>
+
+                <!-- Closing Date and Applicant Limit -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <!-- Closing Date -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Closing Date *
+                        </label>
+                        <TextInput
+                            type="date"
+                            v-model="newJob.closing_date"
+                            required
+                        />
+                    </div>
+
+                    <!-- Applicant Limit -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Applicant Limit *
+                        </label>
+                        <TextInput
+                            type="number"
+                            v-model="newJob.applicant_limit"
+                            min="1"
+                            required
+                        />
+                    </div>
                 </div>
-            </form>
-        </Modal>
+
+                <!-- Status and Category -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <!-- Status -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Status *
+                        </label>
+                        <CustomSelect
+                            :options="[{value: 'Active'}, {value: 'Draft'}, {value: 'Closed'}]"
+                            v-model="newJob.status"
+                            :value-key="'value'"
+                            :display-format="(option) => option.value"
+                            required
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Description Section -->
+            <div class="mb-4">
+                <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
+                    Job Description
+                </h6>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Description *
+                    </label>
+                    <TextArea
+                        v-model="newJob.description"
+                        rows="4"
+                        placeholder="Enter job description"
+                        required
+                    />
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="border-t p-4 flex gap-2 justify-end">
+            <!-- Cancel Button -->
+            <button
+                type="button"
+                class="btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                @click="showAddModal = false"
+            >
+                Cancel
+            </button>
+
+            <!-- Save Button -->
+            <button
+                type="submit"
+                class="btn px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+                Save Job Listing
+            </button>
+        </div>
+    </form>
+</Modal>
 
         <!-- Edit Job Modal -->
         <Modal :show="showEditModal" @close="showEditModal = false" title="Edit Job Listing" max-width="6xl">
@@ -413,6 +462,8 @@ const positions = ref(usePage().props.positions);
 const categories = ref(usePage().props.categories);
 const salaryGrades = ref(usePage().props.salaryGrades);
 
+console.log(positions.value)
+
 // Modified job data structure to match database schema
 const jobs = ref(data.value);
 
@@ -433,6 +484,21 @@ const filteredJobs = computed(() => {
 // Modal state
 const showAddModal = ref(false);
 const showEditModal = ref(false);
+const selectedPosition = ref(null);
+
+const handlePositionSelect = (positionId) => {
+    // use salaryGrades to get the salary grade and years of experience
+    selectedPosition.value = positions.value.find(
+        (p) => p.position_id === positionId
+    );
+    const salaryGrade = salaryGrades.value.find(
+        (sg) => sg.salary_grade_id === selectedPosition.value.salary_grade_id
+    );
+    selectedPosition.value = {
+        ...selectedPosition.value,
+        salary_grade: salaryGrade,
+    };
+};
 
 // Modified new job form data
 const newJob = ref({

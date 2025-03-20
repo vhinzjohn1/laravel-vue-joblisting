@@ -8,7 +8,10 @@ use App\Models\JobListing;
 use Inertia\Inertia;
 use App\Models\Application;
 use App\Models\ApplicantDocument;
+use App\Models\Category;
 use App\Models\EducationalBackground;
+use App\Models\Position;
+use App\Models\SalaryGrade;
 use App\Models\Training;
 use App\Models\WorkExperience;
 use App\Traits\NotificationTrait;
@@ -31,8 +34,6 @@ class JobApplicationController extends Controller
             'minimumRequirements',
             'applications'
         ])->get();
-
-
 
         return Inertia::render('Applicant/ViewJobs/ViewJobListings', [
             'jobListings' => $jobListings

@@ -59,22 +59,68 @@
                                     <div class="flex items-start gap-4 mb-5">
                                         <!-- Position Icon -->
                                         <div
-                                            class="flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
+                                            class="flex-shrink-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                                             style="width: 56px; height: 56px"
                                         >
-                                            <span class="text-blue-600 font-semibold text-lg">
-                                                {{ job.position.position_name.substring(0, 2) }}
+                                            <span
+                                                class="text-green-600 font-semibold text-lg"
+                                            >
+                                                {{
+                                                    job.position.position_name.substring(
+                                                        0,
+                                                        2,
+                                                    )
+                                                }}
                                             </span>
                                         </div>
 
-                                        <!-- Title and Department -->
+                                        <!-- Title and Position -->
                                         <div class="flex-1">
-                                            <h5 class="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                                            <h5
+                                                class="font-bold text-gray-900 text-lg mb-2 group-hover:text-green-600 transition-colors"
+                                            >
                                                 {{ job.title }}
                                             </h5>
-                                            <div class="flex flex-col gap-1">
-                                                <span class="text-gray-600 text-sm">
-                                                    {{ job.position.position_name }}
+                                            <div
+                                                class="flex items-center gap-2 text-sm"
+                                            >
+                                                <span class="text-gray-600">{{
+                                                    job.position.position_name
+                                                }}</span>
+                                                <span class="text-gray-300"
+                                                    >•</span
+                                                >
+                                                <span
+                                                    class="inline-flex items-center gap-1.5"
+                                                >
+                                                    <span
+                                                        class="inline-block w-2.5 h-2.5 rounded-full"
+                                                        :class="{
+                                                            'bg-green-500':
+                                                                job.status ===
+                                                                'Active',
+                                                            'bg-yellow-500':
+                                                                job.status ===
+                                                                'Draft',
+                                                            'bg-red-500':
+                                                                job.status ===
+                                                                'Closed',
+                                                        }"
+                                                    ></span>
+                                                    <span
+                                                        :class="{
+                                                            'text-green-600':
+                                                                job.status ===
+                                                                'Active',
+                                                            'text-yellow-600':
+                                                                job.status ===
+                                                                'Draft',
+                                                            'text-red-600':
+                                                                job.status ===
+                                                                'Closed',
+                                                        }"
+                                                        >{{ job.status }}</span
+                                                    >
                                                 </span>
                                             </div>
                                         </div>
@@ -82,65 +128,85 @@
 
                                     <!-- Content Section -->
                                     <div class="flex-grow">
-                                        <!-- Key Details -->
+                                        <!-- Tags -->
                                         <div class="flex flex-wrap gap-2 mb-4">
-                                            <!-- Salary -->
                                             <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-green-50 text-green-700"
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-900 group-hover:bg-blue-100 transition-colors"
                                             >
-                                                <i class="fas fa-money-bill-wave mr-1.5"></i>
-                                                ₱{{ job.position.salary_grade.amount.toLocaleString() }}
+                                                &#x20B1;{{
+                                                    job.position.salary_grade.amount.toLocaleString()
+                                                }}
                                             </span>
-                                            <!-- Experience -->
                                             <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700"
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 group-hover:bg-gray-100 transition-colors"
                                             >
-                                                <i class="fas fa-briefcase mr-1.5"></i>
-                                                {{ job.position.salary_grade.years_experience }}+ years
+                                                {{
+                                                    job.position.salary_grade
+                                                        .years_experience
+                                                }}+ years
                                             </span>
-                                            <!-- Deadline -->
                                             <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-50 text-purple-700"
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-50 text-purple-900 group-hover:bg-purple-100 transition-colors"
                                             >
-                                                <i class="fas fa-calendar-alt mr-1.5"></i>
-                                                {{ formatDate(job.deadline) }}
+                                                {{ job.category.name }}
                                             </span>
                                         </div>
 
                                         <!-- Description -->
-                                        <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+                                        <p
+                                            class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4"
+                                        >
                                             {{ job.description }}
                                         </p>
 
-                                        <!-- Requirements Preview -->
-                                        <div class="space-y-2">
-                                            <h6 class="text-sm font-semibold text-gray-700">Key Requirements:</h6>
-                                            <ul class="text-sm text-gray-600 space-y-1">
-                                                <li v-for="(req, idx) in job.minimum_requirements.slice(0, 2)" :key="idx"
-                                                    class="flex items-center">
-                                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                                    {{ req.title }}
-                                                </li>
-                                                <li v-if="job.minimum_requirements.length > 2"
-                                                    class="text-blue-600 italic">
-                                                    + {{ job.minimum_requirements.length - 2 }} more requirements...
-                                                </li>
-                                            </ul>
+                                        <!-- Requirements if any -->
+                                        <div
+                                            v-if="
+                                                job.minimum_requirements
+                                                    .length > 0
+                                            "
+                                            class="text-sm text-gray-600"
+                                        >
+                                            <div
+                                                v-for="req in job.minimum_requirements"
+                                                :key="req.requirement_id"
+                                                class="flex items-center gap-2"
+                                            >
+                                                <i
+                                                    class="fas fa-check-circle text-green-500"
+                                                ></i>
+                                                {{ req.title }}
+                                            </div>
                                         </div>
                                     </div>
 
                                     <!-- Footer Section -->
-                                    <div class="mt-6 pt-4 border-t border-gray-50">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm text-gray-500">
-                                                    Posted {{ formatDate(job.created_at) }}
+                                    <div
+                                        class="mt-6 pt-4 border-t border-gray-50"
+                                    >
+                                        <div
+                                            class="flex items-center justify-between"
+                                        >
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
+                                                <span
+                                                    class="text-sm text-gray-500"
+                                                >
+                                                    Posted
+                                                    {{
+                                                        formatDate(
+                                                            job.created_at,
+                                                        )
+                                                    }}
                                                 </span>
                                             </div>
                                             <button
-                                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all duration-200"
+                                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 transition-all duration-200"
                                             >
-                                                <i class="fas fa-arrow-right mr-2"></i>
+                                                <i
+                                                    class="fas fa-arrow-right mr-2"
+                                                ></i>
                                                 View Details
                                             </button>
                                         </div>
@@ -166,6 +232,7 @@ import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 // Fetching Props that was sent by controller
 const jobs = ref(usePage().props.jobListings);
 
+console.log("This is the props ", usePage().props);
 // Search functionality
 const searchQuery = ref("");
 const filteredJobs = computed(() => {
@@ -199,10 +266,10 @@ const showJobDetails = (job) => {
 };
 
 const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+    return new Date(date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
     });
 };
 </script>

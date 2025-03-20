@@ -100,7 +100,6 @@ return new class extends Migration
             'school_name'     => 'Central Mindanao University',
             'degree_course'   => 'BS in Computer Science',
             'year_graduated'  => '2018',
-            'honors_received' => 'Magnum',
             'created_at'      => now(),
             'updated_at'      => now(),
         ]);
@@ -162,12 +161,12 @@ return new class extends Migration
             $table->id('salary_grade_id');
             $table->float('amount', 53, 2)->nullable();
             $table->integer('years_experience')->nullable();
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
         });
 
         DB::table('salary_grades')->insert([
-            ['amount' => 50000, 'years_experience' => 2, 'updated_at' => now()],
-            ['amount' => 70000, 'years_experience' => 5, 'updated_at' => now()],
+            ['amount' => 50000, 'years_experience' => 2],
+            ['amount' => 70000, 'years_experience' => 5],
         ]);
 
         // Create positions table and seed data

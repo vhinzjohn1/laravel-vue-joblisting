@@ -21,7 +21,7 @@ const props = defineProps({
     showHeader: {
         type: Boolean,
         default: true,
-    }
+    },
 });
 
 const emit = defineEmits(["close"]);
@@ -105,13 +105,23 @@ const maxWidthClass = computed(() => {
                     <div
                         v-show="show"
                         class="bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="[maxWidthClass, 'min-h-[75vh] max-h-[90vh] overflow-y-auto']"
+                        :class="[
+                            maxWidthClass,
+                            'min-w-[450px] max-w-[90vw] max-h-[90vh] overflow-y-auto',
+                        ]"
                     >
                         <div v-if="show">
                             <!-- Modal Header -->
-                            <div v-if="showHeader" class="modal-header bg-gray-50 px-5 py-4 border-b">
-                                <div class="flex justify-between items-center w-full">
-                                    <h5 class="modal-title font-semibold text-gray-900 text-lg">
+                            <div
+                                v-if="showHeader"
+                                class="modal-header bg-gray-50 px-5 py-4 border-b"
+                            >
+                                <div
+                                    class="flex justify-between items-center w-full"
+                                >
+                                    <h5
+                                        class="modal-title font-semibold text-gray-900 text-lg"
+                                    >
                                         {{ title }}
                                     </h5>
                                     <button

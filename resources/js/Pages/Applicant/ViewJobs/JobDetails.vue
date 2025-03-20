@@ -74,10 +74,10 @@
                         <!-- Job Header -->
                         <div class="flex items-start gap-4 mb-6">
                             <div
-                                class="flex-shrink-0 bg-blue-50 rounded-lg p-4 flex items-center justify-center"
+                                class="flex-shrink-0 bg-green-50 rounded-lg p-4 flex items-center justify-center"
                                 style="width: 64px; height: 64px"
                             >
-                                <span class="text-blue-600 font-medium text-xl">
+                                <span class="text-green-600 font-medium text-xl">
                                     {{
                                         job.position.position_name.substring(
                                             0,
@@ -215,7 +215,7 @@
                                         'w-full py-3 px-4 rounded-lg transition-colors flex items-center justify-center',
                                         hasApplied
                                             ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-blue-600 hover:bg-blue-700 text-white',
+                                            : 'bg-green-600 hover:bg-green-700 text-white',
                                     ]"
                                 >
                                     <i class="far fa-paper-plane mr-2"></i>

@@ -1,3 +1,25 @@
+<!-- Instruction to Use -->
+<!-- :data - array of objects data-->
+<!-- :columns - array of column objects -->
+    <!-- 2 ways for defining columns -->
+        <!-- 1. column object should have key and title properties -->
+                <!-- :columns="[
+                { key: 'position_id', title: 'Position ID' },
+                { key: 'position_name', title: 'Position Name' },
+                { key: 'item_number', title: 'Item Number' },
+                { key: 'salary_grade.amount', title: 'Salary Grade' }
+            ]" -->
+        <!-- 2. Defined columns by column key -->
+                <!-- :columns="['user_id', 'username', 'email', 'role_name']" -->
+            
+<!-- :sortable - boolean -->
+<!-- :enableRowCheckbox - boolean -->
+<!-- :conditionalColumns - object -->
+<!-- @edit - edit event -->
+<!-- @delete - delete event -->
+
+
+
 <template>
     <div class="p-4">
         <!-- Items per page dropdown -->
@@ -55,38 +77,18 @@
                         </th>
                         <!-- Render specified columns -->
                         <th
-                            v-for="col in showColumns"
-                            :key="col"
-                            @click="sortable && sortBy(col)"
-                            class="px-4 py-2 border border-gray-200 cursor-pointer select-none"
-                        >
-                            <div class="flex items-center space-x-1">
-                                <span>{{ formatHeader(col) }}</span>
-                                <!-- Show sort indicator if this is the active sort column -->
-                                <span v-if="sortable && currentSortKey === col">
-                                    <svg
-                                        v-if="sortDirection === 'asc'"
-                                        class="w-3 h-3"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            d="M5.23 7.21a.75.75 0 011.06 0L10 10.91l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 010-1.06z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        v-else
-                                        class="w-3 h-3"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            d="M14.77 12.79a.75.75 0 01-1.06 0L10 9.09l-3.71 3.7a.75.75 0 11-1.06-1.06l4.24-4.24a.75.75 0 011.06 0l4.24 4.24a.75.75 0 010 1.06z"
-                                        />
-                                    </svg>
-                                </span>
-                            </div>
-                        </th>
+                            v-for="col in columnConfigs"
+                            :key="col.key"
+                            @click="sortable && sortBy(col.key)"
+                                class="px-4 py-2 border border-gray-200 cursor-pointer select-none"
+                            >
+                                <div class="flex items-center space-x-1">
+                                    <span>{{ col.title }}</span>
+                                    <span v-if="sortable && currentSortKey === col.key">
+                                        <!-- ... existing sort indicators ... -->
+                                    </span>
+                                </div>
+                            </th>
                         <!-- Actions Column -->
                         <th class="px-4 py-2 border border-gray-200">
                             Actions
@@ -109,24 +111,23 @@
                         </td>
                         <!-- Render only specified columns -->
                         <td
-                            v-for="col in showColumns"
-                            :key="col"
-                            class="px-4 py-2 border border-gray-200"
+                            v-for="col in columnConfigs"
+                            :key="col.key"
+                            class="px-4 py-2 border border-gray-200 text-center"
                         >
-                            <template v-if="conditionalColumns[col]">
-                                <span
-                                    :class="
-                                        getConditionalClass(
-                                            col,
-                                            getNestedValue(item, col),
-                                        )
-                                    "
-                                >
-                                    {{ getNestedValue(item, col) }}
+                            <template v-if="conditionalColumns[col.key]">
+                                <span :class="getConditionalClass(col.key, getNestedValue(item, col.key))">
+                                    {{ col.currency 
+                                        ? formatCurrency(getNestedValue(item, col.key), col.currency)
+                                        : getNestedValue(item, col.key) 
+                                    }}
                                 </span>
                             </template>
                             <template v-else>
-                                {{ getNestedValue(item, col) }}
+                                {{ col.currency 
+                                    ? formatCurrency(getNestedValue(item, col.key), col.currency)
+                                    : getNestedValue(item, col.key) 
+                                }}
                             </template>
                         </td>
                         <td class="px-4 py-2 border border-gray-200">
@@ -209,7 +210,7 @@ import TextInput from "@/Components/TextInput.vue";
 const props = defineProps({
     data: { type: Array, required: true },
     pageSize: { type: Number, default: 10 },
-    columns: { type: Array, default: null },
+    columns: { type: Array,  default: () => [] },
     pageSizeOptions: { type: Array, default: () => [10, 20, 50, 100] },
     enableRowCheckbox: { type: Boolean, default: false },
     sortable: { type: Boolean, default: true },
@@ -263,6 +264,10 @@ const flattenItem = (item) => {
 const pathCache = new Map();
 const getNestedValue = (obj, path) => {
     if (!obj) return undefined;
+    if (typeof path !== 'string') {
+        // If path is an object (from columnConfigs), use the key property
+        path = path.key || path;
+    }
     
     // Get or create cached path parts
     let parts = pathCache.get(path);
@@ -375,15 +380,23 @@ const visiblePages = computed(() => {
     return range;
 });
 
+const columnConfigs = computed(() => {
+    if (!props.data.length) return [];
+    
+    return props.columns.map(col => {
+        if (typeof col === 'string') {
+            return { key: col, title: formatHeader(col) };
+        }
+        return { 
+            key: col.key, 
+            title: col.title || formatHeader(col.key),
+            currency: col.currency 
+        };
+    });
+});
 // Determine which columns to show: use columns prop if provided, otherwise all keys from first data item.
 const showColumns = computed(() => {
-    if (props.columns && props.columns.length) {
-        return props.columns;
-    }
-    if (props.data.length) {
-        return Object.keys(props.data[0]);
-    }
-    return [];
+    return columnConfigs.value.map(col => col.key);
 });
 
 // Error handler: if columns prop is provided, check that each column exists in the first data item.
@@ -444,18 +457,27 @@ const toggleSelectAll = () => {
 
 // Sorting function: toggles sort direction if same column is clicked,
 // or sets new sort column and resets direction to ascending.
-const sortBy = (col) => {
-    if (!props.sortable) return;
-    
-    if (currentSortKey.value === col) {
-        sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+const sortBy = (column) => {
+    const key = typeof column === 'string' ? column : column.key;
+    if (currentSortKey.value === key) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
     } else {
-        currentSortKey.value = col;
-        sortDirection.value = "asc";
+        currentSortKey.value = key;
+        sortDirection.value = 'asc';
     }
-    
-    // Reset to first page when sorting changes
-    currentPage.value = 1;
+    currentPage.value = 1; // Reset to first page when sorting
+};
+
+
+// Format Currency Helper Function
+const formatCurrency = (value, currency = '') => {
+    if (!value) return '';
+    const numValue = Number(value);
+    if (isNaN(numValue)) return value;
+    return `${currency}${numValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
 };
 
 // Emit edit and delete events

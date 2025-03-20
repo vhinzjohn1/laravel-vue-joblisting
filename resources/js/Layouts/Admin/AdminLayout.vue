@@ -60,19 +60,6 @@ const isActive = (routeName) => {
             }"
             class="fixed left-0 top-0 z-40 h-full bg-[#012f12] shadow-xl transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col"
         >
-            <!-- Sidebar Header -->
-            <div class="flex h-16 items-center border-b border-[#023d17] px-4">
-                <Link :href="route('dashboard')" class="flex items-center">
-                    <ApplicationLogo
-                        class="block h-8 w-auto fill-current text-white"
-                    />
-                    <span
-                        v-if="sidebarOpen"
-                        class="ml-3 text-lg font-semibold text-white"
-                        >Dashboard</span
-                    >
-                </Link>
-            </div>
 
             <!-- Navigation Links -->
             <nav class="flex-1 px-3 py-4 overflow-y-auto">
@@ -239,18 +226,7 @@ const isActive = (routeName) => {
             </div>
         </div>
 
-        <!-- Toggle Sidebar Button -->
-        <button
-            @click="toggleSidebar"
-            class="fixed left-0 top-4 z-40 hidden rounded-r-lg p-2 m-2 text-gray-600 transition-all duration-200 hover:bg-gray-50 hover:text-gray-600 lg:block"
-            :class="{
-                'left-64': sidebarOpen,
-                'left-20': !sidebarOpen,
-            }"
-        >
-            <i class="fas fa-bars h-5 w-5" v-if="sidebarOpen"></i>
-            <i class="fas fa-chevron-right h-5 w-5" v-else></i>
-        </button>
+       
 
         <!-- Mobile Overlay -->
         <div

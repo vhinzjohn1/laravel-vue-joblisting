@@ -2,24 +2,25 @@
 import { Head, Link } from "@inertiajs/vue3";
 import { ref, onMounted } from "vue";
 
-const asset = (path) => {
-    return `/${path}`;
-};
+// Import images using Vite
+import cmuLogo from "@images/cmulogo.png";
+import cmuAdmin from "@images/cmuadmin.png";
+import mainGate from "@images/main_gate.png";
 
 const isMobileMenuOpen = ref(false);
-const mobileMenuClasses = ref('opacity-0 -translate-y-10 hidden');
+const mobileMenuClasses = ref("opacity-0 -translate-y-10 hidden");
 
 const toggleMobileMenu = () => {
     isMobileMenuOpen.value = !isMobileMenuOpen.value;
     if (isMobileMenuOpen.value) {
-        mobileMenuClasses.value = 'opacity-100 translate-y-0 block';
+        mobileMenuClasses.value = "opacity-100 translate-y-0 block";
     } else {
         // Set to transitioning out state first
-        mobileMenuClasses.value = 'opacity-0 -translate-y-10 block';
+        mobileMenuClasses.value = "opacity-0 -translate-y-10 block";
         // Then hide after transition completes
         setTimeout(() => {
             if (!isMobileMenuOpen.value) {
-                mobileMenuClasses.value = 'opacity-0 -translate-y-10 hidden';
+                mobileMenuClasses.value = "opacity-0 -translate-y-10 hidden";
             }
         }, 300);
     }
@@ -47,7 +48,7 @@ const isSmallScreen = ref(false);
 
 onMounted(() => {
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 });
 
 const checkScreenSize = () => {
@@ -67,7 +68,7 @@ const checkScreenSize = () => {
                 <div class="flex justify-between items-center">
                     <a href="#" class="flex items-center space-x-3">
                         <img
-                            :src="asset('img/cmulogo.png')"
+                            :src="cmuLogo"
                             alt="CMU Logo"
                             class="w-10 h-10 sm:w-12 sm:h-12"
                         />
@@ -79,10 +80,7 @@ const checkScreenSize = () => {
                     </a>
 
                     <!-- Hamburger Menu Button -->
-                    <button
-                        @click="toggleMobileMenu"
-                        class="lg:hidden"
-                    >
+                    <button @click="toggleMobileMenu" class="lg:hidden">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="h-6 w-6 text-green-800"
@@ -190,12 +188,24 @@ const checkScreenSize = () => {
             <!-- Hero Section -->
             <section id="home" class="min-h-screen flex items-center pt-16">
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center py-12 lg:py-0">
+                    <div
+                        class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center py-12 lg:py-0"
+                    >
                         <!-- Left Content - Centered on medium and smaller screens -->
-                        <div class="space-y-6 text-center mx-auto sm:mx-auto md:mx-auto lg:text-left lg:mx-0">
-                            <div data-aos="fade-up" data-aos-duration="800" data-aos-mirror="true">
-                                <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold">
-                                    HR Job <span class="text-green-700">Listing</span><br />
+                        <div
+                            class="space-y-6 text-center mx-auto sm:mx-auto md:mx-auto lg:text-left lg:mx-0"
+                        >
+                            <div
+                                data-aos="fade-up"
+                                data-aos-duration="800"
+                                data-aos-mirror="true"
+                            >
+                                <h1
+                                    class="text-4xl sm:text-5xl lg:text-7xl font-bold"
+                                >
+                                    HR Job
+                                    <span class="text-green-700">Listing</span
+                                    ><br />
                                     System
                                 </h1>
                             </div>
@@ -206,9 +216,10 @@ const checkScreenSize = () => {
                                 data-aos-delay="200"
                                 data-aos-mirror="true"
                             >
-                                Streamlined job posting and application management system.
-                                Empowering HR teams with efficient tools while making it easier for applicants
-                                to find and apply for opportunities.
+                                Streamlined job posting and application
+                                management system. Empowering HR teams with
+                                efficient tools while making it easier for
+                                applicants to find and apply for opportunities.
                             </p>
                             <div
                                 class="flex flex-wrap gap-4 justify-center sm:justify-center md:justify-center lg:justify-start"
@@ -242,65 +253,184 @@ const checkScreenSize = () => {
                             data-aos-mirror="true"
                             data-aos-delay="600"
                         >
-                            <div class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl transform -rotate-6 scale-95 transition-transform duration-300 hover:rotate-0"></div>
-                            <div class="relative bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
-                                <div class="flex items-center justify-between mb-6">
-                                    <h3 class="text-lg font-semibold">Application Process</h3>
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl transform -rotate-6 scale-95 transition-transform duration-300 hover:rotate-0"
+                            ></div>
+                            <div
+                                class="relative bg-white p-6 rounded-2xl shadow-xl border border-gray-100"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-6"
+                                >
+                                    <h3 class="text-lg font-semibold">
+                                        Application Process
+                                    </h3>
                                     <div class="flex space-x-2">
-                                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                        <div
+                                            class="w-3 h-3 rounded-full bg-red-400"
+                                        ></div>
+                                        <div
+                                            class="w-3 h-3 rounded-full bg-yellow-400"
+                                        ></div>
+                                        <div
+                                            class="w-3 h-3 rounded-full bg-green-400"
+                                        ></div>
                                     </div>
                                 </div>
                                 <div class="space-y-3">
                                     <!-- Application Process Steps -->
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-semibold text-sm">1</div>
+                                    <div
+                                        class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100"
+                                        data-aos="fade-up"
+                                        data-aos-delay="100"
+                                        data-aos-mirror="true"
+                                    >
+                                        <div
+                                            class="flex items-center space-x-3"
+                                        >
+                                            <div
+                                                class="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                            >
+                                                1
+                                            </div>
                                             <div>
-                                                <p class="text-sm font-medium text-gray-800">Job Posting</p>
-                                                <p class="text-xs text-gray-500">HR posts detailed job openings</p>
+                                                <p
+                                                    class="text-sm font-medium text-gray-800"
+                                                >
+                                                    Job Posting
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-500"
+                                                >
+                                                    HR posts detailed job
+                                                    openings
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">2</div>
+                                    <div
+                                        class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100"
+                                        data-aos="fade-up"
+                                        data-aos-delay="100"
+                                        data-aos-mirror="true"
+                                    >
+                                        <div
+                                            class="flex items-center space-x-3"
+                                        >
+                                            <div
+                                                class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                            >
+                                                2
+                                            </div>
                                             <div>
-                                                <p class="text-sm font-medium text-gray-800">Submit Application</p>
-                                                <p class="text-xs text-gray-500">Apply through user-friendly interface</p>
+                                                <p
+                                                    class="text-sm font-medium text-gray-800"
+                                                >
+                                                    Submit Application
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-500"
+                                                >
+                                                    Apply through user-friendly
+                                                    interface
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-semibold text-sm">3</div>
+                                    <div
+                                        class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100"
+                                        data-aos="fade-up"
+                                        data-aos-delay="100"
+                                        data-aos-mirror="true"
+                                    >
+                                        <div
+                                            class="flex items-center space-x-3"
+                                        >
+                                            <div
+                                                class="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                            >
+                                                3
+                                            </div>
                                             <div>
-                                                <p class="text-sm font-medium text-gray-800">Application Review</p>
-                                                <p class="text-xs text-gray-500">HR reviews and shortlists candidates</p>
+                                                <p
+                                                    class="text-sm font-medium text-gray-800"
+                                                >
+                                                    Application Review
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-500"
+                                                >
+                                                    HR reviews and shortlists
+                                                    candidates
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-semibold text-sm">4</div>
+                                    <div
+                                        class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100"
+                                        data-aos="fade-up"
+                                        data-aos-delay="100"
+                                        data-aos-mirror="true"
+                                    >
+                                        <div
+                                            class="flex items-center space-x-3"
+                                        >
+                                            <div
+                                                class="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                            >
+                                                4
+                                            </div>
                                             <div>
-                                                <p class="text-sm font-medium text-gray-800">Schedule Interview</p>
-                                                <p class="text-xs text-gray-500">Selected candidates are contacted</p>
+                                                <p
+                                                    class="text-sm font-medium text-gray-800"
+                                                >
+                                                    Schedule Interview
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-500"
+                                                >
+                                                    Selected candidates are
+                                                    contacted
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="flex-shrink-0 w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center font-semibold text-sm">5</div>
+                                    <div
+                                        class="bg-gray-50 p-3 rounded-lg transition-all hover:bg-gray-100"
+                                        data-aos="fade-up"
+                                        data-aos-delay="100"
+                                        data-aos-mirror="true"
+                                    >
+                                        <div
+                                            class="flex items-center space-x-3"
+                                        >
+                                            <div
+                                                class="flex-shrink-0 w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                            >
+                                                5
+                                            </div>
                                             <div>
-                                                <p class="text-sm font-medium text-gray-800">Offer & Onboarding</p>
-                                                <p class="text-xs text-gray-500">Successful candidates receive offers</p>
+                                                <p
+                                                    class="text-sm font-medium text-gray-800"
+                                                >
+                                                    Offer & Onboarding
+                                                </p>
+                                                <p
+                                                    class="text-xs text-gray-500"
+                                                >
+                                                    Successful candidates
+                                                    receive offers
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Get Started Button -->
-                                    <div class="mt-6 flex justify-center" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
+                                    <div
+                                        class="mt-6 flex justify-center"
+                                        data-aos="fade-up"
+                                        data-aos-delay="100"
+                                        data-aos-mirror="true"
+                                    >
                                         <Link
                                             v-if="canLogin"
                                             :href="route('login')"
@@ -317,74 +447,182 @@ const checkScreenSize = () => {
             </section>
 
             <!-- Application Process Section (Only visible on small screens) -->
-            <section id="process" class="min-h-screen bg-gray-50 py-16 lg:py-20" v-if="isSmallScreen" data-aos="fade-up" data-aos-mirror="true">
+            <section
+                id="process"
+                class="min-h-screen bg-gray-50 py-16 lg:py-20"
+                v-if="isSmallScreen"
+                data-aos="fade-up"
+                data-aos-mirror="true"
+            >
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center mb-10">
-                        <span class="inline-block px-4 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-4">PROCESS</span>
-                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        <span
+                            class="inline-block px-4 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-4"
+                            >PROCESS</span
+                        >
+                        <h2
+                            class="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+                        >
                             Application Process
                         </h2>
-                        <div class="w-24 h-1 bg-green-600 mx-auto rounded-full"></div>
+                        <div
+                            class="w-24 h-1 bg-green-600 mx-auto rounded-full"
+                        ></div>
                     </div>
 
                     <div class="max-w-2xl mx-auto">
-                        <div class="relative bg-white p-6 rounded-2xl shadow-xl border border-gray-100" data-aos="fade-up">
+                        <div
+                            class="relative bg-white p-6 rounded-2xl shadow-xl border border-gray-100"
+                            data-aos="fade-up"
+                        >
                             <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-lg font-semibold">How It Works</h3>
+                                <h3 class="text-lg font-semibold">
+                                    How It Works
+                                </h3>
                                 <div class="flex space-x-2">
-                                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                    <div
+                                        class="w-3 h-3 rounded-full bg-red-400"
+                                    ></div>
+                                    <div
+                                        class="w-3 h-3 rounded-full bg-yellow-400"
+                                    ></div>
+                                    <div
+                                        class="w-3 h-3 rounded-full bg-green-400"
+                                    ></div>
                                 </div>
                             </div>
                             <div class="space-y-4">
-                                <div class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100" data-aos-mirror="true" data-aos="fade-up" data-aos-delay="100">
+                                <div
+                                    class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100"
+                                    data-aos-mirror="true"
+                                    data-aos="fade-up"
+                                    data-aos-delay="100"
+                                >
                                     <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-semibold text-sm">1</div>
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                        >
+                                            1
+                                        </div>
                                         <div>
-                                            <p class="text-base font-medium text-gray-800">Job Posting</p>
-                                            <p class="text-sm text-gray-500">HR posts detailed job openings</p>
+                                            <p
+                                                class="text-base font-medium text-gray-800"
+                                            >
+                                                Job Posting
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                HR posts detailed job openings
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100" data-aos-mirror="true" data-aos="fade-up" data-aos-delay="100">
+                                <div
+                                    class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100"
+                                    data-aos-mirror="true"
+                                    data-aos="fade-up"
+                                    data-aos-delay="100"
+                                >
                                     <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">2</div>
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                        >
+                                            2
+                                        </div>
                                         <div>
-                                            <p class="text-base font-medium text-gray-800">Submit Application</p>
-                                            <p class="text-sm text-gray-500">Apply through user-friendly interface</p>
+                                            <p
+                                                class="text-base font-medium text-gray-800"
+                                            >
+                                                Submit Application
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Apply through user-friendly
+                                                interface
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100" data-aos-mirror="true" data-aos="fade-up" data-aos-delay="100">
+                                <div
+                                    class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100"
+                                    data-aos-mirror="true"
+                                    data-aos="fade-up"
+                                    data-aos-delay="100"
+                                >
                                     <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-semibold text-sm">3</div>
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                        >
+                                            3
+                                        </div>
                                         <div>
-                                            <p class="text-base font-medium text-gray-800">Application Review</p>
-                                            <p class="text-sm text-gray-500">HR reviews and shortlists candidates</p>
+                                            <p
+                                                class="text-base font-medium text-gray-800"
+                                            >
+                                                Application Review
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                HR reviews and shortlists
+                                                candidates
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100" data-aos-mirror="true" data-aos="fade-up" data-aos-delay="100">
+                                <div
+                                    class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100"
+                                    data-aos-mirror="true"
+                                    data-aos="fade-up"
+                                    data-aos-delay="100"
+                                >
                                     <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0 w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-semibold text-sm">4</div>
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                        >
+                                            4
+                                        </div>
                                         <div>
-                                            <p class="text-base font-medium text-gray-800">Schedule Interview</p>
-                                            <p class="text-sm text-gray-500">Selected candidates are contacted</p>
+                                            <p
+                                                class="text-base font-medium text-gray-800"
+                                            >
+                                                Schedule Interview
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Selected candidates are
+                                                contacted
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100" data-aos-mirror="true" data-aos="fade-up" data-aos-delay="100">
+                                <div
+                                    class="bg-gray-50 p-4 rounded-lg transition-all hover:bg-gray-100"
+                                    data-aos-mirror="true"
+                                    data-aos="fade-up"
+                                    data-aos-delay="100"
+                                >
                                     <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0 w-8 h-8 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center font-semibold text-sm">5</div>
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center font-semibold text-sm"
+                                        >
+                                            5
+                                        </div>
                                         <div>
-                                            <p class="text-base font-medium text-gray-800">Offer & Onboarding</p>
-                                            <p class="text-sm text-gray-500">Successful candidates receive offers</p>
+                                            <p
+                                                class="text-base font-medium text-gray-800"
+                                            >
+                                                Offer & Onboarding
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Successful candidates receive
+                                                offers
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-8 flex justify-center" data-aos="fade-up" data-aos-delay="100" data-aos-mirror="true">
+                            <div
+                                class="mt-8 flex justify-center"
+                                data-aos="fade-up"
+                                data-aos-delay="100"
+                                data-aos-mirror="true"
+                            >
                                 <Link
                                     v-if="canLogin"
                                     :href="route('login')"
@@ -399,36 +637,59 @@ const checkScreenSize = () => {
             </section>
 
             <!-- Mission and Vision Section -->
-            <section id="about" class="py-16 lg:py-20 bg-gradient-to-b from-gray-50 to-white">
+            <section
+                id="about"
+                class="py-16 lg:py-20 bg-gradient-to-b from-gray-50 to-white"
+            >
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center mb-16" data-aos="fade-up">
-                        <span class="inline-block px-4 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-4">DEPARTMENT'S</span>
-                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                        <span
+                            class="inline-block px-4 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-4"
+                            >DEPARTMENT'S</span
+                        >
+                        <h2
+                            class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4"
+                        >
                             Mission and Vision
                         </h2>
-                        <div class="w-24 h-1 bg-green-600 mx-auto rounded-full"></div>
+                        <div
+                            class="w-24 h-1 bg-green-600 mx-auto rounded-full"
+                        ></div>
                     </div>
 
                     <!-- Mission Card -->
                     <div class="max-w-6xl mx-auto mb-12 lg:mb-20">
-                        <div class="relative bg-white rounded-2xl shadow-xl overflow-hidden">
+                        <div
+                            class="relative bg-white rounded-2xl shadow-xl overflow-hidden"
+                        >
                             <div class="grid grid-cols-1 lg:grid-cols-2">
                                 <div
                                     class="relative p-6 sm:p-8 lg:p-12"
                                     data-aos="fade-right"
                                     data-aos-duration="1000"
                                 >
-                                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
-                                    <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                                        <span class="text-green-600 mr-3">01.</span> Our Mission
+                                    <div
+                                        class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"
+                                    ></div>
+                                    <h3
+                                        class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center"
+                                    >
+                                        <span class="text-green-600 mr-3"
+                                            >01.</span
+                                        >
+                                        Our Mission
                                     </h3>
-                                    <p class="text-gray-600 leading-relaxed text-base sm:text-lg">
-                                        To advance the frontier of knowledge through
-                                        internationalization of education and equitable
-                                        access to quality instruction, research,
-                                        extension and production for economic
-                                        prosperity, moral integrity, social and cultural
-                                        sensitivity and environmental consciousness.
+                                    <p
+                                        class="text-gray-600 leading-relaxed text-base sm:text-lg"
+                                    >
+                                        To advance the frontier of knowledge
+                                        through internationalization of
+                                        education and equitable access to
+                                        quality instruction, research, extension
+                                        and production for economic prosperity,
+                                        moral integrity, social and cultural
+                                        sensitivity and environmental
+                                        consciousness.
                                     </p>
                                 </div>
                                 <div
@@ -437,11 +698,13 @@ const checkScreenSize = () => {
                                     data-aos-duration="1000"
                                 >
                                     <img
-                                        :src="asset('img/cmuadmin.png')"
+                                        :src="cmuAdmin"
                                         alt="CMU Admin Building"
                                         class="w-full h-full object-cover"
                                     />
-                                    <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
+                                    <div
+                                        class="absolute inset-0 bg-green-900 bg-opacity-20"
+                                    ></div>
                                 </div>
                             </div>
                         </div>
@@ -449,7 +712,9 @@ const checkScreenSize = () => {
 
                     <!-- Vision Card -->
                     <div class="max-w-6xl mx-auto">
-                        <div class="relative bg-white rounded-2xl shadow-xl overflow-hidden">
+                        <div
+                            class="relative bg-white rounded-2xl shadow-xl overflow-hidden"
+                        >
                             <div class="grid grid-cols-1 lg:grid-cols-2">
                                 <div
                                     class="relative h-60 sm:h-72 lg:h-auto order-2 lg:order-1"
@@ -457,25 +722,37 @@ const checkScreenSize = () => {
                                     data-aos-duration="1000"
                                 >
                                     <img
-                                        :src="asset('img/main_gate.png')"
+                                        :src="mainGate"
                                         alt="CMU Main Gate"
                                         class="w-full h-full object-cover"
                                     />
-                                    <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
+                                    <div
+                                        class="absolute inset-0 bg-green-900 bg-opacity-20"
+                                    ></div>
                                 </div>
                                 <div
                                     class="relative p-6 sm:p-8 lg:p-12 order-1 lg:order-2"
                                     data-aos="fade-left"
                                     data-aos-duration="1000"
                                 >
-                                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
-                                    <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                                        <span class="text-green-600 mr-3">02.</span> Our Vision
+                                    <div
+                                        class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"
+                                    ></div>
+                                    <h3
+                                        class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center"
+                                    >
+                                        <span class="text-green-600 mr-3"
+                                            >02.</span
+                                        >
+                                        Our Vision
                                     </h3>
-                                    <p class="text-gray-600 leading-relaxed text-base sm:text-lg">
-                                        A leading ASEAN university actively committed to
-                                        the total development of people for a globally
-                                        sustainable environment and a humane society.
+                                    <p
+                                        class="text-gray-600 leading-relaxed text-base sm:text-lg"
+                                    >
+                                        A leading ASEAN university actively
+                                        committed to the total development of
+                                        people for a globally sustainable
+                                        environment and a humane society.
                                     </p>
                                 </div>
                             </div>
@@ -487,7 +764,7 @@ const checkScreenSize = () => {
 
         <!-- Footer -->
         <footer class="bg-green-800 text-white py-4 text-center">
-            <p> Software Development Department 2025. All Rights Reserved.</p>
+            <p>Software Development Department 2025. All Rights Reserved.</p>
         </footer>
     </div>
 </template>

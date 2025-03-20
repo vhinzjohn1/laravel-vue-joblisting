@@ -162,6 +162,144 @@ const isActiveGroup = (routeNames) => {
                         </Link>
                     </li>
 
+                    <!-- Manage Job Details with dropdown -->
+
+                    <li class="relative">
+                        <div
+                            @click="toggleDropdown('manage-job-details')"
+                            class="flex items-center justify-between px-3 py-3 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
+                            :class="{
+                                'text-white': isActiveGroup([
+                                    'job-category.index',
+                                    'job-category.show',
+                                    'job-position.index',
+                                ]),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActiveGroup([
+                                        'job-category.index',
+                                        'job-category.show',
+                                        'job-position.index',
+                                    ]),
+                            }"
+                            @mouseenter="setHoveredItem('manage-job-details')"
+                            @mouseleave="clearHoveredItem()"
+                        >
+                            <div class="flex items-center">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-white': isActiveGroup([
+                                            'job-category.index',
+                                            'job-category.show',
+                                            'job-position.index',
+                                        ]),
+                                    }"
+                                >
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    :class="{
+                                        'font-semibold': isActiveGroup([
+                                            'job-category.index',
+                                            'job-category.show',
+                                            'job-position.index',
+                                        ]),
+                                    }"
+                                    >Manage Job Details</span
+                                >
+                            </div>
+                            <div
+                                v-if="sidebarOpen"
+                                class="transition-transform duration-300"
+                                :class="{
+                                    'rotate-180': activeDropdown === 'manage-job-details',
+                                }"
+                            >
+                                <i
+                                    class="fas fa-chevron-down text-xs"
+                                    :class="{
+                                        'text-black': isActiveGroup([
+                                            'job-category.index',
+                                            'job-category.show',
+                                            'job-position.index',
+                                        ]),
+                                    }"
+                                ></i>
+                            </div>
+                            <div
+                                v-if="
+                                    hoveredItem === 'manage-job-details' &&
+                                    !isActiveGroup([
+                                        'job-category.index',
+                                        'job-category.show',
+                                        'job-position.index',
+                                    ])
+                                "
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
+                        </div>
+
+                        <!-- Dropdown menu -->
+                        <transition
+                            enter-active-class="transition duration-200 ease-out"
+                            enter-from-class="transform scale-95 opacity-0"
+                            enter-to-class="transform scale-100 opacity-100"
+                            leave-active-class="transition duration-100 ease-in"
+                            leave-from-class="transform scale-100 opacity-100"
+                            leave-to-class="transform scale-95 opacity-0"
+                        >
+                            <ul
+                                v-show="activeDropdown === 'manage-job-details'"
+                                class="mt-1 space-y-1 pl-7"
+                            >
+                                <li>
+                                    <Link
+                                        :href="route('job-category.index')"
+                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('job-category.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('job-category.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="fas fa-calendar-check mr-2"
+                                            :class="{
+                                                'text-black':
+                                                    isActive('job-category.index'),
+                                            }"
+                                        ></i>
+                                        <span>Job Category</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        :href="route('job-position.index')"
+                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('job-position.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('job-position.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="fas fa-users-cog mr-2"
+                                            :class="{
+                                                'text-black':
+                                                    isActive('job-position.index'),
+                                            }"
+                                        ></i>
+                                        <span>Job Position</span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </transition>
+                    </li>
+
                     <!-- Job Listings -->
                     <li>
                         <Link
