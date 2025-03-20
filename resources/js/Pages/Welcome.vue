@@ -2,10 +2,9 @@
 import { Head, Link } from "@inertiajs/vue3";
 import { ref, onMounted } from "vue";
 
-// Import images using Vite
-import cmuLogo from "@images/cmulogo.png";
-import cmuAdmin from "@images/cmuadmin.png";
-import mainGate from "@images/main_gate.png";
+const asset = (path) => {
+    return `/${path}`;
+};
 
 const isMobileMenuOpen = ref(false);
 const mobileMenuClasses = ref("opacity-0 -translate-y-10 hidden");
@@ -68,7 +67,7 @@ const checkScreenSize = () => {
                 <div class="flex justify-between items-center">
                     <a href="#" class="flex items-center space-x-3">
                         <img
-                            :src="cmuLogo"
+                            :src="asset('img/cmulogo.png')"
                             alt="CMU Logo"
                             class="w-10 h-10 sm:w-12 sm:h-12"
                         />
@@ -698,7 +697,7 @@ const checkScreenSize = () => {
                                     data-aos-duration="1000"
                                 >
                                     <img
-                                        :src="cmuAdmin"
+                                        :src="asset('img/cmuadmin.png')"
                                         alt="CMU Admin Building"
                                         class="w-full h-full object-cover"
                                     />
@@ -722,7 +721,7 @@ const checkScreenSize = () => {
                                     data-aos-duration="1000"
                                 >
                                     <img
-                                        :src="mainGate"
+                                        :src="asset('img/main_gate.png')"
                                         alt="CMU Main Gate"
                                         class="w-full h-full object-cover"
                                     />
