@@ -107,7 +107,7 @@ const maxWidthClass = computed(() => {
                         class="bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
                         :class="[
                             maxWidthClass,
-                            'min-w-[450px] max-w-[90vw] max-h-[90vh] overflow-y-auto',
+                            'min-w-[370px] max-w-[90vw] max-h-[90vh] overflow-y-auto',
                         ]"
                     >
                         <div v-if="show">
