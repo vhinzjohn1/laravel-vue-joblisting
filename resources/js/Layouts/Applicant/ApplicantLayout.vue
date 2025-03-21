@@ -65,7 +65,7 @@ const isActiveGroup = (routeNames) => {
             <!-- Sidebar Header -->
             <div class="flex h-16 items-center border-b border-[#023d17] px-4">
                 <Link
-                    :href="route('applicant.index')"
+                    href="/"
                     class="flex items-center"
                 >
                     <ApplicationLogo

@@ -20,6 +20,8 @@ class User extends Authenticatable
         'password',
         'phone_number',
         'role_name',
+        'name',
+        'profile_completed',
     ];
 
     protected $attributes = [
@@ -44,6 +46,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'profile_completed' => 'boolean',
     ];
 
     public function userDetail()
@@ -54,5 +57,12 @@ class User extends Authenticatable
     public function notifications()
     {
         return $this->hasMany(Notification::class, 'user_id', 'user_id');
+    }
+
+    public function isProfileComplete(): bool
+    {
+        // Check if user has entered the minimum required information
+        // You can expand this logic based on your specific requirements
+        return $this->profile_completed;
     }
 }

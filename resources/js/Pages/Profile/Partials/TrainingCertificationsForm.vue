@@ -16,6 +16,8 @@ const form = useForm({
     certificate_url: null,
 });
 
+const emit = defineEmits(["step-completed"]);
+
 const fetchTrainings = async () => {
     const response = await axios.get(
         route("profile-details.index", "training"),
@@ -29,13 +31,18 @@ const addTraining = async () => {
             route("profile-details.store", "training"),
             form.data(),
             {
-                preserveScroll: true
-            }
+                preserveScroll: true,
+            },
         );
         trainings.value.push(response.data);
         form.reset();
         showModal.value = false;
         showSuccessAlert("add");
+
+        // Emit completion event if at least one training record exists
+        if (trainings.value.length > 0) {
+            emit("step-completed");
+        }
     } catch (error) {
         console.error(error.response.data);
     }
@@ -53,8 +60,8 @@ const deleteTraining = async (id) => {
     });
 
     if (result.isConfirmed) {
-        await axios.delete(route("profile-details.destroy", ["training", id]),{
-            preserveScroll: true
+        await axios.delete(route("profile-details.destroy", ["training", id]), {
+            preserveScroll: true,
         });
         fetchTrainings();
         showSuccessAlert("delete");
@@ -95,21 +102,17 @@ const showSuccessAlert = (action) => {
 };
 
 onMounted(() => {
-    fetchTrainings();
+    fetchTrainings().then(() => {
+        // Emit completion event if training records already exist
+        if (trainings.value.length > 0) {
+            emit("step-completed");
+        }
+    });
 });
 </script>
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Training & Certifications
-            </h2>
-            <p class="mt-1 text-sm text-gray-600">
-                Add your training and certification details.
-            </p>
-        </header>
-
         <PrimaryButton @click="showModal = true">Add Training</PrimaryButton>
 
         <Modal

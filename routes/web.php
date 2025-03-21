@@ -25,11 +25,13 @@ use App\Mail\SendEmail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Http\Controllers\Applicant\ScheduleController as ApplicantScheduleController;
+use App\Http\Controllers\ProfileCompletionController;
+
 
 Route::get('/', function () {
     // If the user is authenticated, redirect based on role
-    if (Auth::check()) {
-        $user = Auth::user();
+    if (auth()->check()) {
+        $user = auth()->user();
         $role = $user->role_name ?? null;
 
         switch ($role) {
@@ -39,8 +41,6 @@ Route::get('/', function () {
                 return redirect()->route('hr.index');
             case 'applicant':
                 return redirect()->route('applicant.index');
-            default:
-                return redirect()->route('dashboard');
         }
     }
 
@@ -53,10 +53,8 @@ Route::get('/', function () {
     ]);
 });
 
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Authentication route group
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -66,23 +64,27 @@ Route::middleware('auth')->group(function () {
     Route::delete('profile-details/{type}/{id}', [ProfileDetailsController::class, 'destroy'])->name('profile-details.destroy');
 });
 
-Route::middleware(['admin'])->group(function () {
+
+// Admin Route Group
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('admin', AdminController::class);
     Route::resource('test', TestController::class);
 });
 
-Route::middleware(['hr'])->group(function () {
+
+// HR Personnel Route Group
+Route::middleware(['auth', 'role:hr'])->group(function () {
     Route::resource('hr', HRController::class);
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
     Route::resource('job-category', JobCategoryController::class);
     Route::resource('job-position', JobPositionController::class);
-    // Application Groups
     Route::resource('groups', ApplicationGroupController::class);
 });
 
-Route::middleware(['applicant'])->group(function () {
-    Route::resource('applicant', ApplicantDashboardController::class);
+// Applicant Route Group
+Route::middleware(['auth', 'role:applicant'])->group(function () {
+    Route::resource('applicant', ApplicantDashboardController::class)->except(['show']);
     Route::resource('job-application', JobApplicationController::class);
     Route::resource('my-applications', MyApplicationsController::class);
 
@@ -114,4 +116,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
 });
 
+// Complete Profile route - protected by auth middleware
+Route::get('/complete-profile', [ProfileCompletionController::class, 'show'])
+    ->middleware(['auth', 'verified'])
+    ->name('complete-profile');
+
+// Add a route to mark profile as complete
+Route::post('/complete-profile', [ProfileCompletionController::class, 'complete'])
+    ->middleware(['auth', 'verified'])
+    ->name('profile.mark-complete');
+
+// Fallback to root
+Route::fallback(function () {
+    return redirect('/');
+});
 require __DIR__ . '/auth.php';

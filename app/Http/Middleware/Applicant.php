@@ -15,6 +15,7 @@ class Applicant
         if ($role !== 'applicant') {
             return redirect()->back()->with('error', 'Access denied. You are not authorized to access this page.');
         }
+
         // If you want to add role-checking logic later, you can do it here.
         // For now, just pass the request to the next middleware/controller.
         return $next($request);

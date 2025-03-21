@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('role_name')->nullable();
-            $table->rememberToken(); // Keep this for "remember me" functionality
+            $table->boolean('profile_completed')->default(false);
+            $table->rememberToken();
             $table->timestamps();
         });
 

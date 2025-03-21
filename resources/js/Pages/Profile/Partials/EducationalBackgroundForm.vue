@@ -17,6 +17,8 @@ const form = useForm({
     honors_received: "",
 });
 
+const emit = defineEmits(["step-completed"]);
+
 const fetchEducations = async () => {
     const response = await axios.get(
         route("profile-details.index", "education"),
@@ -37,6 +39,11 @@ const addEducation = async () => {
         form.reset();
         showModal.value = false;
         showSuccessAlert("add");
+
+        if (educations.value.length > 0) {
+            emit("step-completed");
+            emit("next-step");
+        }
     } catch (error) {
         console.error(error.response.data);
     }
@@ -97,21 +104,16 @@ const showSuccessAlert = (action) => {
 };
 
 onMounted(() => {
-    fetchEducations();
+    fetchEducations().then(() => {
+        if (educations.value.length > 0) {
+            emit("step-completed");
+        }
+    });
 });
 </script>
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Educational Background
-            </h2>
-            <p class="mt-1 text-sm text-gray-600">
-                Add or update your educational information.
-            </p>
-        </header>
-
         <PrimaryButton @click="showModal = true">Add Education</PrimaryButton>
 
         <Modal

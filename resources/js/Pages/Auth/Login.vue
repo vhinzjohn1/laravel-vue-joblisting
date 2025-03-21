@@ -37,6 +37,8 @@ const submit = () => {
             {{ status }}
         </div>
 
+        <h1 class="text-3xl font-bold text-center mb-6">Login Page</h1>
+
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
@@ -46,6 +48,7 @@ const submit = () => {
                     type="email"
                     class="mt-1 block w-full"
                     v-model="form.email"
+                    placeholder="example@gmail.com"
                     required
                     autofocus
                     autocomplete="email"

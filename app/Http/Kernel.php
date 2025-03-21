@@ -42,7 +42,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -69,5 +69,11 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\Admin::class,
         'hr' => \App\Http\Middleware\HR::class,
         'applicant' => \App\Http\Middleware\Applicant::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
+    ];
+
+    protected $routeMiddleware = [
+        // ... other middleware
+        'profile.incomplete' => \App\Http\Middleware\EnsureProfileIsComplete::class,
     ];
 }

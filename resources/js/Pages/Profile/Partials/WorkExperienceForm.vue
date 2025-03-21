@@ -18,6 +18,8 @@ const form = useForm({
     responsibilities: "",
 });
 
+const emit = defineEmits(["step-completed"]);
+
 const fetchExperiences = async () => {
     const response = await axios.get(
         route("profile-details.index", "experience"),
@@ -38,6 +40,11 @@ const addExperience = async () => {
         form.reset();
         showModal.value = false;
         showSuccessAlert("add");
+
+        // Emit completion event if at least one experience record exists
+        if (experiences.value.length > 0) {
+            emit("step-completed");
+        }
     } catch (error) {
         console.error(error.response.data);
     }
@@ -98,19 +105,17 @@ const showSuccessAlert = (action) => {
     });
 };
 onMounted(() => {
-    fetchExperiences();
+    fetchExperiences().then(() => {
+        // Emit completion event if experience records already exist
+        if (experiences.value.length > 0) {
+            emit("step-completed");
+        }
+    });
 });
 </script>
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">Work Experience</h2>
-            <p class="mt-1 text-sm text-gray-600">
-                Add your work experience details.
-            </p>
-        </header>
-
         <PrimaryButton @click="showModal = true">Add Experience</PrimaryButton>
 
         <Modal

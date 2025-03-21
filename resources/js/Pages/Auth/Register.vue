@@ -36,6 +36,7 @@ const submit = () => {
     <GuestLayout>
         <Head title="Register" />
 
+        <h1 class="text-3xl font-bold text-center mb-6">Register Page</h1>
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="username" value="Username" />
@@ -45,6 +46,7 @@ const submit = () => {
                     type="text"
                     class="mt-1 block w-full"
                     v-model="form.username"
+                    placeholder="username"
                     required
                     autofocus
                     autocomplete="username"
@@ -61,6 +63,7 @@ const submit = () => {
                     type="email"
                     class="mt-1 block w-full"
                     v-model="form.email"
+                    placeholder="example@gmail.com"
                     required
                     autocomplete="username"
                 />
