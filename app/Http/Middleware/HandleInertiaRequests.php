@@ -39,12 +39,6 @@ class HandleInertiaRequests extends Middleware
                     'role_name' => $request->user()->role_name,
                 ] : null,
             ],
-           'ziggy' => [
-                'url' => config('app.url'),
-                'port' => null,
-                'routes' => fn () => app('router')->getRoutes()->getRoutesByName(),
-                'location' => $request->url(),
-            ],
             'notifications' => $request->user() ? $request->user()->notifications()->latest()->take(5)->get() : [],
             // ... other shared data ...
         ]);
