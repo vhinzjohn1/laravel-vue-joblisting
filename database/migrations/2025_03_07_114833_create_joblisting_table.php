@@ -23,6 +23,10 @@ return new class extends Migration
             $table->boolean('profile_completed')->default(false);
             $table->rememberToken();
             $table->timestamps();
+
+            // Adding Index for Performance
+            $table->index('email');
+            $table->index('role_name');
         });
 
         // Dummy seeder for users with 3 records
@@ -215,6 +219,12 @@ return new class extends Migration
             $table->foreign('position_id')->references('position_id')->on('positions')->onDelete('cascade');
             $table->foreign('created_by')->references('user_id')->on('users')->onDelete('set null');
             $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('set null');
+
+            // Adding Index
+            $table->index('status');
+            $table->index('category_id');
+            $table->index('position_id');
+            $table->index('created_at');
         });
 
         // Seed a sample job listing
@@ -356,6 +366,15 @@ return new class extends Migration
 
             $table->foreign('group_id')->references('group_id')->on('application_groups')->onDelete('cascade');
             $table->foreign('application_id')->references('application_id')->on('applications')->onDelete('cascade');
+        });
+
+        //Indexes
+
+        Schema::table('applications', function (Blueprint $table) {
+            $table->index('user_id'); // For user's applications
+            $table->index('job_listing_id'); // For job's applications
+            $table->index('status'); // For status filtering
+            $table->index(['job_listing_id', 'status']); // For combined filtering
         });
     }
 

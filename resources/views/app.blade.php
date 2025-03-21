@@ -6,10 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title inertia>{{ config('app.name') }}</title>
 
+    {{-- Favicon --}}
+    <link rel="icon" type="image/x-icon" href="{{ asset('/cmu-favicon.png') }}">
+
     <!-- Fonts -->
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
 
-    <!-- CSS Resources -->
+<!-- CSS Resources -->
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/aos.css') }}">
 

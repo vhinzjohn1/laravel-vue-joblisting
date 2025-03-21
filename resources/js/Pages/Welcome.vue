@@ -57,7 +57,7 @@ const checkScreenSize = () => {
 
 <template>
     <Head>
-        <title>Welcome</title>
+        <title>CMU Job Listing</title>
     </Head>
 
     <div class="relative min-h-screen bg-white overflow-hidden">
