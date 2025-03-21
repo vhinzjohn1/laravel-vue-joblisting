@@ -112,14 +112,14 @@ const checkScreenSize = () => {
                             >Home</a
                         >
                         <a
+                            href="#how-to-apply"
+                            class="text-green-800 hover:text-green-600"
+                            >How to Apply</a
+                        >
+                        <a
                             href="#about"
                             class="text-green-800 hover:text-green-600"
                             >About</a
-                        >
-                        <a
-                            href="#process"
-                            class="text-green-800 hover:text-green-600"
-                            >Process</a
                         >
                         <div class="flex space-x-4">
                             <Link
@@ -152,14 +152,14 @@ const checkScreenSize = () => {
                             >Home</a
                         >
                         <a
+                            href="#how-to-apply"
+                            class="text-green-800 hover:text-green-600"
+                            >How to Apply</a
+                        >
+                        <a
                             href="#about"
                             class="text-green-800 hover:text-green-600"
                             >About</a
-                        >
-                        <a
-                            href="#process"
-                            class="text-green-800 hover:text-green-600"
-                            >Process</a
                         >
                         <div class="flex flex-col space-y-2">
                             <Link
