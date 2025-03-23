@@ -186,191 +186,248 @@
             </div>
         </div>
 
-<!-- Add Job Modal -->
-<Modal :show="showAddModal" @close="showAddModal = false" title="Create New Job Listing" max-width="6xl">
-    <form @submit.prevent="saveJob">
-        <div class="p-5">
-            <!-- Basic Information Section -->
-            <div class="mb-6">
-                <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
-                    Basic Information
-                </h6>
+        <!-- Add Job Modal -->
+        <Modal
+            :show="showAddModal"
+            @close="
+                () => {
+                    showAddModal = false;
+                    clearErrors();
+                }
+            "
+            title="Create New Job Listing"
+            max-width="6xl"
+        >
+            <form @submit.prevent="saveJob">
+                <div class="p-5">
+                    <!-- Basic Information Section -->
+                    <div class="mb-6">
+                        <h6
+                            class="font-semibold text-gray-800 mb-4 pb-2 border-b"
+                        >
+                            Basic Information
+                        </h6>
 
-                <!-- Job Title and Position -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Job Title -->
-                    <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-1" for="jobTitle">
-                            Job Title *
-                        </label>
-                        <TextInput
-                            id="jobTitle"
-                            v-model="newJob.title"
-                            required
-                        />
-                    </div>
+                        <!-- Job Title and Position -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Job Title -->
+                            <div class="form-group">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    for="jobTitle"
+                                >
+                                    Job Title *
+                                </label>
+                                <TextInput
+                                    id="jobTitle"
+                                    v-model="newJob.title"
+                                    required
+                                />
+                            </div>
 
-                    <!-- Position -->
-                    <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-1" for="position">
-                            Position *
-                        </label>
-                        <CustomSelect
-                            :options="positions"
-                            v-model="newJob.position_id"
-                            placeholder="Select a position"
-                            :value-key="'position_id'"
-                            :display-format="(position) => `${position.position_name} (${position.item_number})`"
-                            required
-                            @update:modelValue="handlePositionSelect"
-                        />
-                    </div>
-                </div>
-
-                <!-- Salary Grade and Item Number -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div class="grid grid-cols-2 gap-2">
-                        <!-- Salary Grade -->
-                        <div class="form-group">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                Salary Grade
-                            </label>
-                            <TextInput
-                                :value="selectedPosition?.salary_grade?.amount ? `₱${selectedPosition.salary_grade.amount.toLocaleString()}` : ''"
-                                disabled
-                                class="bg-gray-50"
-                            />
+                            <!-- Position -->
+                            <div class="form-group">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    for="position"
+                                >
+                                    Position *
+                                </label>
+                                <CustomSelect
+                                    :options="positions"
+                                    v-model="newJob.position_id"
+                                    placeholder="Select a position"
+                                    :value-key="'position_id'"
+                                    :display-format="
+                                        (position) =>
+                                            `${position.position_name} (${position.item_number})`
+                                    "
+                                    required
+                                    @update:modelValue="handlePositionSelect"
+                                />
+                            </div>
                         </div>
 
-                        <!-- Item Number -->
+                        <!-- Salary Grade and Item Number -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="grid grid-cols-2 gap-2">
+                                <!-- Salary Grade -->
+                                <div class="form-group">
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Salary Grade
+                                    </label>
+                                    <TextInput
+                                        :value="
+                                            selectedPosition?.salary_grade
+                                                ?.amount
+                                                ? `₱${selectedPosition.salary_grade.amount.toLocaleString()}`
+                                                : ''
+                                        "
+                                        disabled
+                                        class="bg-gray-50"
+                                    />
+                                </div>
+
+                                <!-- Item Number -->
+                                <div class="form-group">
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Item Number
+                                    </label>
+                                    <TextInput
+                                        :value="
+                                            selectedPosition?.item_number || ''
+                                        "
+                                        disabled
+                                        class="bg-gray-50"
+                                    />
+                                </div>
+                            </div>
+                            <!-- Category -->
+                            <div class="form-group">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    for="category"
+                                >
+                                    Category *
+                                </label>
+                                <CustomSelect
+                                    :options="[
+                                        { value: 'Teaching' },
+                                        { value: 'Non-Teaching' },
+                                    ]"
+                                    v-model="newJob.category"
+                                    placeholder="Select a category"
+                                    :value-key="'value'"
+                                    :display-format="(option) => option.value"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Closing Date and Applicant Limit -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <!-- Closing Date -->
+                            <div class="form-group">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Closing Date *
+                                </label>
+                                <TextInput
+                                    type="date"
+                                    v-model="newJob.closing_date"
+                                    required
+                                    :class="{
+                                        'border-red-500': errors.closing_date,
+                                    }"
+                                />
+                                <p
+                                    v-if="errors.closing_date"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ errors.closing_date[0] }}
+                                </p>
+                            </div>
+                            <!-- Status -->
+                            <div class="form-group">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Status *
+                                </label>
+                                <CustomSelect
+                                    :options="[
+                                        { value: 'Active' },
+                                        { value: 'Draft' },
+                                        { value: 'Closed' },
+                                    ]"
+                                    v-model="newJob.status"
+                                    :value-key="'value'"
+                                    :display-format="(option) => option.value"
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description Section -->
+                    <div class="mb-4">
+                        <h6
+                            class="font-semibold text-gray-800 mb-4 pb-2 border-b"
+                        >
+                            Job Description
+                        </h6>
+
+                        <!-- Description -->
                         <div class="form-group">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                Item Number
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Description *
                             </label>
-                            <TextInput
-                                :value="selectedPosition?.item_number || ''"
-                                disabled
-                                class="bg-gray-50"
+                            <TextArea
+                                v-model="newJob.description"
+                                rows="4"
+                                placeholder="Enter job description"
+                                required
                             />
                         </div>
                     </div>
-                      <!-- Category -->
-                      <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-1" for="category">
-                            Category *
-                        </label>
-                        <CustomSelect
-                            :options="categories"
-                            v-model="newJob.category_id"
-                            placeholder="Select a category"
-                            :value-key="'category_id'"
-                            :display-format="(category) => category.name"
-                            required
-                        />
-                    </div>
                 </div>
 
-                <!-- Closing Date and Applicant Limit -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <!-- Closing Date -->
-                    <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Closing Date *
-                        </label>
-                        <TextInput
-                            type="date"
-                            v-model="newJob.closing_date"
-                            required
-                        />
-                    </div>
+                <!-- Modal Footer -->
+                <div class="border-t p-4 flex gap-2 justify-end">
+                    <!-- Cancel Button -->
+                    <button
+                        type="button"
+                        class="btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                        @click="showAddModal = false"
+                    >
+                        Cancel
+                    </button>
 
-                    <!-- Applicant Limit -->
-                    <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Applicant Limit *
-                        </label>
-                        <TextInput
-                            type="number"
-                            v-model="newJob.applicant_limit"
-                            min="1"
-                            required
-                        />
-                    </div>
+                    <!-- Save Button -->
+                    <button
+                        type="submit"
+                        class="btn px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                        Save Job Listing
+                    </button>
                 </div>
-
-                <!-- Status and Category -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <!-- Status -->
-                    <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Status *
-                        </label>
-                        <CustomSelect
-                            :options="[{value: 'Active'}, {value: 'Draft'}, {value: 'Closed'}]"
-                            v-model="newJob.status"
-                            :value-key="'value'"
-                            :display-format="(option) => option.value"
-                            required
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Job Description Section -->
-            <div class="mb-4">
-                <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
-                    Job Description
-                </h6>
-
-                <!-- Description -->
-                <div class="form-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Description *
-                    </label>
-                    <TextArea
-                        v-model="newJob.description"
-                        rows="4"
-                        placeholder="Enter job description"
-                        required
-                    />
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="border-t p-4 flex gap-2 justify-end">
-            <!-- Cancel Button -->
-            <button
-                type="button"
-                class="btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                @click="showAddModal = false"
-            >
-                Cancel
-            </button>
-
-            <!-- Save Button -->
-            <button
-                type="submit"
-                class="btn px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-                Save Job Listing
-            </button>
-        </div>
-    </form>
-</Modal>
+            </form>
+        </Modal>
 
         <!-- Edit Job Modal -->
-        <Modal :show="showEditModal" @close="showEditModal = false" title="Edit Job Listing" max-width="6xl">
+        <Modal
+            :show="showEditModal"
+            @close="
+                () => {
+                    showEditModal = false;
+                    clearErrors();
+                }
+            "
+            title="Edit Job Listing"
+            max-width="6xl"
+        >
             <form @submit.prevent="updateJob">
                 <div class="p-5">
                     <!-- Basic Information Section -->
                     <div class="mb-6">
-                        <h6 class="font-semibold text-gray-800 mb-4 pb-2 border-b">
+                        <h6
+                            class="font-semibold text-gray-800 mb-4 pb-2 border-b"
+                        >
                             Basic Information
                         </h6>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1" for="editPosition">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    for="editPosition"
+                                >
                                     Position
                                 </label>
                                 <CustomSelect
@@ -378,11 +435,17 @@
                                     v-model="editingJob.position_id"
                                     placeholder="Select a position"
                                     :value-key="'position_id'"
-                                    :display-format="(position) => `${position.position_name} (${position.item_number})`"
+                                    :display-format="
+                                        (position) =>
+                                            `${position.position_name} (${position.item_number})`
+                                    "
                                 />
                             </div>
                             <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1" for="editJobTitle">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    for="editJobTitle"
+                                >
                                     Job Title
                                 </label>
                                 <TextInput
@@ -393,26 +456,30 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                >
                                     Closing Date
                                 </label>
                                 <TextInput
                                     type="date"
                                     v-model="editingJob.closing_date"
+                                    :class="{
+                                        'border-red-500': errors.closing_date,
+                                    }"
                                 />
-                            </div>
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Applicant Limit
-                                </label>
-                                <TextInput
-                                    type="number"
-                                    v-model="editingJob.applicant_limit"
-                                />
+                                <p
+                                    v-if="errors.closing_date"
+                                    class="mt-1 text-sm text-red-600"
+                                >
+                                    {{ errors.closing_date[0] }}
+                                </p>
                             </div>
 
                             <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                >
                                     Status
                                 </label>
                                 <CustomSelect
@@ -422,6 +489,24 @@
                                     :display-format="(status) => status"
                                 />
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Category
+                            </label>
+                            <CustomSelect
+                                :options="[
+                                    { value: 'Teaching' },
+                                    { value: 'Non-Teaching' },
+                                ]"
+                                v-model="editingJob.category"
+                                placeholder="Select a category"
+                                :value-key="'value'"
+                                :display-format="(option) => option.value"
+                                required
+                            />
                         </div>
                     </div>
                 </div>
@@ -459,10 +544,9 @@ import Modal from "@/Components/Modal.vue";
 // Fetching Props that was sent by controller
 const data = ref(usePage().props.jobListings);
 const positions = ref(usePage().props.positions);
-const categories = ref(usePage().props.categories);
 const salaryGrades = ref(usePage().props.salaryGrades);
 
-console.log(positions.value)
+console.log(positions.value);
 
 // Modified job data structure to match database schema
 const jobs = ref(data.value);
@@ -489,10 +573,10 @@ const selectedPosition = ref(null);
 const handlePositionSelect = (positionId) => {
     // use salaryGrades to get the salary grade and years of experience
     selectedPosition.value = positions.value.find(
-        (p) => p.position_id === positionId
+        (p) => p.position_id === positionId,
     );
     const salaryGrade = salaryGrades.value.find(
-        (sg) => sg.salary_grade_id === selectedPosition.value.salary_grade_id
+        (sg) => sg.salary_grade_id === selectedPosition.value.salary_grade_id,
     );
     selectedPosition.value = {
         ...selectedPosition.value,
@@ -506,10 +590,9 @@ const newJob = ref({
     title: "",
     description: "",
     closing_date: "",
-    status: "Active",
-    applicant_limit: 1,
+    status: "Draft",
     minimum_requirements: [],
-    category_id: null,
+    category: "",
 });
 
 // Add these to your script setup section
@@ -519,9 +602,8 @@ const editingJob = ref({
     title: "",
     description: "",
     closing_date: "",
-    status: "Active",
-    applicant_limit: 1,
-    category_id: null,
+    status: "Draft",
+    category: "",
 });
 
 const editJob = (job) => {
@@ -531,22 +613,19 @@ const editJob = (job) => {
     showEditModal.value = true;
 };
 
-const updateJob = () => {
+const errors = ref({});
 
-    console.log('this is hte editingjob : ', editingJob.value)
+const updateJob = () => {
+    // Clear previous errors
+    errors.value = {};
+
     axios
         .put(
             `/job-listing/${editingJob.value.job_listing_id}`,
             editingJob.value,
         )
         .then((response) => {
-            // Update the jobs list with the updated data
-            const index = jobs.value.findIndex(
-                (job) => job.job_listing_id === editingJob.value.job_listing_id,
-            );
-            if (index !== -1) {
-                jobs.value[index] = response.data;
-            }
+            jobs.value = response.data;
 
             // Close modal and reset form
             showEditModal.value = false;
@@ -556,31 +635,35 @@ const updateJob = () => {
                 title: "",
                 description: "",
                 status: "Active",
-                applicant_limit: 1,
-                category_id: null,
+                category: "",
             };
 
             showSuccessAlert("update");
         })
         .catch((error) => {
+            if (error.response && error.response.status === 422) {
+                // Store validation errors
+                errors.value = error.response.data.errors;
+            }
             console.error("Error updating job listing:", error);
         });
 };
 
 // Methods
 const saveJob = () => {
+    // Clear previous errors
+    errors.value = {};
+
     const jobToAdd = {
         position_id: newJob.value.position_id,
         title: newJob.value.title,
         description: newJob.value.description,
         closing_date: newJob.value.closing_date,
         status: newJob.value.status,
-        category_id: newJob.value.category_id,
-        applicant_limit: newJob.value.applicant_limit,
-        created_by: usePage().props.auth.user.id, // Assuming you have auth user info
+        category: newJob.value.category,
+        created_by: usePage().props.auth.user.id,
     };
 
-    // In a real application, you would call your API here
     axios
         .post("job-listing", jobToAdd)
         .then((response) => {
@@ -594,6 +677,10 @@ const saveJob = () => {
             showSuccessAlert("add");
         })
         .catch((error) => {
+            if (error.response && error.response.status === 422) {
+                // Store validation errors
+                errors.value = error.response.data.errors;
+            }
             console.error("Error creating job listing:", error.response.data);
         });
 };
@@ -605,8 +692,8 @@ const resetForm = () => {
         description: "",
         closing_date: "",
         status: "Active",
-        applicant_limit: 1,
         minimum_requirements: [],
+        category: "",
     };
 };
 
@@ -660,7 +747,7 @@ const deleteJob = (jobId) => {
                         (job) => job.job_listing_id !== jobId,
                     );
 
-                   showSuccessAlert("delete");
+                    showSuccessAlert("delete");
                 })
                 .catch((error) => {
                     console.error("Error deleting job listing:", error);
@@ -679,6 +766,10 @@ const deleteJob = (jobId) => {
                 });
         }
     });
+};
+
+const clearErrors = () => {
+    errors.value = {};
 };
 </script>
 

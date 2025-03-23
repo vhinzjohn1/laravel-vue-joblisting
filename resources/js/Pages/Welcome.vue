@@ -61,6 +61,7 @@ const checkScreenSize = () => {
     </Head>
 
     <div class="relative min-h-screen bg-white overflow-hidden">
+        
         <!-- Navigation -->
         <header class="fixed w-full bg-white shadow-md z-50">
             <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -220,27 +221,6 @@ const checkScreenSize = () => {
                                 efficient tools while making it easier for
                                 applicants to find and apply for opportunities.
                             </p>
-                            <div
-                                class="flex flex-wrap gap-4 justify-center sm:justify-center md:justify-center lg:justify-start"
-                                data-aos="fade-up"
-                                data-aos-duration="800"
-                                data-aos-delay="400"
-                                data-aos-mirror="true"
-                            >
-                                <Link
-                                    v-if="canLogin"
-                                    :href="route('login')"
-                                    class="px-6 sm:px-8 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors font-medium"
-                                >
-                                    Get Started
-                                </Link>
-                                <a
-                                    href="#process"
-                                    class="px-6 sm:px-8 py-3 border-2 border-gray-300 rounded-lg hover:border-green-800 transition-colors font-medium"
-                                >
-                                    Explore Jobs
-                                </a>
-                            </div>
                         </div>
 
                         <!-- Right Content - Animated Showcase (Only visible on large screens) -->

@@ -31,7 +31,7 @@ class HRController extends Controller
         ];
 
         // Get recent job listings
-        $recentJobs = JobListing::with('category')
+        $recentJobs = JobListing::with('position')
             ->latest()
             ->take(5)
             ->get();

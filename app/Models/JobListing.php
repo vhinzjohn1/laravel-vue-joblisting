@@ -14,12 +14,11 @@ class JobListing extends Model
 
     protected $fillable = [
         'position_id',
-        'category_id',
+        'category',
         'title',
         'description',
         'closing_date',
         'status',
-        'applicant_limit',
         'created_by',
     ];
 
@@ -35,11 +34,6 @@ class JobListing extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function minimumRequirements()

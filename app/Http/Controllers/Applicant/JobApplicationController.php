@@ -8,10 +8,7 @@ use App\Models\JobListing;
 use Inertia\Inertia;
 use App\Models\Application;
 use App\Models\ApplicantDocument;
-use App\Models\Category;
 use App\Models\EducationalBackground;
-use App\Models\Position;
-use App\Models\SalaryGrade;
 use App\Models\Training;
 use App\Models\WorkExperience;
 use App\Traits\NotificationTrait;
@@ -29,11 +26,12 @@ class JobApplicationController extends Controller
             'position' => function ($query) {
                 $query->with('salaryGrade');
             },
-            'category',
             'creator',
             'minimumRequirements',
             'applications'
-        ])->get();
+        ])
+        ->where('status', 'Active')
+        ->get();
 
         return Inertia::render('Applicant/ViewJobs/ViewJobListings', [
             'jobListings' => $jobListings
@@ -49,7 +47,6 @@ class JobApplicationController extends Controller
             'position' => function ($query) {
                 $query->with('salaryGrade');
             },
-            'category',
             'creator',
             'minimumRequirements',
             'applications'
@@ -165,14 +162,16 @@ class JobApplicationController extends Controller
             }
         }
 
-        // Handle document upload
+        // Handle document upload with document name
+        $documentName = $request->file('application_document')->getClientOriginalName();
         $file = $request->file('application_document');
         $documentPath = $file->store('application_documents', 'public');
 
         ApplicantDocument::create([
             'user_id' => auth()->id(),
             'application_id' => $application->application_id,
-            'document_type' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
+            'document_name' => $documentName,
+            'document_type' => pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION),
             'file_path' => $documentPath,
             'is_verified' => false,
         ]);

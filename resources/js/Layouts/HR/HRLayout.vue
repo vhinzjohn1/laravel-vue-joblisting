@@ -1,15 +1,29 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onBeforeMount, watch } from "vue";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import { Link } from "@inertiajs/vue3";
-import { router } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import NotificationBell from "@/Components/NotificationBell.vue";
+import { useVgt } from "vue-guided-tour";
 
 const showMobileMenu = ref(false);
 const sidebarOpen = ref(true);
 const showLogoutModal = ref(false);
 const activeDropdown = ref(null);
 const hoveredItem = ref(null);
+const currentStepIndex = ref(-1);
+const isMobileView = ref(false);
+const isUserTourCompleted = computed(
+    () => usePage().props.auth.user.tour_completed,
+);
+
+// Get the VGT instance
+const $vgt = useVgt();
+
+// Detect if we're in mobile view
+const checkMobileView = () => {
+    isMobileView.value = window.innerWidth < 1024; // lg breakpoint in Tailwind
+};
 
 // Handle dropdown toggle
 const toggleDropdown = (name) => {
@@ -72,29 +86,238 @@ const isActive = (routeName) => {
 const isActiveGroup = (routeNames) => {
     return routeNames.some((name) => route().current(name));
 };
+
+// Common tour steps for both mobile and desktop
+const desktopTourSteps = [
+    {
+        target: "#dashboard-link",
+        title: "HR Dashboard",
+        content:
+            "This is your Dashboard, where you can see all your activity at a glance",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#job-details-link",
+        title: "Job Details",
+        content: "Manage Job details here",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#job-listings-link",
+        title: "Job Listings",
+        content: "View and manage job listings here",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#applications-link",
+        title: "Manage Applications",
+        content: "Track and manage job applications here",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#reports-link",
+        title: "Reports",
+        content: "View reports for Selection Lineup",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#schedule-management-link",
+        title: "Schedule Management",
+        content: "Manage interview schedules and appointments",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#profile-link",
+        title: "User Profile",
+        content: "Update your profile information and personal details",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+];
+
+// Mobile tour steps with hamburger menu first
+const mobileTourSteps = [
+    {
+        target: "#menu-button",
+        title: "Menu Button",
+        content: "Click this button to show the sidebar navigation",
+        popover: {
+            position: "left",
+            placement: "center",
+        },
+        params: {
+            // Force 'Next' button instead of 'Done'
+            buttonLabel: "Next",
+            // Make sure this isn't treated as the final step
+            final: false,
+        },
+        onBeforeNext: () => {
+            if (!showMobileMenu.value) {
+                // Stop the tour from advancing
+                return false;
+            }
+            // Allow the tour to continue
+            return true;
+        },
+    },
+    // Add a placeholder step to ensure the hamburger menu isn't treated as the final step
+    {
+        target: "#dashboard-link",
+        title: "Placeholder",
+        content: "Placeholder",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+        // This step will never be shown as we'll trigger the sidebar open and refresh steps
+        canShow: false,
+    },
+];
+
+// Dynamic tour steps based on device and view state
+const tourSteps = computed(() => {
+    if (isMobileView.value) {
+        // For mobile: If sidebar is open, add navigation steps
+        if (showMobileMenu.value) {
+            // Return all steps including navigation items
+            return [
+                ...mobileTourSteps.slice(0, 1), // Keep menu button step
+                ...desktopTourSteps, // Add all navigation steps
+            ];
+        } else {
+            // Return just the initial steps (hamburger menu + placeholder)
+            return mobileTourSteps;
+        }
+    } else {
+        // For desktop: Return all desktop steps
+        return desktopTourSteps;
+    }
+});
+
+const isTourActive = computed(() => currentStepIndex.value >= 0);
+
+// Function to start the tour
+const startTour = () => {
+    isTourActive.value = true; // Mark the tour as active
+    currentStepIndex.value = -1;
+    checkMobileView();
+    if (isMobileView.value && showMobileMenu.value) {
+        toggleMobileMenu();
+    }
+
+    setTimeout(() => {
+        if ($vgt) {
+            console.log(
+                "Starting tour for",
+                isMobileView.value ? "mobile" : "desktop",
+            );
+            $vgt.start(0);
+        } else {
+            console.error("$vgt global not available");
+            currentStepIndex.value = 0; // Fallback approach
+        }
+    }, 300);
+};
+
+// Tour event handlers
+const onAfterStart = () => {
+    console.log("Tour started");
+    isTourActive.value = true; // Set the tour active flag
+};
+
+const onAfterExit = () => {
+    currentStepIndex.value = -1;
+    console.log("Tour exited");
+    isTourActive.value = false; // Unset the tour active flag
+
+    // axios to update tour completed status in database then console log the response
+    axios
+        .post(route("complete-profile.store"))
+        .then((response) => {
+            console.log(response);
+        })
+        .catch((error) => {
+            console.log(
+                error.response ? error.response.data.message : error.message,
+            );
+        });
+};
+
+const onAfterMove = () => {
+    console.log("Tour moved to step", currentStepIndex.value);
+
+    // For mobile: if we just landed on the mobile menu step (step 1; zero-indexed)
+    if (isMobileView.value && currentStepIndex.value === 1) {
+        if (!showMobileMenu.value) {
+            toggleMobileMenu();
+        }
+    }
+};
+
+// Initialize on mount
+onBeforeMount(() => {
+    // Add window resize listener
+    window.addEventListener("resize", checkMobileView);
+    checkMobileView();
+});
+
+onMounted(async () => {
+    // if not haseentour then return else start tour will timeout
+    if (isUserTourCompleted.value) return;
+    setTimeout(() => {
+        startTour();
+    }, 500);
+});
 </script>
 
 <template>
     <div class="min-h-screen bg-gray-100">
-        <!-- Mobile toggle button -->
-        <button
-            @click="toggleMobileMenu"
-            class="fixed top-4 right-4 z-50 lg:hidden rounded-full w-10 h-10 flex items-center justify-center bg-white shadow-lg text-gray-700 hover:bg-gray-50 focus:outline-none transition-all duration-300"
-        >
-            <i
-                :class="[
-                    showMobileMenu ? 'fa-times' : 'fa-bars',
-                    'fas text-lg',
-                ]"
-            ></i>
-        </button>
-
         <!-- Backdrop overlay for mobile -->
         <div
             v-if="showMobileMenu"
             @click="toggleMobileMenu"
             class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden transition-opacity duration-300"
         ></div>
+
+        <!-- Vue Guided Tour Component -->
+        <vue-guided-tour
+            v-model:stepIndex="currentStepIndex"
+            :steps="tourSteps"
+            :allowOverlayClose="false"
+            @after-start="onAfterStart"
+            @after-exit="onAfterExit"
+            @after-move="onAfterMove"
+        />
+
+        <!-- Tour Start Button -->
+        <button
+            @click="startTour"
+            class="fixed bottom-4 right-4 z-20 bg-[#012f12] text-white px-4 py-2 rounded-full shadow-lg hover:bg-[#034b1c] transition-colors duration-200"
+            title="Start Tour"
+        >
+            <i class="fas fa-question-circle mr-2"></i>
+            <span>Help</span>
+        </button>
 
         <!-- Sidebar -->
         <aside
@@ -124,6 +347,9 @@ const isActiveGroup = (routeNames) => {
                     <!-- Dashboard -->
                     <li>
                         <Link
+                            id="dashboard-link"
+                            as="button"
+                            :disabled="isTourActive"
                             :href="route('hr.index')"
                             class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
@@ -149,7 +375,7 @@ const isActiveGroup = (routeNames) => {
                                     :class="{
                                         'font-semibold': isActive('hr.index'),
                                     }"
-                                    >HR Dashboard</span
+                                    >Dashboard</span
                                 >
                             </div>
                             <div
@@ -162,147 +388,56 @@ const isActiveGroup = (routeNames) => {
                         </Link>
                     </li>
 
-                    <!-- Manage Job Details with dropdown -->
-
-                    <li class="relative">
-                        <div
-                            @click="toggleDropdown('manage-job-details')"
-                            class="flex items-center justify-between px-3 py-3 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
+                    <!-- Job Position Details -->
+                    <li>
+                        <Link
+                            id="job-details-link"
+                            as="button"
+                            :disabled="isTourActive"
+                            :href="route('job-position.index')"
+                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'text-white': isActiveGroup([
-                                    'job-category.index',
-                                    'job-category.show',
-                                    'job-position.index',
-                                ]),
+                                'bg-[#ffc001] text-black': isActive('job-position.index'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    !isActiveGroup([
-                                        'job-category.index',
-                                        'job-category.show',
-                                        'job-position.index',
-                                    ]),
+                                    !isActive('job-position.index'),
                             }"
                             @mouseenter="setHoveredItem('manage-job-details')"
                             @mouseleave="clearHoveredItem()"
                         >
-                            <div class="flex items-center">
+                            <div class="flex items-center w-full">
                                 <div
                                     class="flex items-center justify-center w-8 h-8 transition-all duration-300"
                                     :class="{
-                                        'text-white': isActiveGroup([
-                                            'job-category.index',
-                                            'job-category.show',
-                                            'job-position.index',
-                                        ]),
+                                        'text-black': isActive('job-position.index'),
                                     }"
                                 >
-                                    <i class="fas fa-calendar-alt"></i>
+                                    <i class="fas fa-users-cog"></i>
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
                                     class="ml-3 font-medium transition-all duration-300"
                                     :class="{
-                                        'font-semibold': isActiveGroup([
-                                            'job-category.index',
-                                            'job-category.show',
-                                            'job-position.index',
-                                        ]),
+                                        'font-semibold': isActive('job-position.index'),
                                     }"
-                                    >Manage Job Details</span
+                                    >Job Details</span
                                 >
-                            </div>
-                            <div
-                                v-if="sidebarOpen"
-                                class="transition-transform duration-300"
-                                :class="{
-                                    'rotate-180': activeDropdown === 'manage-job-details',
-                                }"
-                            >
-                                <i
-                                    class="fas fa-chevron-down text-xs"
-                                    :class="{
-                                        'text-black': isActiveGroup([
-                                            'job-category.index',
-                                            'job-category.show',
-                                            'job-position.index',
-                                        ]),
-                                    }"
-                                ></i>
                             </div>
                             <div
                                 v-if="
                                     hoveredItem === 'manage-job-details' &&
-                                    !isActiveGroup([
-                                        'job-category.index',
-                                        'job-category.show',
-                                        'job-position.index',
-                                    ])
+                                    !isActive('job-position.index')
                                 "
                                 class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
                             ></div>
-                        </div>
-
-                        <!-- Dropdown menu -->
-                        <transition
-                            enter-active-class="transition duration-200 ease-out"
-                            enter-from-class="transform scale-95 opacity-0"
-                            enter-to-class="transform scale-100 opacity-100"
-                            leave-active-class="transition duration-100 ease-in"
-                            leave-from-class="transform scale-100 opacity-100"
-                            leave-to-class="transform scale-95 opacity-0"
-                        >
-                            <ul
-                                v-show="activeDropdown === 'manage-job-details'"
-                                class="mt-1 space-y-1 pl-7"
-                            >
-                                <li>
-                                    <Link
-                                        :href="route('job-category.index')"
-                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
-                                        :class="{
-                                            'bg-[#ffc001] text-black font-medium':
-                                                isActive('job-category.index'),
-                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                                !isActive('job-category.index'),
-                                        }"
-                                    >
-                                        <i
-                                            class="fas fa-calendar-check mr-2"
-                                            :class="{
-                                                'text-black':
-                                                    isActive('job-category.index'),
-                                            }"
-                                        ></i>
-                                        <span>Job Category</span>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        :href="route('job-position.index')"
-                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
-                                        :class="{
-                                            'bg-[#ffc001] text-black font-medium':
-                                                isActive('job-position.index'),
-                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                                !isActive('job-position.index'),
-                                        }"
-                                    >
-                                        <i
-                                            class="fas fa-users-cog mr-2"
-                                            :class="{
-                                                'text-black':
-                                                    isActive('job-position.index'),
-                                            }"
-                                        ></i>
-                                        <span>Job Position</span>
-                                    </Link>
-                                </li>
-                            </ul>
-                        </transition>
+                        </Link>
                     </li>
 
                     <!-- Job Listings -->
                     <li>
                         <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="job-listings-link"
                             :href="route('job-listing.index')"
                             class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
@@ -347,6 +482,9 @@ const isActiveGroup = (routeNames) => {
                     <!-- Applications -->
                     <li>
                         <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="applications-link"
                             :href="route('applications.index')"
                             class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
@@ -384,7 +522,7 @@ const isActiveGroup = (routeNames) => {
                                             'applications.show',
                                         ]),
                                     }"
-                                    >Manage Applications</span
+                                    >Applications</span
                                 >
                             </div>
                             <div
@@ -400,9 +538,127 @@ const isActiveGroup = (routeNames) => {
                         </Link>
                     </li>
 
+                    <!-- Reports with dropdown -->
+                    <li class="relative">
+                        <div
+                            id="reports-link"
+                            @click="toggleDropdown('reports')"
+                            class="flex items-center justify-between px-3 py-3 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
+                            :class="{
+                                'text-white': isActiveGroup([
+                                    'selection-lineup.index',
+                                    'selection-lineup.show',
+                                ]),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActiveGroup([
+                                        'selection-lineup.index',
+                                        'selection-lineup.show',
+                                    ]),
+                            }"
+                            @mouseenter="setHoveredItem('reports')"
+                            @mouseleave="clearHoveredItem()"
+                        >
+                            <div class="flex items-center">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-white': isActiveGroup([
+                                            'selection-lineup.index',
+                                            'selection-lineup.show',
+                                        ]),
+                                    }"
+                                >
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-300"
+                                    :class="{
+                                        'font-semibold': isActiveGroup([
+                                            'selection-lineup.index',
+                                            'selection-lineup.show',
+                                        ]),
+                                    }"
+                                    >Reports</span
+                                >
+                            </div>
+                            <div
+                                v-if="sidebarOpen"
+                                class="transition-transform duration-300"
+                                :class="{
+                                    'rotate-180': activeDropdown === 'reports',
+                                }"
+                            >
+                                <i
+                                    class="fas fa-chevron-down text-xs"
+                                    :class="{
+                                        'text-black': isActiveGroup([
+                                            'schedules.index',
+                                            'schedules.show',
+                                            'groups.index',
+                                        ]),
+                                    }"
+                                ></i>
+                            </div>
+                            <div
+                                v-if="
+                                    hoveredItem === 'reports' &&
+                                    !isActiveGroup([
+                                        'selection-lineup.index',
+                                        'selection-lineup.show',
+                                    ])
+                                "
+                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
+                            ></div>
+                        </div>
+
+                        <!-- Dropdown menu -->
+                        <transition
+                            enter-active-class="transition duration-200 ease-out"
+                            enter-from-class="transform scale-95 opacity-0"
+                            enter-to-class="transform scale-100 opacity-100"
+                            leave-active-class="transition duration-100 ease-in"
+                            leave-from-class="transform scale-100 opacity-100"
+                            leave-to-class="transform scale-95 opacity-0"
+                        >
+                            <ul
+                                v-show="activeDropdown === 'reports'"
+                                class="mt-1 space-y-1 pl-7"
+                            >
+                                <li>
+                                    <Link
+                                        :href="route('selection-lineup.index')"
+                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive(
+                                                    'selection-lineup.index',
+                                                ),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive(
+                                                    'selection-lineup.index',
+                                                ),
+                                        }"
+                                    >
+                                        <i
+                                            class="fas fa-calendar-check mr-2"
+                                            :class="{
+                                                'text-black': isActive(
+                                                    'selection-lineup.index',
+                                                ),
+                                            }"
+                                        ></i>
+                                        <span>Selection Lineup</span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </transition>
+                    </li>
+
                     <!-- Schedule Management with Dropdown -->
                     <li class="relative">
                         <div
+                            id="schedule-management-link"
                             @click="toggleDropdown('schedule')"
                             class="flex items-center justify-between px-3 py-3 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
                             :class="{
@@ -444,7 +700,7 @@ const isActiveGroup = (routeNames) => {
                                             'groups.index',
                                         ]),
                                     }"
-                                    >Schedule Management</span
+                                    >Schedule</span
                                 >
                             </div>
                             <div
@@ -540,6 +796,9 @@ const isActiveGroup = (routeNames) => {
                     <!-- Profile -->
                     <li>
                         <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="profile-link"
                             :href="route('profile.edit')"
                             class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
@@ -575,37 +834,6 @@ const isActiveGroup = (routeNames) => {
                                     hoveredItem === 'profile' &&
                                     !isActive('profile.edit')
                                 "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
-                        </Link>
-                    </li>
-
-                    <!-- Reports -->
-                    <li>
-                        <Link
-                            :href="route('profile.edit')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
-                            :class="{
-                                'bg-[#ffc001] text-black': false,
-                                'text-gray-300 hover:bg-[#034b1c] hover:text-white': true,
-                            }"
-                            @mouseenter="setHoveredItem('reports')"
-                            @mouseleave="clearHoveredItem()"
-                        >
-                            <div class="flex items-center w-full">
-                                <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
-                                >
-                                    <i class="fas fa-file-pdf"></i>
-                                </div>
-                                <span
-                                    v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
-                                    >Reports</span
-                                >
-                            </div>
-                            <div
-                                v-if="hoveredItem === 'reports'"
                                 class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
                             ></div>
                         </Link>
@@ -661,7 +889,10 @@ const isActiveGroup = (routeNames) => {
             class="transition-all duration-300 ease-in-out"
         >
             <!-- Page Header -->
-            <header class="bg-white shadow-sm" v-if="$slots.header">
+            <header
+                class="bg-white shadow-sm sticky top-0 z-50"
+                v-if="$slots.header"
+            >
                 <div
                     class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5"
                 >
@@ -679,13 +910,27 @@ const isActiveGroup = (routeNames) => {
                         ></i>
                     </button>
                     <div class="flex-grow">
-                        <slot name="header"/>
+                        <slot name="header" />
                     </div>
 
                     <NotificationBell
                         class="mr-20"
                         :notifications="$page.props.notifications"
                     />
+                    <!-- Mobile hamburger -->
+                    <div class="lg:hidden">
+                        <button
+                            id="menu-button"
+                            @click="toggleMobileMenu"
+                            class="rounded-lg bg-green-600 p-1 m-1 text-white shadow-lg hover:bg-green-500 focus:outline-none"
+                        >
+                            <i
+                                class="fas fa-bars h-6 w-6"
+                                v-if="!showMobileMenu"
+                            ></i>
+                            <i class="fas fa-times h-6 w-6" v-else></i>
+                        </button>
+                    </div>
                 </div>
             </header>
 

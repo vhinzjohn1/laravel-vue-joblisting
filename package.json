@@ -27,6 +27,7 @@
         "@fullcalendar/vue3": "^6.1.15",
         "@inertiajs/server": "^0.1.0",
         "@vue/server-renderer": "^3.5.13",
-        "admin-lte": "^4.0.0-beta3"
+        "admin-lte": "^4.0.0-beta3",
+        "vue-guided-tour": "^0.5.1"
     }
 }

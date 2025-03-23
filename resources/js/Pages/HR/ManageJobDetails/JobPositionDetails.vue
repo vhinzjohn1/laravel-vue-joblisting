@@ -31,8 +31,8 @@
               </div>
 
               <div v-else class="space-y-4">
-                <DataTable 
-                    :data="localJobPosition" 
+                <DataTable
+                    :data="localJobPosition"
                     :columns="[
                         { key: 'position_id', title: 'Position ID' },
                         { key: 'position_name', title: 'Position Name' },
@@ -149,7 +149,7 @@ const form = useForm({
 const showAddModal = ref(false)
 const showEditModal = ref(false)
 
-const localJobPosition = ref(page.props.positions || '') 
+const localJobPosition = ref(page.props.positions || '')
 console.log(page.props.positions)
 
 

@@ -17,16 +17,19 @@ return new class extends Migration
             $table->id('user_id'); // Change primary key name
             $table->string('username')->nullable();
             $table->string('password');
-            $table->string('email');
+            $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('role_name')->nullable();
             $table->boolean('profile_completed')->default(false);
+            $table->boolean('tour_completed')->default(false);
             $table->rememberToken();
             $table->timestamps();
 
             // Adding Index for Performance
             $table->index('email');
             $table->index('role_name');
+            $table->index('profile_completed');
+            $table->index('tour_completed');
         });
 
         // Dummy seeder for users with 3 records
@@ -186,59 +189,57 @@ return new class extends Migration
         });
 
         DB::table('positions')->insert([
-            ['position_name' => 'UI/UX Designer', 'item_number' => 'DES-001', 'salary_grade_id' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['position_name' => 'Software Engineer', 'item_number' => 'ENG-001', 'salary_grade_id' => 2, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        // Create categories table and seed data
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id('category_id');
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->timestamps();
-        });
-
-        DB::table('categories')->insert([
-            ['name' => 'Design', 'description' => 'Design related jobs', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Engineering', 'description' => 'Engineering related jobs', 'created_at' => now(), 'updated_at' => now()],
+            ['position_name' => 'Mathematics Teacher', 'item_number' => 'TCH-001', 'salary_grade_id' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['position_name' => 'Administrative Assistant', 'item_number' => 'ADM-001', 'salary_grade_id' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['position_name' => 'Science Department Head', 'item_number' => 'TCH-002', 'salary_grade_id' => 2, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         // Create job_listings table
         Schema::create('job_listings', function (Blueprint $table) {
             $table->id('job_listing_id');
             $table->unsignedBigInteger('position_id')->nullable();
-            $table->unsignedBigInteger('category_id')->nullable();
+            $table->string('category')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->date('closing_date')->nullable();
             $table->string('status')->nullable();
-            $table->bigInteger('applicant_limit');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
             $table->foreign('position_id')->references('position_id')->on('positions')->onDelete('cascade');
             $table->foreign('created_by')->references('user_id')->on('users')->onDelete('set null');
-            $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('set null');
 
             // Adding Index
             $table->index('status');
-            $table->index('category_id');
+            $table->index('category');
             $table->index('position_id');
             $table->index('created_at');
         });
 
         // Seed a sample job listing
         DB::table('job_listings')->insert([
-            'position_id'     => 2, // Software Engineer
-            'category_id'     => 2, // Engineering
-            'title'           => 'Software Engineer Opportunity',
-            'description'     => 'Join our dynamic team to build cutting-edge web applications.',
-            'closing_date'    => '2025-04-30',
-            'status'          => 'Draft',
-            'applicant_limit' => 50,
-            'created_by'      => 2, // hr user
-            'created_at'      => now(),
-            'updated_at'      => now(),
+            [
+                'position_id'  => 1, // Mathematics Teacher
+                'category'     => 'Teaching',
+                'title'        => 'Mathematics Teacher Position',
+                'description'  => 'Join our academic team to teach mathematics subjects for high school students.',
+                'closing_date' => '2025-04-30',
+                'status'       => 'Draft',
+                'created_by'   => 2, // hr user
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+            [
+                'position_id'  => 2, // Administrative Assistant
+                'category'     => 'Non-Teaching',
+                'title'        => 'Administrative Assistant Position',
+                'description'  => 'Support administrative operations with document handling, correspondence and scheduling.',
+                'closing_date' => '2025-05-15',
+                'status'       => 'Draft',
+                'created_by'   => 2, // hr user
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]
         ]);
 
         Schema::create('minimum_requirements', function (Blueprint $table) {
@@ -247,6 +248,12 @@ return new class extends Migration
             $table->string('requirement_type'); // e.g., 'training', 'experience', 'education', 'certification'
             $table->string('title');
             $table->text('description')->nullable();
+            // Additional fields for education, training, eligibility, and experience
+            $table->string('education_level')->nullable();
+            $table->string('training_hours')->nullable();
+            $table->string('eligibility')->nullable();
+            $table->string('years_experience')->nullable();
+            // End of Additional fields
             $table->boolean('is_required')->default(true);
             $table->timestamps();
 
@@ -254,13 +261,42 @@ return new class extends Migration
         });
 
         // Add minimum requirements for the job listing
-        $jobListingId = DB::table('job_listings')->where('title', 'Software Engineer Opportunity')->value('job_listing_id');
+        $teachingJobId = DB::table('job_listings')->where('title', 'Mathematics Teacher Position')->value('job_listing_id');
+        $nonTeachingJobId = DB::table('job_listings')->where('title', 'Administrative Assistant Position')->value('job_listing_id');
+
         DB::table('minimum_requirements')->insert([
             [
-                'job_listing_id' => $jobListingId,
+                'job_listing_id' => $teachingJobId,
+                'requirement_type' => 'education',
+                'title' => 'Bachelor\'s degree in Mathematics or related field',
+                'description' => 'Candidates must have at least a bachelor\'s degree in Mathematics, Mathematics Education, or related fields.',
+                'is_required' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'job_listing_id' => $teachingJobId,
                 'requirement_type' => 'experience',
-                'title' => '2+ years of software development experience',
-                'description' => 'Candidates should have at least 2 years of experience in software development.',
+                'title' => '2+ years of teaching experience',
+                'description' => 'At least 2 years experience teaching mathematics at the high school level.',
+                'is_required' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'job_listing_id' => $nonTeachingJobId,
+                'requirement_type' => 'education',
+                'title' => 'Associate\'s or Bachelor\'s degree',
+                'description' => 'Minimum of associate\'s degree in any field, bachelor\'s degree preferred.',
+                'is_required' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'job_listing_id' => $nonTeachingJobId,
+                'requirement_type' => 'experience',
+                'title' => '1+ year of administrative experience',
+                'description' => 'At least 1 year experience in administrative support or office management.',
                 'is_required' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -282,6 +318,7 @@ return new class extends Migration
             $table->id('document_id');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('application_id')->nullable();
+            $table->string('document_name')->nullable();
             $table->string('document_type')->nullable();
             $table->string('file_path')->nullable();
             $table->boolean('is_verified')->nullable();
@@ -397,7 +434,6 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('test');
         Schema::dropIfExists('minimum_requirements');
-        Schema::dropIfExists('categories');
         Schema::dropIfExists('work_experiences');
         Schema::dropIfExists('trainings');
         Schema::dropIfExists('educational_backgrounds');

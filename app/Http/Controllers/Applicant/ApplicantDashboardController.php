@@ -25,10 +25,10 @@ class ApplicantDashboardController extends Controller
         $stats = [
             'total_applications' => Application::where('user_id', $user->user_id)->count(),
             'pending_applications' => Application::where('user_id', $user->user_id)
-                ->where('status', 'pending')
+                ->where('status', 'Pending')
                 ->count(),
             'successful_applications' => Application::where('user_id', $user->user_id)
-                ->where('status', 'accepted')
+                ->where('status', 'Accepted')
                 ->count(),
             'upcoming_interviews' => ScheduleParticipant::where('user_id', $user->user_id)
                 ->whereHas('schedule', function ($query) {

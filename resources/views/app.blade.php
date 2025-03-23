@@ -17,6 +17,14 @@
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/aos.css') }}">
 
+    <style>
+        @media print {
+            @page {
+                size: landscape;
+            }
+        }
+    </style>
+
     @routes
     @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
     @inertiaHead

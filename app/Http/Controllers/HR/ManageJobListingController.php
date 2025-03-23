@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 use App\Models\Position;
-use App\Models\Category;
 use App\Models\SalaryGrade;
 
 class ManageJobListingController extends Controller
@@ -20,20 +19,17 @@ class ManageJobListingController extends Controller
             'position' => function ($query) {
                 $query->with('salaryGrade');
             },
-            'category',
             'creator',
             'minimumRequirements',
             'applications'
         ])->get();
 
         $positions = Position::all();
-        $categories = Category::all();
         $salaryGrades = SalaryGrade::all();
 
         return Inertia::render('HR/ManageJobListing/JobListing', [
             'jobListings' => $jobListings,
             'positions' => $positions,
-            'categories' => $categories,
             'salaryGrades' => $salaryGrades,
         ]);
     }
@@ -46,8 +42,7 @@ class ManageJobListingController extends Controller
             'description' => 'required|string',
             'closing_date' => 'required|date|after_or_equal:today',
             'status' => 'required|string|in:Active,Draft,Closed',
-            'applicant_limit' => 'required|integer|min:1',
-            'category_id' => 'nullable|exists:categories,category_id',
+            'category' => 'required|string|in:Teaching,Non-Teaching',
         ]);
 
         if ($validator->fails()) {
@@ -60,16 +55,14 @@ class ManageJobListingController extends Controller
             'description' => $request->description,
             'closing_date' => $request->closing_date,
             'status' => $request->status,
-            'applicant_limit' => $request->applicant_limit,
             'created_by' => Auth::id(),
-            'category_id' => $request->category_id,
+            'category' => $request->category,
         ]);
 
         $jobListings = JobListing::with([
             'position' => function ($query) {
                 $query->with('salaryGrade');
             },
-            'category',
             'creator',
             'minimumRequirements',
             'applications'
@@ -91,8 +84,7 @@ class ManageJobListingController extends Controller
             'description' => 'required|string',
             'closing_date' => 'required|date|after_or_equal:today',
             'status' => 'required|string|in:Active,Draft,Closed',
-            'applicant_limit' => 'required|integer|min:1',
-            'category_id' => 'nullable|exists:categories,category_id',
+            'category' => 'required|string|in:Teaching,Non-Teaching',
         ]);
 
         if ($validator->fails()) {
@@ -107,14 +99,19 @@ class ManageJobListingController extends Controller
             'description' => $request->description,
             'closing_date' => $request->closing_date,
             'status' => $request->status,
-            'applicant_limit' => $request->applicant_limit,
-            'category_id' => $request->category_id,
+            'category' => $request->category,
         ]);
 
-        // Load the relationships that might be needed in the frontend
-        $jobListing->load(['position.salaryGrade', 'category']);
+        $jobListings = JobListing::with([
+            'position' => function ($query) {
+                $query->with('salaryGrade');
+            },
+            'creator',
+            'minimumRequirements',
+            'applications'
+        ])->get();
 
-        return response()->json($jobListing);
+        return response()->json($jobListings, 201);
     }
 
     public function destroy(JobListing $jobListing)

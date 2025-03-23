@@ -200,7 +200,7 @@
                                             >
                                             <p class="font-medium">
                                                 {{
-                                                    job.category?.name || "N/A"
+                                                    job.category || "N/A"
                                                 }}
                                             </p>
                                         </div>

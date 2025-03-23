@@ -17,7 +17,7 @@ class MyApplicationsController extends Controller
         // Get all applications for the current user with related data
         $applications = Application::with([
             'jobListing' => function ($query) {
-                $query->with(['position', 'category']);
+                $query->with(['position']);
             },
             'documents',
             'statusHistory'
@@ -39,7 +39,7 @@ class MyApplicationsController extends Controller
         // Get the specific application with related data
         $application = Application::with([
             'jobListing' => function ($query) {
-                $query->with(['position', 'category', 'creator']);
+                $query->with(['position', 'creator']);
             },
             'documents',
             'statusHistory' => function ($query) {

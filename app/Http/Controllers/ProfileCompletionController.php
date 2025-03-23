@@ -12,23 +12,53 @@ class ProfileCompletionController extends Controller
     /**
      * Display the profile completion page.
      */
-    public function show(): Response
+    public function index()
     {
+        $user = auth()->user();
+
+        // if user completed profile, redirect to dashboard
+        if ($user->profile_completed) {
+            return redirect()->route('job-application.index');
+        }
+        // else if user is not an applicant, redirect to root
+        if ($user->role_name !== 'applicant') {
+            return redirect()->route('/');
+        }
+
         return Inertia::render('Profile/CompleteProfile');
     }
 
     /**
      * Mark the user's profile as complete.
      */
-    public function complete(Request $request): RedirectResponse
+    public function update(Request $request)
     {
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        // Update user's profile status
-        $user->profile_completed = true;
-        $user->save();
+            // Update user's profile status
+            $user->profile_completed = true;
+            $user->save();
 
-        // Redirect to job listing page index
-        return redirect()->route('job-listing.index')->with('success', 'Profile completed successfully!');
+            // Return a successful json response
+            return response()->json(['success' => true, 'message' => 'Profile completed successfully!'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Something went wrong. Please try again later.'], 500);
+        }
+    }
+
+    public function store(Request $request){
+        try {
+            $user = $request->user();
+
+            // Update user's tour status
+            $user->tour_completed = true;
+            $user->save();
+
+            // Return a successful json response
+            return response()->json(['success' => true, 'message' => 'Tour completed successfully!'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Something went wrong. Please try again later.'], 500);
+        }
     }
 }

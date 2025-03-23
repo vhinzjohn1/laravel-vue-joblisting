@@ -39,19 +39,17 @@ const isActive = (routeName) => {
 
 <template>
     <div class="min-h-screen bg-gray-100">
-        <!-- Mobile hamburger -->
-        <div class="lg:hidden">
-            <button
-                @click="toggleMobileMenu"
-                class="fixed top-4 right-4 z-50 rounded-lg bg-white p-2 text-gray-600 shadow-lg hover:bg-gray-50 focus:outline-none"
-            >
-                <i class="fas fa-bars h-6 w-6" v-if="!showMobileMenu"></i>
-                <i class="fas fa-times h-6 w-6" v-else></i>
-            </button>
-        </div>
+
+
+        <!-- Backdrop overlay for mobile -->
+        <div
+            v-if="showMobileMenu"
+            @click="toggleMobileMenu"
+            class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden transition-opacity duration-300"
+        ></div>
 
         <!-- Sidebar -->
-        <div
+        <aside
             :class="{
                 'translate-x-0': showMobileMenu,
                 '-translate-x-full': !showMobileMenu,
@@ -224,7 +222,7 @@ const isActive = (routeName) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </aside>
 
        
 
@@ -277,8 +275,8 @@ const isActive = (routeName) => {
             }"
             class="transition-all duration-300 ease-in-out"
         >
-            <!-- Page Heading -->
-            <header class="bg-white shadow-sm" v-if="$slots.header">
+            <!-- Page Header -->
+            <header class="bg-white shadow-sm sticky top-0 z-50" v-if="$slots.header">
                 <div
                     class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5"
                 >
@@ -303,6 +301,16 @@ const isActive = (routeName) => {
                         class="mr-20"
                         :notifications="$page.props.notifications"
                     />
+                    <!-- Mobile hamburger -->
+                    <div class="lg:hidden">
+                        <button
+                            @click="toggleMobileMenu"
+                            class="rounded-lg bg-green-600 p-1 m-1 text-white shadow-lg hover:bg-green-500 focus:outline-none"
+                        >
+                            <i class="fas fa-bars h-6 w-6" v-if="!showMobileMenu"></i>
+                            <i class="fas fa-times h-6 w-6" v-else></i>
+                        </button>
+                    </div>
                 </div>
             </header>
             <!-- Page Content -->

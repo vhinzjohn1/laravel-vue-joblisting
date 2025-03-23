@@ -37,6 +37,7 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'username' => $request->user()->username,
                     'role_name' => $request->user()->role_name,
+                    'tour_completed' => $request->user()->tour_completed,
                 ] : null,
             ],
             'notifications' => $request->user() ? $request->user()->notifications()->latest()->take(5)->get() : [],

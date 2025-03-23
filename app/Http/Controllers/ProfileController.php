@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\UserDetail;
+use Illuminate\Http\JsonResponse;
 
 class ProfileController extends Controller
 {
@@ -60,6 +62,21 @@ class ProfileController extends Controller
         );
 
         return Redirect::route('profile.edit');
+    }
+
+    public function tour(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+        // Update user's profile status
+        $user->tour_completed = true;
+        $user->save();
+
+            return response()->json(['tour_completed' => true], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
     /**

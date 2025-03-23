@@ -81,9 +81,11 @@ const currentComponent = computed(() => {
 
 // Check if profile is complete - this would connect to your backend
 const completeProfile = () => {
+
+    console.log('this is the user:', user)
     // Make API call to mark profile as complete
     axios
-        .post(route("profile.mark-complete"))
+    .put(route("complete-profile.update", user.id))
         .then(() => {
             Swal.fire({
                 title: "Profile Completed!",

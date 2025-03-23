@@ -51,10 +51,10 @@
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <h4 class="font-medium text-gray-900">
-                                            {{ job.title }}
+                                            {{ job?.title }}
                                         </h4>
                                         <p class="text-sm text-gray-600">
-                                            {{ job.category.name }}
+                                            {{ job?.category?.name }}
                                         </p>
                                     </div>
                                     <span
@@ -89,18 +89,18 @@
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <h4 class="font-medium text-gray-900">
-                                            {{ interview.schedule.title}}
+                                            {{ interview?.schedule?.title }}
                                         </h4>
                                         <p class="text-sm text-gray-600">
                                             {{
-                                                interview.schedule.description
+                                                interview?.schedule?.description
                                             }}
                                         </p>
                                     </div>
                                     <span class="text-sm text-gray-600">
                                         {{
                                             new Date(
-                                                interview.schedule.schedule_date,
+                                                interview?.schedule?.schedule_date,
                                             ).toLocaleDateString()
                                         }}
                                     </span>
@@ -152,28 +152,28 @@
                                         class="hover:bg-gray-50"
                                     >
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ application.user.user_detail.lastname }},
-                                            {{ application.user.user_detail.firstname }}
+                                            {{ application?.user?.email }},
+                                            {{ application?.user?.user_detail?.lastname }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ application.job_listing.title }}
+                                            {{ application?.job_listing?.title }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span
                                                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                                                 :class="{
                                                     'bg-yellow-100 text-yellow-800':
-                                                        application.status ===
+                                                        application?.status ===
                                                         'pending',
                                                     'bg-green-100 text-green-800':
-                                                        application.status ===
+                                                        application?.status ===
                                                         'accepted',
                                                     'bg-red-100 text-red-800':
-                                                        application.status ===
+                                                        application?.status ===
                                                         'rejected',
                                                 }"
                                             >
-                                                {{ application.status }}
+                                                {{ application?.status }}
                                             </span>
                                         </td>
                                         <td
@@ -181,7 +181,7 @@
                                         >
                                             {{
                                                 new Date(
-                                                    application.created_at,
+                                                    application?.created_at,
                                                 ).toLocaleDateString()
                                             }}
                                         </td>

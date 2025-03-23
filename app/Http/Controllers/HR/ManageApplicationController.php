@@ -21,7 +21,7 @@ class ManageApplicationController extends Controller
         // Get all applications with related data
         $applications = Application::with([
             'jobListing' => function ($query) {
-                $query->with(['position', 'category']);
+                $query->with(['position']);
             },
             'user' => function ($query) {
                 $query->with('userDetail');
@@ -55,7 +55,7 @@ class ManageApplicationController extends Controller
         // Get the specific application with related data
         $application = Application::with([
             'jobListing' => function ($query) {
-                $query->with(['position', 'category', 'creator']);
+                $query->with(['position', 'creator']);
             },
             'user',
             'documents',
@@ -112,7 +112,7 @@ class ManageApplicationController extends Controller
         // Get fresh applications data with relationships
         $applications = Application::with([
             'jobListing' => function ($query) {
-                $query->with(['position', 'category']);
+                $query->with(['position']);
             },
             'user' => function ($query) {
                 $query->with('userDetail');

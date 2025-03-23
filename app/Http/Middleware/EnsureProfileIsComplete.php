@@ -19,7 +19,7 @@ class EnsureProfileIsComplete
     {
         // Check if the user has completed their profile
         // This is a simple example - you should adapt based on your user model and requirements
-        if ($request->user() && !$request->user()->profile_completed) {
+        if ($request->user() && !$request->user()->profile_completed && $request->user()->role_name === 'applicant') {
             return redirect()->route('complete-profile');
         }
 

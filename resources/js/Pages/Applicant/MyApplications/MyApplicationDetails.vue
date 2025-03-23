@@ -101,7 +101,7 @@
                                             <p class="mt-1">
                                                 {{
                                                     application.job_listing
-                                                        .category?.name || "N/A"
+                                                        .category || "N/A"
                                                 }}
                                             </p>
                                         </div>

@@ -14,6 +14,7 @@ class ApplicantDocument extends Model
     protected $fillable = [
         'user_id',
         'application_id',
+        'document_name',
         'document_type',
         'file_path',
         'is_verified'

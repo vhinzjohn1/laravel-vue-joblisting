@@ -15,7 +15,6 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\ProfileDetailsController;
 use App\Http\Controllers\HR\ScheduleController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\HR\JobCategoryController;
 use App\Http\Controllers\HR\JobPositionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +24,7 @@ use App\Mail\SendEmail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Http\Controllers\Applicant\ScheduleController as ApplicantScheduleController;
+use App\Http\Controllers\HR\SelectionLineupController;
 use App\Http\Controllers\ProfileCompletionController;
 
 
@@ -51,7 +51,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion'     => PHP_VERSION,
     ]);
-});
+})->name('/');
 
 
 // Authentication route group
@@ -77,9 +77,9 @@ Route::middleware(['auth', 'role:hr'])->group(function () {
     Route::resource('hr', HRController::class);
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
-    Route::resource('job-category', JobCategoryController::class);
     Route::resource('job-position', JobPositionController::class);
     Route::resource('groups', ApplicationGroupController::class);
+    Route::resource('selection-lineup', SelectionLineupController::class);
 });
 
 // Applicant Route Group
@@ -116,15 +116,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
 });
 
-// Complete Profile route - protected by auth middleware
-Route::get('/complete-profile', [ProfileCompletionController::class, 'show'])
-    ->middleware(['auth', 'verified'])
-    ->name('complete-profile');
-
-// Add a route to mark profile as complete
-Route::post('/complete-profile', [ProfileCompletionController::class, 'complete'])
-    ->middleware(['auth', 'verified'])
-    ->name('profile.mark-complete');
+Route::resource('complete-profile', ProfileCompletionController::class)
+    ->middleware(['auth']);
 
 // Fallback to root
 Route::fallback(function () {

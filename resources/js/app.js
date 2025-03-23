@@ -5,6 +5,8 @@ import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
+import VueGuidedTour from 'vue-guided-tour'
+import 'vue-guided-tour/style.css'
 
 createInertiaApp({
     title: (title) => `${title}`,
@@ -17,6 +19,7 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(VueGuidedTour)
             .mount(el);
     },
     progress: {
