@@ -168,13 +168,54 @@ return new class extends Migration
         Schema::create('salary_grades', function (Blueprint $table) {
             $table->id('salary_grade_id');
             $table->float('amount', 53, 2)->nullable();
-            $table->integer('years_experience')->nullable();
             $table->timestamps();
         });
 
         DB::table('salary_grades')->insert([
-            ['amount' => 50000, 'years_experience' => 2],
-            ['amount' => 70000, 'years_experience' => 5],
+            ['amount' => 50000],
+            ['amount' => 70000],
+        ]);
+
+        // Create minimum_requirements table
+        Schema::create('minimum_requirements', function (Blueprint $table) {
+            $table->id('minimum_requirement_id');
+            $table->string('education_level')->nullable();
+            $table->integer('training_hours')->nullable();
+            $table->string('eligibility')->nullable();
+            $table->integer('years_experience')->nullable();
+            $table->boolean('is_required')->default(true);
+            $table->timestamps();
+        });
+
+        // Seed minimum requirements first
+        DB::table('minimum_requirements')->insert([
+            [
+                'education_level' => 'Bachelor\'s degree',
+                'training_hours' => 3,
+                'eligibility' => 'Career Service (Professional)',
+                'years_experience' => 1,
+                'is_required' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'education_level' => 'Bachelor\'s degree',
+                'training_hours' => 4,
+                'eligibility' => 'Career Service (Sub-Professional)',
+                'years_experience' => 1,
+                'is_required' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'education_level' => 'Bachelor\'s degree',
+                'training_hours' => 3,
+                'eligibility' => 'RA 1080 (Board/Bar/Court)',
+                'years_experience' => 1,
+                'is_required' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         // Create positions table and seed data
@@ -183,15 +224,39 @@ return new class extends Migration
             $table->string('position_name')->nullable();
             $table->string('item_number')->nullable();
             $table->unsignedBigInteger('salary_grade_id')->nullable();
+            $table->unsignedBigInteger('minimum_requirement_id')->nullable();
             $table->timestamps();
 
             $table->foreign('salary_grade_id')->references('salary_grade_id')->on('salary_grades')->onDelete('set null');
+            $table->foreign('minimum_requirement_id')->references('minimum_requirement_id')->on('minimum_requirements')->onDelete('set null');
         });
 
+        // Insert positions with proper minimum requirement IDs
         DB::table('positions')->insert([
-            ['position_name' => 'Mathematics Teacher', 'item_number' => 'TCH-001', 'salary_grade_id' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['position_name' => 'Administrative Assistant', 'item_number' => 'ADM-001', 'salary_grade_id' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['position_name' => 'Science Department Head', 'item_number' => 'TCH-002', 'salary_grade_id' => 2, 'created_at' => now(), 'updated_at' => now()],
+            [
+                'position_name' => 'Mathematics Teacher',
+                'item_number' => 'TCH-001',
+                'salary_grade_id' => 1,
+                'minimum_requirement_id' => 1, // Bachelor's degree with CSP eligibility
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'position_name' => 'Administrative Assistant',
+                'item_number' => 'ADM-001',
+                'salary_grade_id' => 1,
+                'minimum_requirement_id' => 2, // Associate's or Bachelor's with Sub-Professional eligibility
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'position_name' => 'Science Department Head',
+                'item_number' => 'TCH-002',
+                'salary_grade_id' => 2,
+                'minimum_requirement_id' => 3, // Associate's or Bachelor's with RA 1080 eligibility
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ]);
 
         // Create job_listings table
@@ -224,7 +289,7 @@ return new class extends Migration
                 'title'        => 'Mathematics Teacher Position',
                 'description'  => 'Join our academic team to teach mathematics subjects for high school students.',
                 'closing_date' => '2025-04-30',
-                'status'       => 'Draft',
+                'status'       => 'Active',
                 'created_by'   => 2, // hr user
                 'created_at'   => now(),
                 'updated_at'   => now(),
@@ -235,73 +300,13 @@ return new class extends Migration
                 'title'        => 'Administrative Assistant Position',
                 'description'  => 'Support administrative operations with document handling, correspondence and scheduling.',
                 'closing_date' => '2025-05-15',
-                'status'       => 'Draft',
+                'status'       => 'Active',
                 'created_by'   => 2, // hr user
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ]
         ]);
 
-        Schema::create('minimum_requirements', function (Blueprint $table) {
-            $table->id('requirement_id');
-            $table->unsignedBigInteger('job_listing_id')->nullable();
-            $table->string('requirement_type'); // e.g., 'training', 'experience', 'education', 'certification'
-            $table->string('title');
-            $table->text('description')->nullable();
-            // Additional fields for education, training, eligibility, and experience
-            $table->string('education_level')->nullable();
-            $table->string('training_hours')->nullable();
-            $table->string('eligibility')->nullable();
-            $table->string('years_experience')->nullable();
-            // End of Additional fields
-            $table->boolean('is_required')->default(true);
-            $table->timestamps();
-
-            $table->foreign('job_listing_id')->references('job_listing_id')->on('job_listings')->onDelete('cascade');
-        });
-
-        // Add minimum requirements for the job listing
-        $teachingJobId = DB::table('job_listings')->where('title', 'Mathematics Teacher Position')->value('job_listing_id');
-        $nonTeachingJobId = DB::table('job_listings')->where('title', 'Administrative Assistant Position')->value('job_listing_id');
-
-        DB::table('minimum_requirements')->insert([
-            [
-                'job_listing_id' => $teachingJobId,
-                'requirement_type' => 'education',
-                'title' => 'Bachelor\'s degree in Mathematics or related field',
-                'description' => 'Candidates must have at least a bachelor\'s degree in Mathematics, Mathematics Education, or related fields.',
-                'is_required' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'job_listing_id' => $teachingJobId,
-                'requirement_type' => 'experience',
-                'title' => '2+ years of teaching experience',
-                'description' => 'At least 2 years experience teaching mathematics at the high school level.',
-                'is_required' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'job_listing_id' => $nonTeachingJobId,
-                'requirement_type' => 'education',
-                'title' => 'Associate\'s or Bachelor\'s degree',
-                'description' => 'Minimum of associate\'s degree in any field, bachelor\'s degree preferred.',
-                'is_required' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'job_listing_id' => $nonTeachingJobId,
-                'requirement_type' => 'experience',
-                'title' => '1+ year of administrative experience',
-                'description' => 'At least 1 year experience in administrative support or office management.',
-                'is_required' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
 
         Schema::create('applications', function (Blueprint $table) {
             $table->id('application_id');

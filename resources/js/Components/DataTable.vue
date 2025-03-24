@@ -1,24 +1,23 @@
 <!-- Instruction to Use -->
 <!-- :data - array of objects data-->
 <!-- :columns - array of column objects -->
-    <!-- 2 ways for defining columns -->
-        <!-- 1. column object should have key and title properties -->
-                <!-- :columns="[
+<!-- 2 ways for defining columns -->
+<!-- 1. column object should have key and title properties -->
+<!-- :columns="[
                 { key: 'position_id', title: 'Position ID' },
                 { key: 'position_name', title: 'Position Name' },
                 { key: 'item_number', title: 'Item Number' },
-                { key: 'salary_grade.amount', title: 'Salary Grade' }
+                { key: 'salary_grade.amount', title: 'Salary Grade' },
+                { key: 'id', title: 'ID', hidden: true } // Example of hidden column
             ]" -->
-        <!-- 2. Defined columns by column key -->
-                <!-- :columns="['user_id', 'username', 'email', 'role_name']" -->
-            
+<!-- 2. Defined columns by column key -->
+<!-- :columns="['user_id', 'username', 'email', 'role_name']" -->
+
 <!-- :sortable - boolean -->
 <!-- :enableRowCheckbox - boolean -->
 <!-- :conditionalColumns - object -->
 <!-- @edit - edit event -->
 <!-- @delete - delete event -->
-
-
 
 <template>
     <div class="p-4">
@@ -40,13 +39,40 @@
             </select>
         </div>
 
-        <!-- Search Field -->
-        <div class="mb-4">
+        <!-- Search Field with indicator -->
+        <div class="mb-4 relative">
             <TextInput
                 type="text"
-                v-model="searchQuery"
+                :modelValue="searchQuery"
+                @update:modelValue="immediateSearch"
                 placeholder="Search..."
+                class="pr-8"
             />
+            <div
+                v-if="isSearching"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+                <svg
+                    class="animate-spin h-4 w-4 text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+                    <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                </svg>
+            </div>
         </div>
 
         <!-- Error Message -->
@@ -77,18 +103,22 @@
                         </th>
                         <!-- Render specified columns -->
                         <th
-                            v-for="col in columnConfigs"
+                            v-for="col in visibleColumns"
                             :key="col.key"
                             @click="sortable && sortBy(col.key)"
-                                class="px-4 py-2 border border-gray-200 cursor-pointer select-none"
-                            >
-                                <div class="flex items-center space-x-1">
-                                    <span>{{ col.title }}</span>
-                                    <span v-if="sortable && currentSortKey === col.key">
-                                        <!-- ... existing sort indicators ... -->
-                                    </span>
-                                </div>
-                            </th>
+                            class="px-4 py-2 border border-gray-200 cursor-pointer select-none"
+                        >
+                            <div class="flex items-center space-x-1">
+                                <span>{{ col.title }}</span>
+                                <span
+                                    v-if="
+                                        sortable && currentSortKey === col.key
+                                    "
+                                >
+                                    <!-- ... existing sort indicators ... -->
+                                </span>
+                            </div>
+                        </th>
                         <!-- Actions Column -->
                         <th class="px-4 py-2 border border-gray-200">
                             Actions
@@ -96,7 +126,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in paginatedItems" :key="item.id">
+                    <tr
+                        v-for="(item, index) in virtualItems"
+                        :key="item.id || index"
+                        :style="getItemStyle(startIndex + index)"
+                    >
                         <!-- Checkbox cell for each row -->
                         <td
                             v-if="enableRowCheckbox"
@@ -111,22 +145,37 @@
                         </td>
                         <!-- Render only specified columns -->
                         <td
-                            v-for="col in columnConfigs"
+                            v-for="col in visibleColumns"
                             :key="col.key"
                             class="px-4 py-2 border border-gray-200 text-center"
                         >
                             <template v-if="conditionalColumns[col.key]">
-                                <span :class="getConditionalClass(col.key, getNestedValue(item, col.key))">
-                                    {{ col.currency 
-                                        ? formatCurrency(getNestedValue(item, col.key), col.currency)
-                                        : getNestedValue(item, col.key) 
+                                <span
+                                    :class="
+                                        getConditionalClass(
+                                            col.key,
+                                            getNestedValue(item, col.key),
+                                        )
+                                    "
+                                >
+                                    {{
+                                        col.currency
+                                            ? formatCurrency(
+                                                  getNestedValue(item, col.key),
+                                                  col.currency,
+                                              )
+                                            : getNestedValue(item, col.key)
                                     }}
                                 </span>
                             </template>
                             <template v-else>
-                                {{ col.currency 
-                                    ? formatCurrency(getNestedValue(item, col.key), col.currency)
-                                    : getNestedValue(item, col.key) 
+                                {{
+                                    col.currency
+                                        ? formatCurrency(
+                                              getNestedValue(item, col.key),
+                                              col.currency,
+                                          )
+                                        : getNestedValue(item, col.key)
                                 }}
                             </template>
                         </td>
@@ -149,8 +198,8 @@
                         <td
                             :colspan="
                                 enableRowCheckbox
-                                    ? showColumns.length + 2
-                                    : showColumns.length + 1
+                                    ? visibleColumns.length + 2
+                                    : visibleColumns.length + 1
                             "
                             class="text-center py-4"
                         >
@@ -203,14 +252,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, shallowRef, nextTick } from "vue";
 import TextInput from "@/Components/TextInput.vue";
 
 // Props definition including conditionalColumns prop
 const props = defineProps({
     data: { type: Array, required: true },
     pageSize: { type: Number, default: 10 },
-    columns: { type: Array,  default: () => [] },
+    columns: { type: Array, default: () => [] },
     pageSizeOptions: { type: Array, default: () => [10, 20, 50, 100] },
     enableRowCheckbox: { type: Boolean, default: false },
     sortable: { type: Boolean, default: true },
@@ -221,98 +270,100 @@ const props = defineProps({
 // Emits for actions (edit and delete)
 const emit = defineEmits(["edit", "delete"]);
 
-// Local state for search, pagination, sorting, and selected row IDs
-const searchQuery = ref("");
-const currentPage = ref(1);
-const currentPageSize = ref(props.pageSize);
+// Use shallowRef for primitive values
+const searchQuery = shallowRef("");
+const currentPage = shallowRef(1);
+const currentPageSize = shallowRef(props.pageSize);
 const selectedItems = ref([]);
 
 // Sorting state
-const currentSortKey = ref(null);
-const sortDirection = ref("asc");
+const currentSortKey = shallowRef(null);
+const sortDirection = shallowRef("asc");
 
-/**
- * Helper function to recursively flatten an item's values (including nested values)
- * Memoized to improve performance when called multiple times with the same item
- */
+// Helper function to optimize the flattening of items for search
 const flattenItemCache = new WeakMap();
 const flattenItem = (item) => {
-    // Return cached result if available
     if (flattenItemCache.has(item)) {
         return flattenItemCache.get(item);
     }
-    
+
     const values = [];
-    const recurse = (obj) => {
-        if (obj && typeof obj === "object") {
-            Object.values(obj).forEach((val) => recurse(val));
-        } else if (obj !== undefined && obj !== null) {
-            values.push(String(obj).toLowerCase());
+    const queue = [item];
+
+    while (queue.length > 0) {
+        const current = queue.shift();
+
+        if (current && typeof current === "object") {
+            queue.push(...Object.values(current));
+        } else if (current !== undefined && current !== null) {
+            values.push(String(current).toLowerCase());
         }
-    };
-    recurse(item);
-    
-    // Cache the result
+    }
+
     flattenItemCache.set(item, values);
     return values;
 };
 
-/**
- * Helper function to get nested value from an object using dot notation
- * Optimized with path splitting memoization
- */
+// Helper function to get nested value from an object using dot notation
 const pathCache = new Map();
 const getNestedValue = (obj, path) => {
     if (!obj) return undefined;
-    if (typeof path !== 'string') {
+    if (typeof path !== "string") {
         // If path is an object (from columnConfigs), use the key property
         path = path.key || path;
     }
-    
+
     // Get or create cached path parts
     let parts = pathCache.get(path);
     if (!parts) {
         parts = path.split(".");
         pathCache.set(path, parts);
     }
-    
+
     return parts.reduce((acc, part) => acc && acc[part], obj);
 };
 
-/**
- * Helper: format header names (capitalize first letter and replace underscores with spaces)
- * Memoized for performance
- */
-const headerCache = new Map();
-const formatHeader = (key) => {
-    if (headerCache.has(key)) {
-        return headerCache.get(key);
+// Helper function to quickly check common fields before doing a full search
+const quickSearchMatch = (item, query) => {
+    // List of common fields to check directly first
+    const commonFields = [
+        "id",
+        "name",
+        "title",
+        "email",
+        "username",
+        "position_id",
+        "position_name",
+    ];
+
+    // Check these fields directly for a match
+    for (const field of commonFields) {
+        const value = item[field];
+        if (
+            value !== undefined &&
+            String(value).toLowerCase().includes(query)
+        ) {
+            return true;
+        }
     }
-    
-    const formatted = key
-        .split(".")
-        .pop()
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (char) => char.toUpperCase());
-    
-    headerCache.set(key, formatted);
-    return formatted;
+
+    // No quick match found
+    return false;
 };
 
-/**
- * Compute filtered items based on the search query.
- * This version searches across every value in the flattened item.
- * Optimized with debounced search and pre-lowercased values
- */
+// Update filteredItems to use the quick path
 const filteredItems = computed(() => {
     if (!searchQuery.value.trim()) return props.data;
 
     const query = searchQuery.value.toLowerCase();
+
     return props.data.filter((item) => {
-        // Get flattened and lowercased values from cache or compute them
+        // Try quick path first
+        if (quickSearchMatch(item, query)) return true;
+
+        // If no quick match, do the more extensive search
         const flatValues = flattenItem(item);
-        // Check if any value includes the query
-        return flatValues.some(val => val.includes(query));
+        return flatValues.some((val) => val.includes(query));
     });
 });
 
@@ -324,25 +375,29 @@ const totalPages = computed(() =>
 // Compute sorted items based on current sort key and direction
 const sortedItems = computed(() => {
     if (!currentSortKey.value) return filteredItems.value;
-    
+
     return [...filteredItems.value].sort((a, b) => {
         const aValue = getNestedValue(a, currentSortKey.value);
         const bValue = getNestedValue(b, currentSortKey.value);
-        
+
         // Handle null/undefined values
-        if (aValue === undefined || aValue === null) return sortDirection.value === 'asc' ? 1 : -1;
-        if (bValue === undefined || bValue === null) return sortDirection.value === 'asc' ? -1 : 1;
-        
+        if (aValue === undefined || aValue === null)
+            return sortDirection.value === "asc" ? 1 : -1;
+        if (bValue === undefined || bValue === null)
+            return sortDirection.value === "asc" ? -1 : 1;
+
         // Compare based on type
-        if (typeof aValue === 'number' && typeof bValue === 'number') {
-            return sortDirection.value === 'asc' ? aValue - bValue : bValue - aValue;
+        if (typeof aValue === "number" && typeof bValue === "number") {
+            return sortDirection.value === "asc"
+                ? aValue - bValue
+                : bValue - aValue;
         }
-        
+
         // Default string comparison
         const aString = String(aValue).toLowerCase();
         const bString = String(bValue).toLowerCase();
-        
-        return sortDirection.value === 'asc' 
+
+        return sortDirection.value === "asc"
             ? aString.localeCompare(bString)
             : bString.localeCompare(aString);
     });
@@ -382,21 +437,28 @@ const visiblePages = computed(() => {
 
 const columnConfigs = computed(() => {
     if (!props.data.length) return [];
-    
-    return props.columns.map(col => {
-        if (typeof col === 'string') {
+
+    return props.columns.map((col) => {
+        if (typeof col === "string") {
             return { key: col, title: formatHeader(col) };
         }
-        return { 
-            key: col.key, 
+        return {
+            key: col.key,
             title: col.title || formatHeader(col.key),
-            currency: col.currency 
+            currency: col.currency,
+            hidden: col.hidden || false, // Add support for hidden property
         };
     });
 });
+
+// Create a new computed property for visible columns only
+const visibleColumns = computed(() => {
+    return columnConfigs.value.filter((col) => !col.hidden);
+});
+
 // Determine which columns to show: use columns prop if provided, otherwise all keys from first data item.
 const showColumns = computed(() => {
-    return columnConfigs.value.map(col => col.key);
+    return columnConfigs.value.map((col) => col.key);
 });
 
 // Error handler: if columns prop is provided, check that each column exists in the first data item.
@@ -458,25 +520,24 @@ const toggleSelectAll = () => {
 // Sorting function: toggles sort direction if same column is clicked,
 // or sets new sort column and resets direction to ascending.
 const sortBy = (column) => {
-    const key = typeof column === 'string' ? column : column.key;
+    const key = typeof column === "string" ? column : column.key;
     if (currentSortKey.value === key) {
-        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+        sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
     } else {
         currentSortKey.value = key;
-        sortDirection.value = 'asc';
+        sortDirection.value = "asc";
     }
     currentPage.value = 1; // Reset to first page when sorting
 };
 
-
 // Format Currency Helper Function
-const formatCurrency = (value, currency = '') => {
-    if (!value) return '';
+const formatCurrency = (value, currency = "") => {
+    if (!value) return "";
     const numValue = Number(value);
     if (isNaN(numValue)) return value;
-    return `${currency}${numValue.toLocaleString('en-US', {
+    return `${currency}${numValue.toLocaleString("en-US", {
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        maximumFractionDigits: 2,
     })}`;
 };
 
@@ -494,11 +555,11 @@ const onDelete = (item) => {
 const classCache = new Map();
 const getConditionalClass = (column, value) => {
     const cacheKey = `${column}:${value}`;
-    
+
     if (classCache.has(cacheKey)) {
         return classCache.get(cacheKey);
     }
-    
+
     let result = "";
     if (
         props.conditionalColumns[column] &&
@@ -506,16 +567,20 @@ const getConditionalClass = (column, value) => {
     ) {
         result = props.conditionalColumns[column][value];
     }
-    
+
     classCache.set(cacheKey, result);
     return result;
 };
 
 // Watch for changes in props.data to clear caches when data changes completely
-watch(() => props.data, () => {
-    flattenItemCache.clear && flattenItemCache.clear();
-    classCache.clear();
-}, { deep: false });
+watch(
+    () => props.data,
+    () => {
+        flattenItemCache.clear && flattenItemCache.clear();
+        classCache.clear();
+    },
+    { deep: false },
+);
 
 // Initialize with a default sort if sortable is enabled
 onMounted(() => {
@@ -523,4 +588,64 @@ onMounted(() => {
         currentSortKey.value = props.columns[0];
     }
 });
+
+// Add window size tracking for virtual scrolling
+const windowSize = shallowRef(20); // Number of items to render in virtual window
+const startIndex = shallowRef(0);
+const endIndex = shallowRef(0);
+
+// Improve the virtual window algorithm for better performance
+const calculateVirtualWindow = () => {
+    // Only recalculate when visible on screen
+    if (
+        typeof document !== "undefined" &&
+        document.visibilityState === "hidden"
+    )
+        return;
+
+    const start = (currentPage.value - 1) * currentPageSize.value;
+    startIndex.value = Math.max(0, start - windowSize.value);
+    endIndex.value = Math.min(
+        sortedItems.value.length,
+        start + currentPageSize.value + windowSize.value,
+    );
+};
+
+// Use virtualized items for rendering (only render visible + buffer)
+const virtualItems = computed(() => {
+    return sortedItems.value.slice(startIndex.value, endIndex.value);
+});
+
+// Add index tracking for better rendering performance
+const getItemStyle = (index) => {
+    const start = (currentPage.value - 1) * currentPageSize.value;
+    if (index < start || index >= start + currentPageSize.value) {
+        return { display: "none" };
+    }
+    return {};
+};
+
+// Add a function to defer heavy operations until after rendering
+const deferOperation = (callback) => {
+    nextTick().then(() => {
+        setTimeout(callback, 0);
+    });
+};
+
+// Update when page or data changes
+watch([currentPage, () => sortedItems.value.length], calculateVirtualWindow);
+
+// Add a loading indicator for visual feedback
+const isSearching = ref(false);
+
+// Replace debounced search with immediate search
+const immediateSearch = (value) => {
+    isSearching.value = true;
+    searchQuery.value = value;
+
+    // Clear the loading indicator on the next tick after the filter completes
+    nextTick(() => {
+        isSearching.value = false;
+    });
+};
 </script>

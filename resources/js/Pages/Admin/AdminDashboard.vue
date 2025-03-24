@@ -17,7 +17,24 @@
                     <DataTable
                         :data="data"
                         :pageSize="10"
-                        :columns="['user_id', 'username', 'email', 'role_name']"
+                        :columns="[
+                            {
+                                key: 'user_id',
+                                title: 'User ID',
+                            },
+                            {
+                                key: 'username',
+                                title: 'Username',
+                            },
+                            {
+                                key: 'email',
+                                title: 'Email',
+                            },
+                            {
+                                key: 'role_name',
+                                title: 'Role',
+                            },
+                        ]"
                         @edit="showEdit"
                         @delete="deleteItem"
                     />

@@ -24,14 +24,15 @@ class JobApplicationController extends Controller
     {
         $jobListings = JobListing::with([
             'position' => function ($query) {
-                $query->with('salaryGrade');
+                $query->with(['salaryGrade', 'minimumRequirement']);
             },
             'creator',
-            'minimumRequirements',
-            'applications'
+            'applications' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }
         ])
-        ->where('status', 'Active')
-        ->get();
+            ->where('status', 'Active')
+            ->get();
 
         return Inertia::render('Applicant/ViewJobs/ViewJobListings', [
             'jobListings' => $jobListings
@@ -45,11 +46,12 @@ class JobApplicationController extends Controller
     {
         $job = JobListing::with([
             'position' => function ($query) {
-                $query->with('salaryGrade');
+                $query->with(['salaryGrade', 'minimumRequirement']);
             },
             'creator',
-            'minimumRequirements',
-            'applications'
+            'applications' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }
         ])->findOrFail($id);
 
         // Get user's existing data
@@ -59,10 +61,157 @@ class JobApplicationController extends Controller
             'experiences' => WorkExperience::where('user_id', auth()->id())->get(),
         ];
 
+        // Check if user meets minimum requirements
+        $meetsRequirements = $this->checkRequirementsMet($job, $userData);
+
         return Inertia::render('Applicant/ViewJobs/JobDetails', [
             'job' => $job,
             'userData' => $userData,
+            'meetsRequirements' => $meetsRequirements
         ]);
+    }
+
+    /**
+     * Check if user meets the minimum requirements for the job
+     */
+    private function checkRequirementsMet($job, $userData)
+    {
+        // Only proceed if job has minimum requirements
+        if (!$job->position->minimumRequirement) {
+            return true;
+        }
+
+        $minimumReq = $job->position->minimumRequirement;
+        $requirements = [
+            'education' => [
+                'met' => false,
+                'required' => $minimumReq->education_level,
+                'user_has' => 'None',
+                'details' => 'Education requirement not met'
+            ],
+            'experience' => [
+                'met' => false,
+                'required' => $minimumReq->years_experience . ' year(s)',
+                'user_has' => '0 years',
+                'details' => 'Experience requirement not met'
+            ],
+            'training' => [
+                'met' => false,
+                'required' => $minimumReq->training_hours . ' hours',
+                'user_has' => '0 hours',
+                'details' => 'Training requirement not met'
+            ],
+            'eligibility' => [
+                'met' => false,
+                'required' => $minimumReq->eligibility,
+                'user_has' => 'None',
+                'details' => 'Eligibility verification not available'
+            ]
+        ];
+
+        // Check education - look for education level that matches or exceeds requirement
+        $educationLevels = [
+            'high school' => 1,
+            'associate\'s degree' => 2,
+            'bachelor\'s degree' => 3,
+            'master\'s degree' => 4,
+            'doctorate degree' => 5
+        ];
+
+        $requiredEduLevel = $educationLevels[strtolower($minimumReq->education_level)] ?? 0;
+        $highestUserEduLevel = 0;
+        $highestUserEduName = 'None';
+
+        foreach ($userData['education'] as $education) {
+            $userEduLevel = $educationLevels[strtolower($education->level)] ?? 0;
+            if ($userEduLevel > $highestUserEduLevel) {
+                $highestUserEduLevel = $userEduLevel;
+                $highestUserEduName = $education->level;
+            }
+
+            if ($userEduLevel >= $requiredEduLevel) {
+                $requirements['education']['met'] = true;
+                $requirements['education']['user_has'] = $education->level;
+                $requirements['education']['details'] = 'You have ' . $education->level . ' which meets or exceeds the required ' . $minimumReq->education_level;
+                break;
+            }
+        }
+
+        // If education requirement not met, provide detailed explanation
+        if (!$requirements['education']['met']) {
+            $requirements['education']['user_has'] = $highestUserEduName;
+            $requirements['education']['details'] = 'You have ' . $highestUserEduName . ' but the position requires ' . $minimumReq->education_level;
+        }
+
+        // Check experience
+        $requiredYears = $minimumReq->years_experience;
+        $totalYears = 0;
+
+        foreach ($userData['experiences'] as $experience) {
+            // Calculate years between start and end dates
+            $startDate = new \DateTime($experience->start_date);
+
+            if ($experience->is_current_job) {
+                $endDate = new \DateTime();
+            } else if ($experience->end_date) {
+                $endDate = new \DateTime($experience->end_date);
+            } else {
+                continue; // Skip if no end date and not current job
+            }
+
+            $interval = $startDate->diff($endDate);
+            $years = $interval->y;
+            $totalYears += $years;
+        }
+
+        $requirements['experience']['met'] = $totalYears >= $requiredYears;
+        $requirements['experience']['user_has'] = $totalYears . ' year(s)';
+
+        if ($requirements['experience']['met']) {
+            $requirements['experience']['details'] = 'You have ' . $totalYears . ' year(s) of experience, which meets the required ' . $requiredYears . ' year(s)';
+        } else {
+            $requirements['experience']['details'] = 'You have ' . $totalYears . ' year(s) of experience, but the position requires ' . $requiredYears . ' year(s)';
+        }
+
+        // Check training hours
+        $requiredHours = $minimumReq->training_hours;
+        $totalHours = 0;
+
+        foreach ($userData['trainings'] as $training) {
+            $totalHours += $training->duration_hours ?? 0;
+        }
+
+        $requirements['training']['met'] = $totalHours >= $requiredHours;
+        $requirements['training']['user_has'] = $totalHours . ' hours';
+
+        if ($requirements['training']['met']) {
+            $requirements['training']['details'] = 'You have ' . $totalHours . ' hours of training, which meets the required ' . $requiredHours . ' hours';
+        } else {
+            $requirements['training']['details'] = 'You have ' . $totalHours . ' hours of training, but the position requires ' . $requiredHours . ' hours';
+        }
+
+        // Calculate overall requirement status
+        // Check if user meets minimum requirements (considering only education, experience, and training)
+        $criticalRequirements = [
+            'education' => $requirements['education']['met'],
+            'experience' => $requirements['experience']['met'],
+            'training' => $requirements['training']['met']
+        ];
+
+        // Check if all critical requirements are met
+        $allCriticalMet = !in_array(false, $criticalRequirements);
+
+        // Or at least a majority (2 out of 3) when not all are met
+        $majorityMet = array_sum(array_values($criticalRequirements)) >= 2;
+
+        return [
+            'overall' => $allCriticalMet || $majorityMet,
+            'details' => $requirements,
+            'counts' => [
+                'total' => count($criticalRequirements),
+                'met' => array_sum(array_values($criticalRequirements))
+            ]
+        ];
     }
 
     /**
@@ -80,7 +229,18 @@ class JobApplicationController extends Controller
     {
         $request->validate([
             'job_listing_id' => 'required|exists:job_listings,job_listing_id',
-            'application_document' => 'required|file|mimes:pdf,doc,docx|max:2048',
+
+            // Document validation
+            'documents' => 'required|array',
+            'documents.application_letter' => 'required|file|mimes:pdf|max:10240',
+            'documents.personal_data_sheet' => 'required|file|mimes:pdf|max:10240',
+            'documents.work_experience_sheet' => 'required|file|mimes:pdf|max:10240',
+            'documents.transcript_and_diploma' => 'required|file|mimes:pdf|max:10240',
+            'documents.eligibility_proof' => 'required|file|mimes:pdf|max:10240',
+            'documents.performance_rating' => 'required|file|mimes:pdf|max:10240',
+            'documents.training_certificates' => 'required|file|mimes:pdf|max:10240',
+            'documents.employment_certificate' => 'required|file|mimes:pdf|max:10240',
+
             // Validate education
             'education.*.education_id' => 'nullable|exists:educational_backgrounds,education_id',
             'education.*.level' => 'required_without:education.*.education_id|string',
@@ -162,25 +322,66 @@ class JobApplicationController extends Controller
             }
         }
 
-        // Handle document upload with document name
-        $documentName = $request->file('application_document')->getClientOriginalName();
-        $file = $request->file('application_document');
-        $documentPath = $file->store('application_documents', 'public');
+        // Handle multiple document uploads
+        $documentTypes = [
+            'application_letter' => 'Application Letter',
+            'personal_data_sheet' => 'Personal Data Sheet',
+            'work_experience_sheet' => 'Work Experience Sheet',
+            'transcript_and_diploma' => 'Transcript and Diploma',
+            'eligibility_proof' => 'Eligibility Proof',
+            'performance_rating' => 'Performance Rating',
+            'training_certificates' => 'Training Certificates',
+            'employment_certificate' => 'Employment Certificate'
+        ];
 
-        ApplicantDocument::create([
-            'user_id' => auth()->id(),
-            'application_id' => $application->application_id,
-            'document_name' => $documentName,
-            'document_type' => pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION),
-            'file_path' => $documentPath,
-            'is_verified' => false,
-        ]);
+        foreach ($documentTypes as $key => $label) {
+            if ($request->hasFile("documents.$key")) {
+                $file = $request->file("documents.$key");
+                $documentName = $label . ' - ' . $file->getClientOriginalName();
+                $documentPath = $file->store('application_documents', 'public');
+
+                ApplicantDocument::create([
+                    'user_id' => auth()->id(),
+                    'application_id' => $application->application_id,
+                    'document_name' => $documentName,
+                    'document_type' => $key,
+                    'file_path' => $documentPath,
+                    'is_verified' => false,
+                ]);
+            }
+        }
 
         // Notify HR about new application
         $this->notifyHRNewApplication($application);
 
-        return redirect()->route('my-applications.index')
-            ->with('message', 'Application submitted successfully');
+        $job = JobListing::with([
+            'position' => function ($query) {
+                $query->with(['salaryGrade', 'minimumRequirement']);
+            },
+            'creator',
+            'applications' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }
+        ])->findOrFail($request->job_listing_id);
+
+        // Get user's existing data
+        $userData = [
+            'education' => EducationalBackground::where('user_id', auth()->id())->get(),
+            'trainings' => Training::where('user_id', auth()->id())->get(),
+            'experiences' => WorkExperience::where('user_id', auth()->id())->get(),
+        ];
+
+        // Check if user meets minimum requirements
+        $meetsRequirements = $this->checkRequirementsMet($job, $userData);
+
+        // Return JSON response with application and job data
+        return response()->json([
+            'success' => true,
+            'message' => 'Application submitted successfully',
+            'job' => $job,
+            'meetsRequirements' => $meetsRequirements,
+            'redirect_url' => route('my-applications.index')
+        ]);
     }
 
     /**

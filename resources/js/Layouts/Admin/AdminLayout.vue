@@ -3,14 +3,13 @@ import { ref, computed } from "vue";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
-import NotificationBell from "@/Components/NotificationBell.vue";   
+import NotificationBell from "@/Components/NotificationBell.vue";
 
 const showMobileMenu = ref(false);
 const sidebarOpen = ref(true);
 const showLogoutModal = ref(false);
-const hoveredItem = ref(null);
 
-console.log(usePage().props)
+console.log(usePage().props);
 
 const toggleSidebar = () => {
     sidebarOpen.value = !sidebarOpen.value;
@@ -24,14 +23,6 @@ const handleLogout = () => {
     router.post(route("logout"));
 };
 
-const setHoveredItem = (item) => {
-    hoveredItem.value = item;
-};
-
-const clearHoveredItem = () => {
-    hoveredItem.value = null;
-};
-
 const isActive = (routeName) => {
     return route().current(routeName);
 };
@@ -39,8 +30,6 @@ const isActive = (routeName) => {
 
 <template>
     <div class="min-h-screen bg-gray-100">
-
-
         <!-- Backdrop overlay for mobile -->
         <div
             v-if="showMobileMenu"
@@ -58,26 +47,36 @@ const isActive = (routeName) => {
             }"
             class="fixed left-0 top-0 z-40 h-full bg-[#012f12] shadow-xl transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col"
         >
-
+            <!-- Sidebar Header -->
+            <div class="flex h-16 items-center border-b border-[#023d17] px-4">
+                <Link href="/" class="flex items-center">
+                    <ApplicationLogo
+                        class="block h-8 w-auto fill-current text-white"
+                    />
+                    <span
+                        v-if="sidebarOpen"
+                        class="ml-3 text-lg font-semibold text-white"
+                        >Admin</span
+                    >
+                </Link>
+            </div>
             <!-- Navigation Links -->
-            <nav class="flex-1 px-3 py-4 overflow-y-auto">
-                <ul class="space-y-1">
+            <nav class="flex-1 px-2 py-5 overflow-y-auto">
+                <ul class="space-y-2">
                     <li>
                         <Link
                             :href="route('admin.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('admin.index'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActive('admin.index'),
                             }"
-                            @mouseenter="setHoveredItem('dashboard')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                     :class="{
                                         'text-black': isActive('admin.index'),
                                     }"
@@ -86,7 +85,7 @@ const isActive = (routeName) => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold':
                                             isActive('admin.index'),
@@ -94,31 +93,22 @@ const isActive = (routeName) => {
                                     >Admin Dashboard</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'dashboard' &&
-                                    !isActive('admin.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                     <li>
                         <Link
                             :href="route('profile.edit')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('profile.edit'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActive('profile.edit'),
                             }"
-                            @mouseenter="setHoveredItem('profile')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                     :class="{
                                         'text-black': isActive('profile.edit'),
                                     }"
@@ -127,7 +117,7 @@ const isActive = (routeName) => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold':
                                             isActive('profile.edit'),
@@ -135,31 +125,22 @@ const isActive = (routeName) => {
                                     >Profile</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'profile' &&
-                                    !isActive('profile.edit')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                     <li>
                         <Link
                             :href="route('test.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('test.index'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActive('test.index'),
                             }"
-                            @mouseenter="setHoveredItem('test')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                     :class="{
                                         'text-black': isActive('test.index'),
                                     }"
@@ -168,27 +149,22 @@ const isActive = (routeName) => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold': isActive('test.index'),
                                     }"
                                     >Test Upload</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'test' &&
-                                    !isActive('test.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                 </ul>
             </nav>
 
             <!-- User Menu -->
-            <div class="border-t border-[#023d17] p-4 mt-auto">
+            <div
+                class="border-t border-[#023d17] p-4 mt-auto user-profile-section"
+            >
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -223,8 +199,6 @@ const isActive = (routeName) => {
                 </div>
             </div>
         </aside>
-
-       
 
         <!-- Mobile Overlay -->
         <div
@@ -276,7 +250,10 @@ const isActive = (routeName) => {
             class="transition-all duration-300 ease-in-out"
         >
             <!-- Page Header -->
-            <header class="bg-white shadow-sm sticky top-0 z-50" v-if="$slots.header">
+            <header
+                class="bg-white shadow-sm sticky top-0 z-10"
+                v-if="$slots.header"
+            >
                 <div
                     class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5"
                 >
@@ -294,7 +271,7 @@ const isActive = (routeName) => {
                         ></i>
                     </button>
                     <div class="flex-grow">
-                        <slot name="header"/>
+                        <slot name="header" />
                     </div>
 
                     <NotificationBell
@@ -307,7 +284,10 @@ const isActive = (routeName) => {
                             @click="toggleMobileMenu"
                             class="rounded-lg bg-green-600 p-1 m-1 text-white shadow-lg hover:bg-green-500 focus:outline-none"
                         >
-                            <i class="fas fa-bars h-6 w-6" v-if="!showMobileMenu"></i>
+                            <i
+                                class="fas fa-bars h-6 w-6"
+                                v-if="!showMobileMenu"
+                            ></i>
                             <i class="fas fa-times h-6 w-6" v-else></i>
                         </button>
                     </div>
@@ -326,6 +306,7 @@ const isActive = (routeName) => {
 <style scoped>
 .transition-all {
     transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* New styles for sidebar */
@@ -337,17 +318,59 @@ const isActive = (routeName) => {
     color: #ffffff; /* White text for links */
 }
 
-.sidebar nav a:hover,
-.sidebar nav a.bg-gray-100 {
-    background-color: #ffc001;
-    color: black !important; /* Green text on hover */
-}
 .logout {
     background-color: #012f12;
 }
 
-.sidebar nav a:hover i {
-    color: black !important;
+/* Custom scrollbar for the sidebar */
+nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+nav::-webkit-scrollbar-track {
+    background: #012f12;
+}
+
+nav::-webkit-scrollbar-thumb {
+    background-color: #034b1c;
+    border-radius: 20px;
+}
+
+/* New improved hover effects with CSS */
+.sidebar-link {
+    position: relative;
+}
+
+.sidebar-link::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: #ffc001;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+.sidebar-link:not(.bg-[#ffc001]):hover::before {
+    transform: scaleY(1);
+}
+
+/* Transition improvements */
+.sidebar-link {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+/* User profile hover effect */
+.user-profile-section {
+    transition: background-color 0.2s ease;
+}
+
+.user-profile-section:hover {
+    background-color: #023d17;
 }
 
 /* Add modal animation */

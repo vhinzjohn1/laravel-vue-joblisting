@@ -9,10 +9,11 @@ import { useVgt } from "vue-guided-tour";
 const showMobileMenu = ref(false);
 const sidebarOpen = ref(true);
 const showLogoutModal = ref(false);
-const hoveredItem = ref(null);
 const currentStepIndex = ref(-1);
 const isMobileView = ref(false);
-const isUserTourCompleted = computed(() => usePage().props.auth.user.tour_completed);
+const isUserTourCompleted = computed(
+    () => usePage().props.auth.user.tour_completed,
+);
 
 // Get the VGT instance
 const $vgt = useVgt();
@@ -116,7 +117,7 @@ const mobileTourSteps = [
             }
             // Allow the tour to continue
             return true;
-    },
+        },
     },
     // Add a placeholder step to ensure the hamburger menu isn't treated as the final step
     {
@@ -152,7 +153,6 @@ const tourSteps = computed(() => {
     }
 });
 
-
 const isTourActive = computed(() => currentStepIndex.value >= 0);
 
 // Function to start the tour
@@ -166,7 +166,10 @@ const startTour = () => {
 
     setTimeout(() => {
         if ($vgt) {
-            console.log("Starting tour for", isMobileView.value ? "mobile" : "desktop");
+            console.log(
+                "Starting tour for",
+                isMobileView.value ? "mobile" : "desktop",
+            );
             $vgt.start(0);
         } else {
             console.error("$vgt global not available");
@@ -187,13 +190,17 @@ const onAfterExit = () => {
     isTourActive.value = false; // Unset the tour active flag
 
     // axios to update tour completed status in database then console log the response
-    axios.post(route('complete-profile.store')).then(response => {
-        console.log(response);
-    }).catch(error => {
-        console.log(error.response ? error.response.data.message : error.message);
-    });
+    axios
+        .post(route("complete-profile.store"))
+        .then((response) => {
+            console.log(response);
+        })
+        .catch((error) => {
+            console.log(
+                error.response ? error.response.data.message : error.message,
+            );
+        });
 };
-
 
 const onAfterMove = () => {
     console.log("Tour moved to step", currentStepIndex.value);
@@ -205,7 +212,6 @@ const onAfterMove = () => {
         }
     }
 };
-
 
 // Initialize on mount
 onBeforeMount(() => {
@@ -234,14 +240,6 @@ const handleLogout = () => {
     router.post(route("logout"));
 };
 
-const setHoveredItem = (item) => {
-    hoveredItem.value = item;
-};
-
-const clearHoveredItem = () => {
-    hoveredItem.value = null;
-};
-
 const isActive = (routeName) => {
     return route().current(routeName);
 };
@@ -249,8 +247,6 @@ const isActive = (routeName) => {
 const isActiveGroup = (routeNames) => {
     return routeNames.some((name) => route().current(name));
 };
-
-
 </script>
 
 <template>
@@ -308,15 +304,15 @@ const isActiveGroup = (routeNames) => {
             </div>
 
             <!-- Navigation Links -->
-            <nav class="flex-1 px-3 py-4 overflow-y-auto">
-                <ul class="space-y-1">
+            <nav class="flex-1 px-2 py-5 overflow-y-auto">
+                <ul class="space-y-2">
                     <li>
                         <Link
                             as="button"
                             :disabled="isTourActive"
                             id="dashboard-link"
                             :href="route('applicant.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('applicant.index'),
@@ -324,12 +320,10 @@ const isActiveGroup = (routeNames) => {
                                     !isActive('applicant.index'),
                                 'cursor-not-allowed opacity-80': isTourActive,
                             }"
-                            @mouseenter="setHoveredItem('dashboard')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                     :class="{
                                         'text-black':
                                             isActive('applicant.index'),
@@ -339,7 +333,7 @@ const isActiveGroup = (routeNames) => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold':
                                             isActive('applicant.index'),
@@ -347,13 +341,6 @@ const isActiveGroup = (routeNames) => {
                                     >Dashboard</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'dashboard' &&
-                                    !isActive('applicant.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                     <li>
@@ -362,47 +349,38 @@ const isActiveGroup = (routeNames) => {
                             :disabled="isTourActive"
                             id="jobs-link"
                             :href="route('job-application.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-[#ffc001] text-black': isActive(
+                                'bg-[#ffc001] text-black': isActiveGroup([
                                     'job-application.index',
-                                ),
+                                    'job-application.show',
+                                ]),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    !isActive('job-application.index'),
+                                    !isActiveGroup([
+                                        'job-application.index',
+                                        'job-application.show',
+                                    ]),
                                 'cursor-not-allowed opacity-80': isTourActive,
                             }"
-                            @mouseenter="setHoveredItem('jobs')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
-                                    :class="{
-                                        'text-black': isActive(
-                                            'job-application.index',
-                                        ),
-                                    }"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                 >
                                     <i class="fas fa-briefcase"></i>
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
-                                        'font-semibold': isActive(
+                                        'font-semibold': isActiveGroup([
                                             'job-application.index',
-                                        ),
+                                            'job-application.show',
+                                        ]),
                                     }"
                                     >View Job Listings</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'jobs' &&
-                                    !isActive('job-application.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                     <li>
@@ -411,48 +389,44 @@ const isActiveGroup = (routeNames) => {
                             :disabled="isTourActive"
                             id="applications-link"
                             :href="route('my-applications.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-[#ffc001] text-black': isActive(
+                                'bg-[#ffc001] text-black': isActiveGroup([
                                     'my-applications.index',
-                                ),
+                                    'my-applications.show',
+                                ]),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    !isActive('my-applications.index'),
+                                    !isActiveGroup([
+                                        'my-applications.index',
+                                        'my-applications.show',
+                                    ]),
                                 'cursor-not-allowed opacity-80': isTourActive,
                             }"
-                            @mouseenter="setHoveredItem('applications')"
-                            @mouseleave="clearHoveredItem()"
-
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                     :class="{
-                                        'text-black': isActive(
+                                        'text-black': isActiveGroup([
                                             'my-applications.index',
-                                        ),
+                                            'my-applications.show',
+                                        ]),
                                     }"
                                 >
                                     <i class="fas fa-file-alt"></i>
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
-                                        'font-semibold': isActive(
+                                        'font-semibold': isActiveGroup([
                                             'my-applications.index',
-                                        ),
+                                            'my-applications.show',
+                                        ]),
                                     }"
                                     >My Applications</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'applications' &&
-                                    !isActive('my-applications.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                     <li>
@@ -461,7 +435,7 @@ const isActiveGroup = (routeNames) => {
                             :disabled="isTourActive"
                             id="schedules-link"
                             :href="route('my-schedules.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('my-schedules.index') ||
@@ -471,13 +445,10 @@ const isActiveGroup = (routeNames) => {
                                     !isActive('my-schedules.show'),
                                 'cursor-not-allowed opacity-80': isTourActive,
                             }"
-                            @mouseenter="setHoveredItem('schedules')"
-                            @mouseleave="clearHoveredItem()"
-
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                     :class="{
                                         'text-black':
                                             isActive('my-schedules.index') ||
@@ -488,7 +459,7 @@ const isActiveGroup = (routeNames) => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold':
                                             isActive('my-schedules.index') ||
@@ -497,14 +468,6 @@ const isActiveGroup = (routeNames) => {
                                     >My Schedules</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'schedules' &&
-                                    !isActive('my-schedules.index') &&
-                                    !isActive('my-schedules.show')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                     <li>
@@ -513,7 +476,7 @@ const isActiveGroup = (routeNames) => {
                             :disabled="isTourActive"
                             id="profile-link"
                             :href="route('profile.edit')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('profile.edit'),
@@ -521,13 +484,10 @@ const isActiveGroup = (routeNames) => {
                                     !isActive('profile.edit'),
                                 'cursor-not-allowed opacity-80': isTourActive,
                             }"
-                            @mouseenter="setHoveredItem('profile')"
-                            @mouseleave="clearHoveredItem()"
-
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex items-center justify-center w-8 h-8 transition-all duration-200"
                                     :class="{
                                         'text-black': isActive('profile.edit'),
                                     }"
@@ -536,7 +496,7 @@ const isActiveGroup = (routeNames) => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold':
                                             isActive('profile.edit'),
@@ -544,20 +504,15 @@ const isActiveGroup = (routeNames) => {
                                     >Profile</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'profile' &&
-                                    !isActive('profile.edit')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                 </ul>
             </nav>
 
             <!-- User Menu -->
-            <div class="border-t border-[#023d17] p-4 mt-auto">
+            <div
+                class="border-t border-[#023d17] p-4 mt-auto user-profile-section"
+            >
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -602,7 +557,10 @@ const isActiveGroup = (routeNames) => {
         >
             <!-- Page Header -->
             <!-- make page header stay even on scroll -->
-            <header class="bg-white shadow-sm sticky top-0 z-50" v-if="$slots.header">
+            <header
+                class="bg-white shadow-sm sticky top-0 z-10"
+                v-if="$slots.header"
+            >
                 <div
                     class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5"
                 >
@@ -696,6 +654,7 @@ const isActiveGroup = (routeNames) => {
 <style scoped>
 .transition-all {
     transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* New styles for sidebar */
@@ -707,16 +666,59 @@ const isActiveGroup = (routeNames) => {
     color: #ffffff; /* White text for links */
 }
 
-.sidebar nav a:hover,
-.sidebar nav a.bg-gray-100 {
-    background-color: #ffc001;
-    color: black !important; /* Green text on hover */
-}
-.sidebar nav a:hover i {
-    color: black !important;
-}
 .logout {
     background-color: #012f12;
+}
+
+/* Custom scrollbar for the sidebar */
+nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+nav::-webkit-scrollbar-track {
+    background: #012f12;
+}
+
+nav::-webkit-scrollbar-thumb {
+    background-color: #034b1c;
+    border-radius: 20px;
+}
+
+/* New improved hover effects with CSS */
+.sidebar-link {
+    position: relative;
+}
+
+.sidebar-link::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: #ffc001;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+.sidebar-link:not(.bg-\[#ffc001\]):hover::before {
+    transform: scaleY(1);
+}
+
+/* Transition improvements */
+.sidebar-link {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+/* User profile hover effect */
+.user-profile-section {
+    transition: background-color 0.2s ease;
+}
+
+.user-profile-section:hover {
+    background-color: #023d17;
 }
 
 /* Add modal animation */

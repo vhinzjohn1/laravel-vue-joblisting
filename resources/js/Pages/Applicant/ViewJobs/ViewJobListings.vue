@@ -51,12 +51,25 @@
                             <div
                                 v-for="(job, index) in filteredJobs"
                                 :key="index"
-                                class="bg-white rounded-xl border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full cursor-pointer"
+                                class="bg-white rounded-xl border hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full cursor-pointer relative"
+                                :class="[
+                                    hasAppliedToJob(job)
+                                        ? 'border-green-200 bg-green-50/30'
+                                        : 'border-gray-100',
+                                ]"
                                 @click="showJobDetails(job)"
                             >
                                 <div class="p-6 flex flex-col h-full">
+                                    <!-- Applied Badge (Top-Right Corner) -->
+                                    <div
+                                        v-if="hasAppliedToJob(job)"
+                                        class="absolute top-0 right-0 bg-[#ffc001] text-black text-sm font-bold px-3 py-1 rounded-bl-lg"
+                                    >
+                                        Applied
+                                    </div>
+
                                     <!-- Header Section -->
-                                    <div class="flex items-start gap-4 mb-5">
+                                    <div class="flex items-start gap-4 mb-3">
                                         <!-- Position Icon -->
                                         <div
                                             class="flex-shrink-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
@@ -128,28 +141,88 @@
 
                                     <!-- Content Section -->
                                     <div class="flex-grow">
-                                        <!-- Tags -->
-                                        <div class="flex flex-wrap gap-2 mb-4">
-                                            <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-900 group-hover:bg-blue-100 transition-colors"
+                                        <!-- Minimum Requirements -->
+                                        <div
+                                            v-if="
+                                                job.position.minimum_requirement
+                                            "
+                                            class="mb-4"
+                                        >
+                                            <h6
+                                                class="text-sm font-medium text-gray-700 mb-2"
                                             >
-                                                &#x20B1;{{
-                                                    job.position.salary_grade.amount.toLocaleString()
-                                                }}
-                                            </span>
-                                            <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 group-hover:bg-gray-100 transition-colors"
+                                                Minimum Requirements:
+                                            </h6>
+                                            <ul
+                                                class="list-disc list-inside text-sm text-gray-600 space-y-1"
                                             >
-                                                {{
-                                                    job.position.salary_grade
-                                                        .years_experience
-                                                }}+ years
-                                            </span>
-                                            <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-50 text-purple-900 group-hover:bg-purple-100 transition-colors"
-                                            >
-                                                {{ job.category.name }}
-                                            </span>
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .education_level
+                                                    "
+                                                >
+                                                    <i
+                                                        class="fas fa-graduation-cap mr-1 text-gray-500"
+                                                    ></i>
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .education_level
+                                                    }}
+                                                </li>
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .eligibility
+                                                    "
+                                                >
+                                                    <i
+                                                        class="fas fa-certificate mr-1 text-gray-500"
+                                                    ></i>
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .eligibility
+                                                    }}
+                                                </li>
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .training_hours
+                                                    "
+                                                >
+                                                    <i
+                                                        class="fas fa-chalkboard-teacher mr-1 text-gray-500"
+                                                    ></i>
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .training_hours
+                                                    }}
+                                                    hours training
+                                                </li>
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .years_experience
+                                                    "
+                                                >
+                                                    <i
+                                                        class="fas fa-briefcase mr-1 text-gray-500"
+                                                    ></i>
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .years_experience
+                                                    }}
+                                                    year(s) experience
+                                                </li>
+                                            </ul>
                                         </div>
 
                                         <!-- Description -->
@@ -158,26 +231,6 @@
                                         >
                                             {{ job.description }}
                                         </p>
-
-                                        <!-- Requirements if any -->
-                                        <div
-                                            v-if="
-                                                job.minimum_requirements
-                                                    .length > 0
-                                            "
-                                            class="text-sm text-gray-600"
-                                        >
-                                            <div
-                                                v-for="req in job.minimum_requirements"
-                                                :key="req.requirement_id"
-                                                class="flex items-center gap-2"
-                                            >
-                                                <i
-                                                    class="fas fa-check-circle text-green-500"
-                                                ></i>
-                                                {{ req.title }}
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <!-- Footer Section -->
@@ -201,14 +254,18 @@
                                                     }}
                                                 </span>
                                             </div>
-                                            <button
-                                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 transition-all duration-200"
+                                            <div
+                                                class="flex items-center gap-2"
                                             >
-                                                <i
-                                                    class="fas fa-arrow-right mr-2"
-                                                ></i>
-                                                View Details
-                                            </button>
+                                                <button
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 transition-all duration-200"
+                                                >
+                                                    <i
+                                                        class="fas fa-arrow-right mr-2"
+                                                    ></i>
+                                                    View Details
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -246,6 +303,11 @@ const filteredJobs = computed(() => {
             job.position.position_name.toLowerCase().includes(query),
     );
 });
+
+// Check if user has applied to a specific job
+const hasAppliedToJob = (job) => {
+    return job.applications && job.applications.length > 0;
+};
 
 // Methods
 const applyForJob = (jobId) => {

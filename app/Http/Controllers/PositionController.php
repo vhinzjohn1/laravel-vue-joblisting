@@ -22,7 +22,6 @@ class PositionController extends Controller
         // First create the salary grade
         $salaryValidator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:0',
-            'years_experience' => 'required|integer|min:0',
         ]);
 
         if ($salaryValidator->fails()) {
@@ -34,7 +33,6 @@ class PositionController extends Controller
 
         $salaryGrade = SalaryGrade::create([
             'amount' => $request->amount,
-            'years_experience' => $request->years_experience
         ]);
 
         // Then create the position with the new salary grade
@@ -81,7 +79,6 @@ class PositionController extends Controller
             'item_number' => 'string|max:255',
             'minimum_requirements' => 'string',
             'amount' => 'numeric|min:0',
-            'years_experience' => 'integer|min:0'
         ]);
 
         if ($validator->fails()) {
@@ -91,11 +88,10 @@ class PositionController extends Controller
             ], 422);
         }
 
-        // Update salary grade if amount or years_experience is provided
-        if ($request->has('amount') || $request->has('years_experience')) {
+        // Update salary grade if amount is provided
+        if ($request->has('amount')) {
             $position->salaryGrade->update([
                 'amount' => $request->amount ?? $position->salaryGrade->amount,
-                'years_experience' => $request->years_experience ?? $position->salaryGrade->years_experience
             ]);
         }
 

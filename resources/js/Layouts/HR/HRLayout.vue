@@ -10,7 +10,6 @@ const showMobileMenu = ref(false);
 const sidebarOpen = ref(true);
 const showLogoutModal = ref(false);
 const activeDropdown = ref(null);
-const hoveredItem = ref(null);
 const currentStepIndex = ref(-1);
 const isMobileView = ref(false);
 const isUserTourCompleted = computed(
@@ -69,14 +68,6 @@ const toggleMobileMenu = () => {
 
 const handleLogout = () => {
     router.post(route("logout"));
-};
-
-const setHoveredItem = (item) => {
-    hoveredItem.value = item;
-};
-
-const clearHoveredItem = () => {
-    hoveredItem.value = null;
 };
 
 const isActive = (routeName) => {
@@ -311,6 +302,7 @@ onMounted(async () => {
 
         <!-- Tour Start Button -->
         <button
+            id="tour-start-button"
             @click="startTour"
             class="fixed bottom-4 right-4 z-20 bg-[#012f12] text-white px-4 py-2 rounded-full shadow-lg hover:bg-[#034b1c] transition-colors duration-200"
             title="Start Tour"
@@ -342,8 +334,8 @@ onMounted(async () => {
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 px-3 py-4 overflow-y-auto">
-                <ul class="space-y-1">
+            <nav class="flex-1 py-5 overflow-y-auto">
+                <ul class="space-y-2 px-2">
                     <!-- Dashboard -->
                     <li>
                         <Link
@@ -351,14 +343,12 @@ onMounted(async () => {
                             as="button"
                             :disabled="isTourActive"
                             :href="route('hr.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black': isActive('hr.index'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActive('hr.index'),
                             }"
-                            @mouseenter="setHoveredItem('dashboard')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
@@ -371,20 +361,13 @@ onMounted(async () => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold': isActive('hr.index'),
                                     }"
                                     >Dashboard</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'dashboard' &&
-                                    !isActive('hr.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
 
@@ -395,40 +378,34 @@ onMounted(async () => {
                             as="button"
                             :disabled="isTourActive"
                             :href="route('job-position.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'bg-[#ffc001] text-black': isActive('job-position.index'),
+                                'bg-[#ffc001] text-black':
+                                    isActive('job-position.index'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActive('job-position.index'),
                             }"
-                            @mouseenter="setHoveredItem('manage-job-details')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
                                     class="flex items-center justify-center w-8 h-8 transition-all duration-300"
                                     :class="{
-                                        'text-black': isActive('job-position.index'),
+                                        'text-black':
+                                            isActive('job-position.index'),
                                     }"
                                 >
                                     <i class="fas fa-users-cog"></i>
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
-                                        'font-semibold': isActive('job-position.index'),
+                                        'font-semibold':
+                                            isActive('job-position.index'),
                                     }"
                                     >Job Details</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'manage-job-details' &&
-                                    !isActive('job-position.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
 
@@ -439,15 +416,13 @@ onMounted(async () => {
                             :disabled="isTourActive"
                             id="job-listings-link"
                             :href="route('job-listing.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('job-listing.index'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActive('job-listing.index'),
                             }"
-                            @mouseenter="setHoveredItem('jobs')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
@@ -461,7 +436,7 @@ onMounted(async () => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold':
                                             isActive('job-listing.index'),
@@ -469,13 +444,6 @@ onMounted(async () => {
                                     >Job Listings</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'jobs' &&
-                                    !isActive('job-listing.index')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
 
@@ -486,7 +454,7 @@ onMounted(async () => {
                             :disabled="isTourActive"
                             id="applications-link"
                             :href="route('applications.index')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black': isActiveGroup([
                                     'applications.index',
@@ -498,8 +466,6 @@ onMounted(async () => {
                                         'applications.show',
                                     ]),
                             }"
-                            @mouseenter="setHoveredItem('applications')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
@@ -515,7 +481,7 @@ onMounted(async () => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold': isActiveGroup([
                                             'applications.index',
@@ -525,16 +491,6 @@ onMounted(async () => {
                                     >Applications</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'applications' &&
-                                    !isActiveGroup([
-                                        'applications.index',
-                                        'applications.show',
-                                    ])
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
 
@@ -543,7 +499,7 @@ onMounted(async () => {
                         <div
                             id="reports-link"
                             @click="toggleDropdown('reports')"
-                            class="flex items-center justify-between px-3 py-3 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'text-white': isActiveGroup([
                                     'selection-lineup.index',
@@ -555,8 +511,6 @@ onMounted(async () => {
                                         'selection-lineup.show',
                                     ]),
                             }"
-                            @mouseenter="setHoveredItem('reports')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center">
                                 <div
@@ -572,7 +526,7 @@ onMounted(async () => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold': isActiveGroup([
                                             'selection-lineup.index',
@@ -584,7 +538,7 @@ onMounted(async () => {
                             </div>
                             <div
                                 v-if="sidebarOpen"
-                                class="transition-transform duration-300"
+                                class="transition-transform duration-200"
                                 :class="{
                                     'rotate-180': activeDropdown === 'reports',
                                 }"
@@ -592,7 +546,7 @@ onMounted(async () => {
                                 <i
                                     class="fas fa-chevron-down text-xs"
                                     :class="{
-                                        'text-black': isActiveGroup([
+                                        'text-white': isActiveGroup([
                                             'schedules.index',
                                             'schedules.show',
                                             'groups.index',
@@ -600,16 +554,6 @@ onMounted(async () => {
                                     }"
                                 ></i>
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'reports' &&
-                                    !isActiveGroup([
-                                        'selection-lineup.index',
-                                        'selection-lineup.show',
-                                    ])
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </div>
 
                         <!-- Dropdown menu -->
@@ -623,12 +567,12 @@ onMounted(async () => {
                         >
                             <ul
                                 v-show="activeDropdown === 'reports'"
-                                class="mt-1 space-y-1 pl-7"
+                                class="mt-1 space-y-1 ml-4 pl-4 pr-2"
                             >
                                 <li>
                                     <Link
                                         :href="route('selection-lineup.index')"
-                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        class="dropdown-link flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
                                         :class="{
                                             'bg-[#ffc001] text-black font-medium':
                                                 isActive(
@@ -655,57 +599,60 @@ onMounted(async () => {
                         </transition>
                     </li>
 
-                    <!-- Schedule Management with Dropdown -->
+                    <!-- Schedule Management with Dropdown - Fixed reference -->
                     <li class="relative">
                         <div
                             id="schedule-management-link"
                             @click="toggleDropdown('schedule')"
-                            class="flex items-center justify-between px-3 py-3 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
                             :class="{
-                                'text-white': isActiveGroup([
-                                    'schedules.index',
-                                    'schedules.show',
-                                    'groups.index',
-                                ]),
+                                'text-white bg-[#034b1c]':
+                                    activeDropdown === 'schedule' ||
+                                    isActiveGroup([
+                                        'schedules.index',
+                                        'schedules.show',
+                                        'groups.index',
+                                    ]),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    activeDropdown !== 'schedule' &&
                                     !isActiveGroup([
                                         'schedules.index',
                                         'schedules.show',
                                         'groups.index',
                                     ]),
                             }"
-                            @mouseenter="setHoveredItem('schedule')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center">
                                 <div
                                     class="flex items-center justify-center w-8 h-8 transition-all duration-300"
                                     :class="{
-                                        'text-white': isActiveGroup([
-                                            'schedules.index',
-                                            'schedules.show',
-                                            'groups.index',
-                                        ]),
+                                        'text-white':
+                                            isActiveGroup([
+                                                'schedules.index',
+                                                'schedules.show',
+                                                'groups.index',
+                                            ]) || activeDropdown === 'schedule',
                                     }"
                                 >
                                     <i class="fas fa-calendar-alt"></i>
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
-                                        'font-semibold': isActiveGroup([
-                                            'schedules.index',
-                                            'schedules.show',
-                                            'groups.index',
-                                        ]),
+                                        'font-semibold':
+                                            isActiveGroup([
+                                                'schedules.index',
+                                                'schedules.show',
+                                                'groups.index',
+                                            ]) || activeDropdown === 'schedule',
                                     }"
                                     >Schedule</span
                                 >
                             </div>
                             <div
                                 v-if="sidebarOpen"
-                                class="transition-transform duration-300"
+                                class="transition-transform duration-200"
                                 :class="{
                                     'rotate-180': activeDropdown === 'schedule',
                                 }"
@@ -713,25 +660,16 @@ onMounted(async () => {
                                 <i
                                     class="fas fa-chevron-down text-xs"
                                     :class="{
-                                        'text-black': isActiveGroup([
-                                            'schedules.index',
-                                            'schedules.show',
-                                            'groups.index',
-                                        ]),
+                                        'text-white':
+                                            activeDropdown === 'schedule' ||
+                                            isActiveGroup([
+                                                'schedules.index',
+                                                'schedules.show',
+                                                'groups.index',
+                                            ]),
                                     }"
                                 ></i>
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'schedule' &&
-                                    !isActiveGroup([
-                                        'schedules.index',
-                                        'schedules.show',
-                                        'groups.index',
-                                    ])
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </div>
 
                         <!-- Dropdown menu -->
@@ -745,12 +683,12 @@ onMounted(async () => {
                         >
                             <ul
                                 v-show="activeDropdown === 'schedule'"
-                                class="mt-1 space-y-1 pl-7"
+                                class="mt-1 space-y-1 ml-4 pl-4 pr-2"
                             >
                                 <li>
                                     <Link
                                         :href="route('schedules.index')"
-                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        class="dropdown-link flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
                                         :class="{
                                             'bg-[#ffc001] text-black font-medium':
                                                 isActive('schedules.index'),
@@ -771,7 +709,7 @@ onMounted(async () => {
                                 <li>
                                     <Link
                                         :href="route('groups.index')"
-                                        class="flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        class="dropdown-link flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
                                         :class="{
                                             'bg-[#ffc001] text-black font-medium':
                                                 isActive('groups.index'),
@@ -800,15 +738,13 @@ onMounted(async () => {
                             :disabled="isTourActive"
                             id="profile-link"
                             :href="route('profile.edit')"
-                            class="flex items-center px-3 py-3 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('profile.edit'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActive('profile.edit'),
                             }"
-                            @mouseenter="setHoveredItem('profile')"
-                            @mouseleave="clearHoveredItem()"
                         >
                             <div class="flex items-center w-full">
                                 <div
@@ -821,7 +757,7 @@ onMounted(async () => {
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-300"
+                                    class="ml-3 font-medium transition-all duration-200"
                                     :class="{
                                         'font-semibold':
                                             isActive('profile.edit'),
@@ -829,13 +765,6 @@ onMounted(async () => {
                                     >Profile</span
                                 >
                             </div>
-                            <div
-                                v-if="
-                                    hoveredItem === 'profile' &&
-                                    !isActive('profile.edit')
-                                "
-                                class="absolute left-0 top-0 h-full w-1 bg-[#ffc001] transform transition-all duration-300"
-                            ></div>
                         </Link>
                     </li>
                 </ul>
@@ -890,7 +819,7 @@ onMounted(async () => {
         >
             <!-- Page Header -->
             <header
-                class="bg-white shadow-sm sticky top-0 z-50"
+                class="bg-white shadow-sm sticky top-0 z-10"
                 v-if="$slots.header"
             >
                 <div
@@ -913,23 +842,23 @@ onMounted(async () => {
                         <slot name="header" />
                     </div>
 
-                    <NotificationBell
-                        class="mr-20"
-                        :notifications="$page.props.notifications"
-                    />
-                    <!-- Mobile hamburger -->
-                    <div class="lg:hidden">
-                        <button
-                            id="menu-button"
-                            @click="toggleMobileMenu"
-                            class="rounded-lg bg-green-600 p-1 m-1 text-white shadow-lg hover:bg-green-500 focus:outline-none"
-                        >
-                            <i
-                                class="fas fa-bars h-6 w-6"
-                                v-if="!showMobileMenu"
-                            ></i>
-                            <i class="fas fa-times h-6 w-6" v-else></i>
-                        </button>
+                    <div class="flex items-center mr-3">
+                        <NotificationBell
+                            :notifications="$page.props.notifications"
+                        />
+                        <!-- Mobile hamburger -->
+                        <div class="lg:hidden" id="menu-button">
+                            <button
+                                @click="toggleMobileMenu"
+                                class="rounded-lg bg-green-600 p-1 m-1 text-white shadow-lg hover:bg-green-500 focus:outline-none"
+                            >
+                                <i
+                                    class="fas fa-bars h-6 w-6"
+                                    v-if="!showMobileMenu"
+                                ></i>
+                                <i class="fas fa-times h-6 w-6" v-else></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -1009,17 +938,62 @@ nav::-webkit-scrollbar-thumb {
     border-radius: 20px;
 }
 
-/* Active item indicator animation */
-.sidebar-item-active-indicator {
-    width: 4px;
-    background-color: #ffc001;
-    position: absolute;
-    left: 0;
-    height: 0;
-    transition: height 0.3s ease;
+/* New improved hover effects with CSS */
+.sidebar-link {
+    position: relative;
 }
 
-.group:hover .sidebar-item-active-indicator {
+.sidebar-link::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
     height: 100%;
+    width: 3px;
+    background-color: #ffc001;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+.sidebar-link:not(.bg-[#ffc001]):hover::before {
+    transform: scaleY(1);
+}
+
+/* Dropdown link hover effect */
+.dropdown-link {
+    position: relative;
+}
+
+.dropdown-link::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: #ffc001;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+.dropdown-link:not(.bg-[#ffc001]):hover::before {
+    transform: scaleY(1);
+}
+
+/* Transition improvements */
+.sidebar-link,
+.dropdown-link {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+/* User profile hover effect */
+.user-profile-section {
+    transition: background-color 0.2s ease;
+}
+
+.user-profile-section:hover {
+    background-color: #023d17;
 }
 </style>

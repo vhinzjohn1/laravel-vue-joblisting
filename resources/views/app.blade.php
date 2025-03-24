@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Streamlined HR job posting and application management system. Empower HR teams with efficient tools while making it easier for applicants to find and apply for opportunities.">
+    <meta name="description"
+        content="Streamlined HR job posting and application management system. Empower HR teams with efficient tools while making it easier for applicants to find and apply for opportunities.">
     <title inertia>{{ config('app.name') }}</title>
 
     {{-- Favicon --}}
@@ -20,7 +21,12 @@
     <style>
         @media print {
             @page {
-                size: landscape;
+                size: landscape !important;
+            }
+            header,
+            #print-button,
+            #tour-start-button {
+                display: none !important;
             }
         }
     </style>

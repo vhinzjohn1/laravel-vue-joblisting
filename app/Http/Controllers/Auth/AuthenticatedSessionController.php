@@ -50,7 +50,7 @@ class AuthenticatedSessionController extends Controller
             case 'hr':
                 $redirectTo = route('hr.index');
                 break;
-           case 'applicant':
+            case 'applicant':
                 $redirectTo = route('applicant.index');
                 break;
             default:
@@ -60,8 +60,6 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()->intended($redirectTo);
     }
-
-
 
     /**
      * Destroy an authenticated session.

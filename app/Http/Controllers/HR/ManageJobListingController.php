@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 use App\Models\Position;
-use App\Models\SalaryGrade;
 
 class ManageJobListingController extends Controller
 {
@@ -17,20 +16,17 @@ class ManageJobListingController extends Controller
     {
         $jobListings = JobListing::with([
             'position' => function ($query) {
-                $query->with('salaryGrade');
+                $query->with(['salaryGrade', 'minimumRequirement']);
             },
             'creator',
-            'minimumRequirements',
             'applications'
         ])->get();
 
-        $positions = Position::all();
-        $salaryGrades = SalaryGrade::all();
+        $positions = Position::with(['salaryGrade', 'minimumRequirement'])->get();
 
-        return Inertia::render('HR/ManageJobListing/JobListing', [
+        return Inertia::render('HR/ManageJobListing/ManageJobListing', [
             'jobListings' => $jobListings,
             'positions' => $positions,
-            'salaryGrades' => $salaryGrades,
         ]);
     }
 
@@ -61,10 +57,9 @@ class ManageJobListingController extends Controller
 
         $jobListings = JobListing::with([
             'position' => function ($query) {
-                $query->with('salaryGrade');
+                $query->with(['salaryGrade', 'minimumRequirement']);
             },
             'creator',
-            'minimumRequirements',
             'applications'
         ])->get();
 
@@ -73,7 +68,13 @@ class ManageJobListingController extends Controller
 
     public function show(JobListing $jobListing)
     {
-        return response()->json($jobListing);
+        return response()->json($jobListing->load([
+            'position' => function ($query) {
+                $query->with(['salaryGrade', 'minimumRequirement']);
+            },
+            'creator',
+            'applications'
+        ]));
     }
 
     public function update(Request $request, $id)
@@ -104,10 +105,9 @@ class ManageJobListingController extends Controller
 
         $jobListings = JobListing::with([
             'position' => function ($query) {
-                $query->with('salaryGrade');
+                $query->with(['salaryGrade', 'minimumRequirement']);
             },
             'creator',
-            'minimumRequirements',
             'applications'
         ])->get();
 

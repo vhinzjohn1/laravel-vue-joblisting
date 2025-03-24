@@ -17,7 +17,7 @@ class Position extends Model
         'position_name',
         'item_number',
         'salary_grade_id',
-        'minimum_requirements',
+        'minimum_requirement_id',
     ];
 
     /**
@@ -34,5 +34,13 @@ class Position extends Model
     public function salaryGrade(): BelongsTo
     {
         return $this->belongsTo(SalaryGrade::class, 'salary_grade_id');
+    }
+
+    /**
+     * Get the minimum requirement for this position
+     */
+    public function minimumRequirement(): BelongsTo
+    {
+        return $this->belongsTo(MinimumRequirement::class, 'minimum_requirement_id');
     }
 }

@@ -135,10 +135,87 @@
                                                 class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 group-hover:bg-gray-100 transition-colors"
                                             >
                                                 {{
-                                                    job.position.salary_grade
+                                                    job.position
+                                                        .minimum_requirement
                                                         .years_experience
                                                 }}+ years
                                             </span>
+                                        </div>
+
+                                        <!-- Minimum Requirements -->
+                                        <div
+                                            v-if="
+                                                job.position.minimum_requirement
+                                            "
+                                            class="mb-4"
+                                        >
+                                            <h6
+                                                class="text-sm font-medium text-gray-700 mb-2"
+                                            >
+                                                Minimum Requirements:
+                                            </h6>
+                                            <ul
+                                                class="list-disc list-inside text-sm text-gray-600 space-y-1"
+                                            >
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .education_level
+                                                    "
+                                                >
+                                                    Education:
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .education_level
+                                                    }}
+                                                </li>
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .eligibility
+                                                    "
+                                                >
+                                                    Eligibility:
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .eligibility
+                                                    }}
+                                                </li>
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .training_hours
+                                                    "
+                                                >
+                                                    Training:
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .training_hours
+                                                    }}
+                                                    hours
+                                                </li>
+                                                <li
+                                                    v-if="
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .years_experience
+                                                    "
+                                                >
+                                                    Experience:
+                                                    {{
+                                                        job.position
+                                                            .minimum_requirement
+                                                            .years_experience
+                                                    }}
+                                                    year(s)
+                                                </li>
+                                            </ul>
                                         </div>
 
                                         <!-- Description -->
@@ -156,13 +233,31 @@
                                         <div
                                             class="flex items-center justify-between"
                                         >
-                                            <button
-                                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
-                                                @click="editJob(job)"
-                                            >
-                                                <i class="fas fa-edit mr-2"></i>
-                                                Edit
-                                            </button>
+                                            <div class="flex gap-2">
+                                                <button
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
+                                                    @click="editJob(job)"
+                                                >
+                                                    <i
+                                                        class="fas fa-edit mr-2"
+                                                    ></i>
+                                                    Edit
+                                                </button>
+                                                <Link
+                                                    :href="
+                                                        route(
+                                                            'selection-lineup.show',
+                                                            job.job_listing_id,
+                                                        )
+                                                    "
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 hover:text-green-900 transition-all duration-200"
+                                                >
+                                                    <i
+                                                        class="fas fa-users mr-2"
+                                                    ></i>
+                                                    Lineup
+                                                </Link>
+                                            </div>
                                             <button
                                                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-all duration-200"
                                                 @click="
@@ -377,6 +472,76 @@
                             />
                         </div>
                     </div>
+
+                    <!-- Minimum Requirements Section -->
+                    <div
+                        v-if="selectedPosition?.minimum_requirement"
+                        class="mb-4"
+                    >
+                        <h6
+                            class="font-semibold text-gray-800 mb-4 pb-2 border-b"
+                        >
+                            Minimum Requirements
+                        </h6>
+                        <ul
+                            class="list-disc list-inside text-sm text-gray-600 space-y-2"
+                        >
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .education_level
+                                "
+                            >
+                                <span class="font-medium">Education:</span>
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .education_level
+                                }}
+                            </li>
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .eligibility
+                                "
+                            >
+                                <span class="font-medium">Eligibility:</span>
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .eligibility
+                                }}
+                            </li>
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .training_hours
+                                "
+                            >
+                                <span class="font-medium"
+                                    >Training Required:</span
+                                >
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .training_hours
+                                }}
+                                hours
+                            </li>
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .years_experience
+                                "
+                            >
+                                <span class="font-medium"
+                                    >Experience Required:</span
+                                >
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .years_experience
+                                }}
+                                year(s)
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Modal Footer -->
@@ -422,13 +587,31 @@
                         >
                             Basic Information
                         </h6>
+
+                        <!-- Job Title and Position -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Job Title -->
+                            <div class="form-group">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    for="editJobTitle"
+                                >
+                                    Job Title *
+                                </label>
+                                <TextInput
+                                    id="editJobTitle"
+                                    v-model="editingJob.title"
+                                    required
+                                />
+                            </div>
+
+                            <!-- Position -->
                             <div class="form-group">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-1"
                                     for="editPosition"
                                 >
-                                    Position
+                                    Position *
                                 </label>
                                 <CustomSelect
                                     :options="positions"
@@ -439,31 +622,85 @@
                                         (position) =>
                                             `${position.position_name} (${position.item_number})`
                                     "
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-1"
-                                    for="editJobTitle"
-                                >
-                                    Job Title
-                                </label>
-                                <TextInput
-                                    id="editJobTitle"
-                                    v-model="editingJob.title"
+                                    required
+                                    @update:modelValue="handlePositionSelect"
                                 />
                             </div>
                         </div>
+
+                        <!-- Salary Grade and Item Number -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="grid grid-cols-2 gap-2">
+                                <!-- Salary Grade -->
+                                <div class="form-group">
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Salary Grade
+                                    </label>
+                                    <TextInput
+                                        :value="
+                                            selectedPosition?.salary_grade
+                                                ?.amount
+                                                ? `₱${selectedPosition.salary_grade.amount.toLocaleString()}`
+                                                : ''
+                                        "
+                                        disabled
+                                        class="bg-gray-50"
+                                    />
+                                </div>
+
+                                <!-- Item Number -->
+                                <div class="form-group">
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Item Number
+                                    </label>
+                                    <TextInput
+                                        :value="
+                                            selectedPosition?.item_number || ''
+                                        "
+                                        disabled
+                                        class="bg-gray-50"
+                                    />
+                                </div>
+                            </div>
+                            <!-- Category -->
+                            <div class="form-group">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    for="editCategory"
+                                >
+                                    Category *
+                                </label>
+                                <CustomSelect
+                                    :options="[
+                                        { value: 'Teaching' },
+                                        { value: 'Non-Teaching' },
+                                    ]"
+                                    v-model="editingJob.category"
+                                    placeholder="Select a category"
+                                    :value-key="'value'"
+                                    :display-format="(option) => option.value"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Closing Date and Status -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <!-- Closing Date -->
                             <div class="form-group">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-1"
                                 >
-                                    Closing Date
+                                    Closing Date *
                                 </label>
                                 <TextInput
                                     type="date"
                                     v-model="editingJob.closing_date"
+                                    required
                                     :class="{
                                         'border-red-500': errors.closing_date,
                                     }"
@@ -475,41 +712,124 @@
                                     {{ errors.closing_date[0] }}
                                 </p>
                             </div>
-
+                            <!-- Status -->
                             <div class="form-group">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-1"
                                 >
-                                    Status
+                                    Status *
                                 </label>
                                 <CustomSelect
-                                    :options="['Active', 'Draft', 'Closed']"
+                                    :options="[
+                                        { value: 'Active' },
+                                        { value: 'Draft' },
+                                        { value: 'Closed' },
+                                    ]"
                                     v-model="editingJob.status"
-                                    placeholder="Select a status"
-                                    :display-format="(status) => status"
+                                    :value-key="'value'"
+                                    :display-format="(option) => option.value"
+                                    required
                                 />
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Job Description Section -->
+                    <div class="mb-4">
+                        <h6
+                            class="font-semibold text-gray-800 mb-4 pb-2 border-b"
+                        >
+                            Job Description
+                        </h6>
+
+                        <!-- Description -->
                         <div class="form-group">
                             <label
                                 class="block text-sm font-medium text-gray-700 mb-1"
                             >
-                                Category
+                                Description *
                             </label>
-                            <CustomSelect
-                                :options="[
-                                    { value: 'Teaching' },
-                                    { value: 'Non-Teaching' },
-                                ]"
-                                v-model="editingJob.category"
-                                placeholder="Select a category"
-                                :value-key="'value'"
-                                :display-format="(option) => option.value"
+                            <TextArea
+                                v-model="editingJob.description"
+                                rows="4"
+                                placeholder="Enter job description"
                                 required
                             />
                         </div>
                     </div>
+
+                    <!-- Minimum Requirements Section -->
+                    <div
+                        v-if="selectedPosition?.minimum_requirement"
+                        class="mb-4"
+                    >
+                        <h6
+                            class="font-semibold text-gray-800 mb-4 pb-2 border-b"
+                        >
+                            Minimum Requirements
+                        </h6>
+                        <ul
+                            class="list-disc list-inside text-sm text-gray-600 space-y-2"
+                        >
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .education_level
+                                "
+                            >
+                                <span class="font-medium">Education:</span>
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .education_level
+                                }}
+                            </li>
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .eligibility
+                                "
+                            >
+                                <span class="font-medium">Eligibility:</span>
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .eligibility
+                                }}
+                            </li>
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .training_hours
+                                "
+                            >
+                                <span class="font-medium"
+                                    >Training Required:</span
+                                >
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .training_hours
+                                }}
+                                hours
+                            </li>
+                            <li
+                                v-if="
+                                    selectedPosition.minimum_requirement
+                                        .years_experience
+                                "
+                            >
+                                <span class="font-medium"
+                                    >Experience Required:</span
+                                >
+                                {{
+                                    selectedPosition.minimum_requirement
+                                        .years_experience
+                                }}
+                                year(s)
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+
+                <!-- Modal Footer -->
                 <div class="border-t p-4 flex gap-2 justify-end">
                     <button
                         type="button"
@@ -540,13 +860,13 @@ import TextInput from "@/Components/TextInput.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
 import TextArea from "@/Components/TextArea.vue";
 import Modal from "@/Components/Modal.vue";
+import { Link } from "@inertiajs/vue3";
 
 // Fetching Props that was sent by controller
 const data = ref(usePage().props.jobListings);
 const positions = ref(usePage().props.positions);
-const salaryGrades = ref(usePage().props.salaryGrades);
 
-console.log(positions.value);
+console.log("this is the props: ", usePage().props);
 
 // Modified job data structure to match database schema
 const jobs = ref(data.value);
@@ -571,17 +891,9 @@ const showEditModal = ref(false);
 const selectedPosition = ref(null);
 
 const handlePositionSelect = (positionId) => {
-    // use salaryGrades to get the salary grade and years of experience
     selectedPosition.value = positions.value.find(
         (p) => p.position_id === positionId,
     );
-    const salaryGrade = salaryGrades.value.find(
-        (sg) => sg.salary_grade_id === selectedPosition.value.salary_grade_id,
-    );
-    selectedPosition.value = {
-        ...selectedPosition.value,
-        salary_grade: salaryGrade,
-    };
 };
 
 // Modified new job form data
@@ -591,7 +903,6 @@ const newJob = ref({
     description: "",
     closing_date: "",
     status: "Draft",
-    minimum_requirements: [],
     category: "",
 });
 
@@ -610,6 +921,9 @@ const editJob = (job) => {
     editingJob.value = { ...job };
     // Format the date for the input
     editingJob.value.closing_date = job.closing_date.split("T")[0];
+    selectedPosition.value = positions.value.find(
+        (p) => p.position_id === job.position_id,
+    );
     showEditModal.value = true;
 };
 
@@ -692,7 +1006,6 @@ const resetForm = () => {
         description: "",
         closing_date: "",
         status: "Active",
-        minimum_requirements: [],
         category: "",
     };
 };

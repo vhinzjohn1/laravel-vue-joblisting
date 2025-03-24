@@ -9,18 +9,18 @@ class MinimumRequirement extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'requirement_id';
+    protected $primaryKey = 'minimum_requirement_id';
 
     protected $fillable = [
-        'job_listing_id',
-        'requirement_type',
-        'title',
-        'description',
+        'education_level',
+        'training_hours',
+        'eligibility',
+        'years_experience',
         'is_required',
     ];
 
-    public function jobListing()
+    public function positions()
     {
-        return $this->belongsTo(JobListing::class, 'job_listing_id');
+        return $this->hasMany(Position::class, 'minimum_requirement_id');
     }
 }
