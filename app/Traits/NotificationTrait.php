@@ -4,6 +4,9 @@ namespace App\Traits;
 
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\NotificationEmail;
 
 trait NotificationTrait
 {
@@ -13,7 +16,7 @@ trait NotificationTrait
         $hrUsers = User::where('role_name', 'hr')->get();
 
         foreach ($hrUsers as $hrUser) {
-            Notification::create([
+            $notification = Notification::create([
                 'user_id' => $hrUser->user_id,
                 'type' => 'new_application',
                 'message' => "New application received for {$application->jobListing->title}",
@@ -24,13 +27,19 @@ trait NotificationTrait
                     'applicant_name' => $application->user->userDetail->firstname . ' ' . $application->user->userDetail->lastname
                 ]
             ]);
+
+            // Note: No email to HR users, as per requirements
         }
     }
 
     public function notifyApplicantStatusChange($application)
     {
-        Notification::create([
-            'user_id' => $application->user_id,
+        // Ensure we have the full user model
+        $user = User::findOrFail($application->user_id);
+
+        // Create notification in database
+        $notification = Notification::create([
+            'user_id' => $user->user_id,
             'type' => 'status_change',
             'message' => "Your application for {$application->jobListing->title} status has been updated to {$application->status}",
             'is_read' => false,
@@ -40,6 +49,14 @@ trait NotificationTrait
                 'status' => $application->status
             ]
         ]);
+
+        // Send email to applicant
+        try {
+            Mail::to($user->email)->send(new NotificationEmail($notification, $user));
+        } catch (\Exception $e) {
+            // Log email sending failure but don't break the flow
+            Log::error("Failed to send notification email to {$user->email}: " . $e->getMessage());
+        }
     }
 
     public function notifyApplicantScheduled($schedule, $application, $isUpdate = false)
@@ -52,12 +69,16 @@ trait NotificationTrait
             return;
         }
 
+        // Ensure we have the full user model
+        $user = User::findOrFail($application->user_id);
+
         $message = $isUpdate
             ? "Your schedule for {$schedule->title} has been updated"
             : "You have been scheduled for {$schedule->title}";
 
-        Notification::create([
-            'user_id' => $application->user_id,
+        // Create notification in database
+        $notification = Notification::create([
+            'user_id' => $user->user_id,
             'type' => 'scheduled',
             'message' => $message,
             'is_read' => false,
@@ -68,5 +89,44 @@ trait NotificationTrait
                 'location' => $schedule->location
             ]
         ]);
+
+        // Send email to applicant
+        try {
+            Mail::to($user->email)->send(new NotificationEmail($notification, $user));
+        } catch (\Exception $e) {
+            // Log email sending failure but don't break the flow
+            Log::error("Failed to send schedule notification email to {$user->email}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send a direct notification with email to an applicant
+     */
+    public function notifyApplicantWithEmail($userId, $type, $message, $data = [])
+    {
+        // Ensure we have the full user model
+        $user = User::findOrFail($userId);
+
+        // Only proceed if user is an applicant (not HR)
+        if ($user->role_name !== 'applicant') {
+            return;
+        }
+
+        // Create notification in database
+        $notification = Notification::create([
+            'user_id' => $user->user_id,
+            'type' => $type,
+            'message' => $message,
+            'is_read' => false,
+            'data' => $data
+        ]);
+
+        // Send email to applicant
+        try {
+            Mail::to($user->email)->send(new NotificationEmail($notification, $user));
+        } catch (\Exception $e) {
+            // Log email sending failure but don't break the flow
+            Log::error("Failed to send custom notification email to {$user->email}: " . $e->getMessage());
+        }
     }
 }

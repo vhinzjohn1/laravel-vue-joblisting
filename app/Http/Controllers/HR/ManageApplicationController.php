@@ -57,7 +57,18 @@ class ManageApplicationController extends Controller
             'jobListing' => function ($query) {
                 $query->with(['position', 'creator']);
             },
-            'user',
+            'user' => function ($query) {
+                $query->with('userDetail');
+
+                // Load user's educational backgrounds
+                $query->with('userDetail.educationalBackgrounds');
+
+                // Load user's trainings
+                $query->with('userDetail.trainings');
+
+                // Load user's work experiences
+                $query->with('userDetail.workExperiences');
+            },
             'documents',
             'statusHistory' => function ($query) {
                 $query->with('updater');
@@ -140,7 +151,12 @@ class ManageApplicationController extends Controller
 
     public function store(Request $request)
     {
-        // ... existing validation and creation code ...
+        // Validate the request data
+        $validated = $request->validate([
+            'job_listing_id' => 'required|exists:job_listings,job_listing_id',
+            'user_id' => 'required|exists:users,user_id',
+            'status' => 'required|string',
+        ]);
 
         $application = Application::create($validated);
 

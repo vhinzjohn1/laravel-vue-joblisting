@@ -105,6 +105,8 @@ Route::get('/php-info', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('send-email', EmailController::class);
+    Route::get('test-notification-email', [EmailController::class, 'sendTestNotification'])->name('email.test-notification');
+    Route::post('notify-applicant', [EmailController::class, 'notifyApplicant'])->name('email.notify-applicant');
     Route::resource('schedules', ScheduleController::class);
 });
 

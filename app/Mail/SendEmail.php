@@ -17,7 +17,7 @@ class SendEmail extends Mailable
      */
     public function __construct($data)
     {
-        $this->data = $data; 
+        $this->data = $data;
     }
 
     /**
@@ -25,8 +25,10 @@ class SendEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Welcome to Our Service')
-                    ->view('emails.example')
-                    ->with('data', $this->data);
+        $subject = $this->data['subject'] ?? 'CMU Job Listings - Notification';
+
+        return $this->subject($subject)
+            ->view('emails.example')
+            ->with('data', $this->data);
     }
 }

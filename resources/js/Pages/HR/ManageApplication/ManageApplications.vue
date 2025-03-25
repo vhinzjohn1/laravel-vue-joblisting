@@ -42,7 +42,6 @@
                                 </div>
                             </div>
                             <div class="flex gap-2">
-
                                 <CustomSelect
                                     v-model="statusFilter"
                                     :options="statuses"
@@ -64,7 +63,6 @@
                                     placeholder="All Job Titles"
                                     class="w-72"
                                 />
-
                             </div>
                         </div>
                     </div>
@@ -165,19 +163,28 @@
                                                         <span
                                                             class="text-sm font-medium text-gray-600"
                                                         >
-                                                            {{ application.user.user_detail.firstname.charAt(0) }}
+                                                            {{
+                                                                application.user.user_detail.firstname.charAt(
+                                                                    0,
+                                                                )
+                                                            }}
                                                         </span>
                                                     </div>
                                                     <div class="ml-4">
                                                         <div
                                                             class="text-sm font-medium text-gray-900"
                                                         >
-                                                            {{ `${application.user.user_detail.firstname} ${application.user.user_detail.lastname}` }}
+                                                            {{
+                                                                `${application.user.user_detail.firstname} ${application.user.user_detail.lastname}`
+                                                            }}
                                                         </div>
                                                         <div
                                                             class="text-sm text-gray-500"
                                                         >
-                                                            {{ application.user.email }}
+                                                            {{
+                                                                application.user
+                                                                    .email
+                                                            }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -247,7 +254,7 @@
                                                                 'Qualified',
                                                                 'Rejected',
                                                                 'Competency Exam',
-                                                                'Interview'
+                                                                'Interview',
                                                             ].includes(
                                                                 application.status,
                                                             ),
@@ -280,290 +287,15 @@
             </div>
         </div>
     </HRLayout>
-
-    <!-- Application Details Modal - UPDATED -->
-    <Modal
-        :show="showDetailsModal"
-        @close="closeDetailsModal"
-        :max-width="'7xl'"
-        :title="'Application Details'"
-    >
-        <div class="p-4">
-
-            <!-- Application Details Content -->
-            <div class="mt-2" v-if="selectedApplication">
-                <!-- Application Status -->
-                <div class="mb-4 flex items-center justify-between">
-                    <h1 class="text-xl font-bold text-gray-900">
-                        {{ selectedApplication.job_listing.title }}
-                    </h1>
-                    <span
-                        class="px-3 py-1 text-sm font-semibold rounded-full"
-                        :class="getStatusColor(selectedApplication.status)"
-                    >
-                        {{ selectedApplication.status }}
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <!-- Left Column: Job Information -->
-                    <div class="md:col-span-7 space-y-4">
-                        <!-- Applicant Information -->
-                        <div class="bg-white p-4 rounded-lg border">
-                            <h2 class="text-base font-semibold mb-3">
-                                Applicant Information
-                            </h2>
-                            <div class="space-y-3">
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-gray-500"
-                                        >Name</label
-                                    >
-                                    <p class="mt-1">
-                                        {{ `${selectedApplication.user.user_detail.firstname} ${selectedApplication.user.user_detail.middle_initial}. ${selectedApplication.user.user_detail.lastname}` }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-gray-500"
-                                        >Email</label
-                                    >
-                                    <p class="mt-1">
-                                        {{ selectedApplication.user.email }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-gray-500"
-                                        >Phone Number</label
-                                    >
-                                    <p class="mt-1">
-                                        {{ selectedApplication.user.user_detail.phone_number }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Job Details -->
-                        <div class="bg-white p-4 rounded-lg border">
-                            <h2 class="text-base font-semibold mb-3">
-                                Job Details
-                            </h2>
-                            <div class="space-y-3">
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-gray-500"
-                                        >Position</label
-                                    >
-                                    <p class="mt-1">
-                                        {{
-                                            selectedApplication.job_listing
-                                                .position.position_name
-                                        }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-gray-500"
-                                        >Description</label
-                                    >
-                                    <p class="mt-1 text-sm">
-                                        {{
-                                            selectedApplication.job_listing
-                                                .description
-                                        }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Documents -->
-                        <div class="bg-white p-4 rounded-lg border">
-                            <h2 class="text-base font-semibold mb-3">
-                                Documents
-                            </h2>
-                            <div
-                                v-if="
-                                    selectedApplication.documents &&
-                                    selectedApplication.documents.length > 0
-                                "
-                            >
-                                <div
-                                    v-for="doc in selectedApplication.documents"
-                                    :key="doc.document_id"
-                                    class="flex justify-between items-center py-1.5"
-                                >
-                                    <span class="text-gray-700 text-sm">{{
-                                        doc.document_type
-                                    }}</span>
-                                    <button
-                                        @click="openDocumentModal(doc)"
-                                        class="text-green-800 hover:text-green-900 text-sm"
-                                    >
-                                        View
-                                    </button>
-                                </div>
-                            </div>
-                            <div v-else class="text-gray-500 text-sm">
-                                No documents attached
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Status Updates -->
-                    <div class="md:col-span-5 space-y-4">
-                        <!-- Status Update Form -->
-                        <div class="bg-white p-4 rounded-lg border">
-                            <h2 class="text-base font-semibold mb-3">
-                                Update Status
-                            </h2>
-                            <form @submit.prevent="updateStatus">
-                                <div class="mb-3">
-                                    <label
-                                        for="status"
-                                        class="block text-sm font-medium text-gray-700 mb-1"
-                                        >Status</label
-                                    >
-                                    <select
-                                        id="status"
-                                        v-model="form.status"
-                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                    >
-                                        <option
-                                            v-for="status in statuses"
-                                            :key="status"
-                                            :value="status"
-                                        >
-                                            {{ status }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label
-                                        for="remarks"
-                                        class="block text-sm font-medium text-gray-700 mb-1"
-                                        >Remarks</label
-                                    >
-                                    <textarea
-                                        id="remarks"
-                                        v-model="form.remarks"
-                                        rows="2"
-                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                        placeholder="Add any notes about this status change"
-                                    ></textarea>
-                                </div>
-                                <button
-                                    type="submit"
-                                    class="w-full bg-green-800 text-white py-1.5 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-
-                                >
-                                    Update Status
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Status History -->
-                        <div class="bg-white p-4 rounded-lg border">
-                            <h2 class="text-base font-semibold mb-3">
-                                Status History
-                            </h2>
-                            <div
-                                v-if="
-                                    selectedApplication.status_history &&
-                                    selectedApplication.status_history.length >
-                                        0
-                                "
-                                class="space-y-3 max-h-[320px] overflow-y-auto pr-2"
-                            >
-                                <div
-                                    v-for="(history, index) in [
-                                        ...selectedApplication.status_history,
-                                    ].reverse()"
-                                    :key="index"
-                                    class="border-l-2 border-gray-200 pl-3 pb-3 text-sm"
-                                >
-                                    <div class="text-xs text-gray-600">
-                                        {{ formatDateTime(history.created_at) }}
-                                    </div>
-                                    <p class="mt-1">
-                                        Status changed from
-                                        <span class="font-semibold">{{
-                                            history.previous_status || "New"
-                                        }}</span>
-                                        to
-                                        <span class="font-semibold">{{
-                                            history.new_status
-                                        }}</span>
-                                    </p>
-                                    <p
-                                        v-if="history.remarks"
-                                        class="mt-1 text-gray-600 text-xs"
-                                    >
-                                        {{ history.remarks }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div v-else class="text-gray-500 text-sm">
-                                No status history available
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </Modal>
-
-    <!-- Document Viewer Modal -->
-    <Modal
-        :show="showDocumentModal"
-        @close="closeDocumentModal"
-        :max-width="'4xl'"
-        :title="'View Document'"
-    >
-        <div class="p-4">
-
-            <!-- Document Viewer Content -->
-            <div class="mt-2 h-[80vh]" ref="documentContainer">
-                <iframe
-                    v-if="documentUrl"
-                    :src="documentUrl"
-                    class="w-full h-full border-0"
-                    title="Document Viewer"
-                ></iframe>
-                <div v-else class="flex items-center justify-center h-full">
-                    <p class="text-gray-500">Loading document...</p>
-                </div>
-            </div>
-
-            <div class="mt-3 flex justify-end space-x-2">
-                <button
-                    type="button"
-                    class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-3 py-1.5 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-                    @click="closeDocumentModal"
-                >
-                    Close
-                </button>
-                <a
-                    v-if="documentUrl"
-                    :href="documentUrl"
-                    target="_blank"
-                    class="inline-flex items-center justify-center rounded-md border border-transparent shadow-sm px-3 py-1.5 bg-green-800 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                >
-                    Open in new tab
-                </a>
-            </div>
-        </div>
-    </Modal>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
-import Modal from "@/Components/Modal.vue";
 import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
@@ -577,139 +309,16 @@ const props = defineProps({
     },
 });
 
-
 const applications = ref(props.applications);
 const searchQuery = ref("");
 const statusFilter = ref("");
 const jobTitleFilter = ref("");
 const statuses = ref(props.statuses);
-const jobListings = ref(props.applications.map(app => app.job_listing));
-
-const showDetailsModal = ref(false);
-const selectedApplication = ref(null);
-const showDocumentModal = ref(false);
-const currentDocument = ref(null);
-const documentUrl = ref(null);
-
-const form = useForm({
-    status: "",
-    remarks: "",
-});
+const jobListings = ref(props.applications.map((app) => app.job_listing));
 
 const viewDetails = (applicationId) => {
-    selectedApplication.value = applications.value.find(
-        (app) => app.application_id === applicationId,
-    );
-    form.status = selectedApplication.value.status;
-    form.remarks = "";
-    showDetailsModal.value = true;
-};
-
-const closeDetailsModal = () => {
-    showDetailsModal.value = false;
-    setTimeout(() => {
-        selectedApplication.value = null;
-        form.reset();
-    }, 300);
-};
-
-const openDocumentModal = (doc) => {
-    currentDocument.value = doc;
-    documentUrl.value = `/storage/${doc.file_path}`;
-    showDocumentModal.value = true;
-};
-
-const closeDocumentModal = () => {
-    showDocumentModal.value = false;
-    setTimeout(() => {
-        currentDocument.value = null;
-        documentUrl.value = null;
-    }, 300);
-};
-
-const updateStatus = () => {
-    // Check if the new status is the same as the current status
-    if (form.status === selectedApplication.value.status) {
-        showToast({
-            icon: "warning",
-            title: "No changes made",
-            text: "The selected status is the same as the current status"
-        });
-        return;
-    }
-
-    axios
-        .put(
-            route(
-                "applications.update",
-                selectedApplication.value.application_id,
-            ),
-            {
-                status: form.status,
-                remarks: form.remarks,
-            },
-        )
-        .then((response) => {
-            // Update the applications array with new data
-            applications.value = response.data.applications;
-
-            // Update the selected application with the new data
-            selectedApplication.value = response.data.applications.find(
-                (app) =>
-                    app.application_id ===
-                    selectedApplication.value.application_id,
-            );
-
-            // Update statuses array if needed
-            statuses.value = response.data.statuses;
-
-            // Reset remarks
-            form.remarks = "";
-
-            // Close modal
-            closeDetailsModal();
-
-            // Show success toast with status change message
-            showToast({
-                icon: "success",
-                title: "Status updated successfully",
-                success: true,
-            });
-        })
-        .catch((error) => {
-            console.error("Error updating status:", error);
-            showToast({
-                icon: "error",
-                title: "Failed to update status",
-                text: error.response?.data?.message || "An error occurred",
-                success: false,
-            });
-        });
-};
-
-// Separate toast function
-const showToast = (config) => {
-    Swal.fire({
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        toast: true,
-        ...config,
-        background: config.success ? "#22c55e" : "#ef4444",
-        color: "#ffffff",
-        iconColor: "#ffffff",
-    });
-};
-
-const getStatusColor = (status) => {
-    const colors = {
-        Pending: "bg-yellow-100 text-yellow-800",
-        Approved: "bg-green-100 text-green-800",
-        Rejected: "bg-red-100 text-red-800",
-        Shortlisted: "bg-blue-100 text-blue-800",
-        Interview: "bg-purple-100 text-purple-800",
-    };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    // Instead of showing modal, redirect to the application details page
+    window.location.href = route("applications.show", applicationId);
 };
 
 const filteredApplications = computed(() => {
@@ -723,7 +332,7 @@ const filteredApplications = computed(() => {
     // Apply job title filter
     if (jobTitleFilter.value) {
         filtered = filtered.filter(
-            (app) => app.job_listing?.job_listing_id === jobTitleFilter.value
+            (app) => app.job_listing?.job_listing_id === jobTitleFilter.value,
         );
     }
 
@@ -732,12 +341,13 @@ const filteredApplications = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter((application) => {
             // Safely access nested properties
-            const jobTitle = application.job_listing?.title || '';
-            const positionName = application.job_listing?.position?.position_name || '';
-            const userEmail = application.user?.email || '';
-            const status = application.status || '';
-            const firstName = application.user?.user_detail?.firstname || '';
-            const lastName = application.user?.user_detail?.lastname || '';
+            const jobTitle = application.job_listing?.title || "";
+            const positionName =
+                application.job_listing?.position?.position_name || "";
+            const userEmail = application.user?.email || "";
+            const status = application.status || "";
+            const firstName = application.user?.user_detail?.firstname || "";
+            const lastName = application.user?.user_detail?.lastname || "";
 
             return (
                 jobTitle.toLowerCase().includes(query) ||
@@ -757,18 +367,6 @@ const filteredApplications = computed(() => {
 const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-};
-
-const formatDateTime = (dateString) => {
-    if (!dateString) return "N/A";
-    const options = {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    };
     return new Date(dateString).toLocaleDateString(undefined, options);
 };
 </script>

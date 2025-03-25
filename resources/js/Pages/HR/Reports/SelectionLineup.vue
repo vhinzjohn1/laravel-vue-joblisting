@@ -266,21 +266,80 @@ const print = () => {
                                                 class="border border-gray-300 px-4 py-2 text-left"
                                             >
                                                 Education
+                                                <div
+                                                    v-if="
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            ?.education_level
+                                                    "
+                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                >
+                                                    {{
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            .education_level
+                                                    }}
+                                                    relevant to the Job
+                                                </div>
                                             </th>
                                             <th
                                                 class="border border-gray-300 px-4 py-2 text-left"
                                             >
                                                 Training
+                                                <div
+                                                    v-if="
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            ?.training_hours
+                                                    "
+                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                >
+                                                    {{
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            .training_hours
+                                                    }}
+                                                    hours relevant training
+                                                </div>
                                             </th>
                                             <th
                                                 class="border border-gray-300 px-4 py-2 text-left"
                                             >
                                                 Experience
+                                                <div
+                                                    v-if="
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            ?.years_experience
+                                                    "
+                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                >
+                                                    {{
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            .years_experience
+                                                    }}
+                                                    year(s) relevant experience
+                                                </div>
                                             </th>
                                             <th
                                                 class="border border-gray-300 px-4 py-2 text-left"
                                             >
                                                 Eligibility
+                                                <div
+                                                    v-if="
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            ?.eligibility
+                                                    "
+                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                >
+                                                    {{
+                                                        jobListing.position
+                                                            .minimum_requirement
+                                                            .eligibility
+                                                    }}
+                                                </div>
                                             </th>
                                             <th
                                                 class="border border-gray-300 px-4 py-2 text-left no-print"
@@ -295,20 +354,15 @@ const print = () => {
                                             :key="applicant.application_id"
                                         >
                                             <td
-                                                class="border border-gray-300 px-4 py-2"
+                                                class="border border-gray-300 px-4 py-2 uppercase"
                                             >
-                                                {{ applicant.applicant_name }}
+                                                {{ applicant.applicant_name.toUpperCase() }}
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
                                                 <div v-if="applicant.education">
-                                                    <p>
-                                                        {{
-                                                            applicant.education
-                                                                .level || "N/A"
-                                                        }}
-                                                    </p>
+
                                                     <p
                                                         class="text-sm text-gray-600"
                                                     >
@@ -317,14 +371,7 @@ const print = () => {
                                                                 .course || "N/A"
                                                         }}
                                                     </p>
-                                                    <p
-                                                        class="text-sm text-gray-600"
-                                                    >
-                                                        {{
-                                                            applicant.education
-                                                                .school || "N/A"
-                                                        }}
-                                                    </p>
+                                                   
                                                 </div>
                                                 <span
                                                     v-else
