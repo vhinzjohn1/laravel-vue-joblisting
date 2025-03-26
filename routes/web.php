@@ -44,8 +44,8 @@ Route::get('/', function () {
         }
     }
 
-    // Otherwise, show the welcome page for guests
-    return Inertia::render('Welcome', [
+    // Otherwise, show the welcome page for guests as a Blade template (server-side rendered)
+    return view('welcome', [
         'canLogin'       => Route::has('login'),
         'canRegister'    => Route::has('register'),
         'laravelVersion' => Application::VERSION,

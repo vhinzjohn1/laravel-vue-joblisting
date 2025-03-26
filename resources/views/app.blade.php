@@ -23,6 +23,7 @@
             @page {
                 size: landscape !important;
             }
+
             header,
             #print-button,
             #tour-start-button {
