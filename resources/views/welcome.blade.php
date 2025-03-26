@@ -8,6 +8,10 @@
         content="Streamlined HR job posting and application management system. Empower HR teams with efficient tools while making it easier for applicants to find and apply for opportunities.">
     <title>{{ config('app.name') }}</title>
 
+    <!-- Resource Hints for Performance -->
+    <link rel="preconnect" href="{{ request()->getSchemeAndHttpHost() }}">
+    <link rel="dns-prefetch" href="{{ request()->getSchemeAndHttpHost() }}">
+
     {{-- Favicon --}}
     <link rel="icon" type="image/x-icon" href="{{ asset('/cmu-favicon.png') }}">
 
@@ -17,11 +21,8 @@
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
 
     <!-- CSS Resources -->
-    <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/aos.css') }}">
 
-    <!-- Vite assets for welcome page styles -->
-    @vite(['resources/css/app.css'])
 
     <style>
         /* Global styles to prevent horizontal scroll */
@@ -56,6 +57,33 @@
         img {
             max-width: 100%;
             height: auto;
+        }
+
+        /* Image optimization */
+        img:not(.critical-image) {
+            content-visibility: auto;
+        }
+
+        /* Lazy image loading with background placeholder */
+        .lazy-image {
+            background-color: #f3f4f6;
+            /* Light gray placeholder */
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Prevent content layout shift (CLS) */
+        img.lazy-image[loading] {
+            opacity: 0;
+        }
+
+        img.lazy-image.loaded {
+            opacity: 1;
+        }
+
+        /* Optimize SVG rendering */
+        svg {
+            display: inline-block;
+            shape-rendering: geometricPrecision;
         }
 
         /* Smooth scrolling */
@@ -104,6 +132,12 @@
             @apply text-gray-600;
         }
     </style>
+
+    <!-- Preload Inertia app assets for faster transitions when navigating to Login/Register -->
+    @php $appJsPath = vite_app_js(); @endphp
+    @if ($appJsPath)
+        <link rel="preload" href="{{ asset($appJsPath) }}" as="script" />
+    @endif
 </head>
 
 <body class="antialiased">
@@ -113,7 +147,8 @@
             <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
                 <div class="flex justify-between items-center">
                     <a href="#" class="flex items-center space-x-3">
-                        <img src="{{ asset('img/cmulogo.png') }}" alt="CMU Logo" class="w-10 h-10 sm:w-12 sm:h-12">
+                        <img src="{{ asset('img/cmulogo.png') }}" alt="CMU Logo"
+                            class="w-10 h-10 sm:w-12 sm:h-12 critical-image">
                         <span class="font-semibold text-green-800 text-sm sm:text-base lg:text-xl">
                             Central Mindanao University
                         </span>
@@ -122,7 +157,7 @@
                     <!-- Hamburger Menu Button -->
                     <button id="mobile-menu-button" class="lg:hidden">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-800" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
+                            viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path id="hamburger-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16"></path>
                             <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round"
@@ -473,7 +508,7 @@
                     <div class="max-w-6xl mx-auto">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <!-- Step 1: Registration -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105"
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform"
                                 data-aos="fade-up" data-aos-delay="100">
                                 <div class="h-2 bg-green-600"></div>
                                 <div class="p-6">
@@ -490,7 +525,7 @@
                                     <ul class="space-y-2 text-gray-600">
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -498,7 +533,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -506,7 +541,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -517,7 +552,7 @@
                             </div>
 
                             <!-- Step 2: Profile Details -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105"
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform"
                                 data-aos="fade-up" data-aos-delay="200">
                                 <div class="h-2 bg-blue-600"></div>
                                 <div class="p-6">
@@ -534,7 +569,7 @@
                                     <ul class="space-y-2 text-gray-600">
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -542,7 +577,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -550,7 +585,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -561,7 +596,7 @@
                             </div>
 
                             <!-- Step 3: Job Search -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105"
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform"
                                 data-aos="fade-up" data-aos-delay="300">
                                 <div class="h-2 bg-purple-600"></div>
                                 <div class="p-6">
@@ -578,7 +613,7 @@
                                     <ul class="space-y-2 text-gray-600">
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-purple-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -586,7 +621,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-purple-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -594,7 +629,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-purple-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -605,7 +640,7 @@
                             </div>
 
                             <!-- Step 4: Application Submission -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105"
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform"
                                 data-aos="fade-up" data-aos-delay="400">
                                 <div class="h-2 bg-orange-600"></div>
                                 <div class="p-6">
@@ -622,7 +657,7 @@
                                     <ul class="space-y-2 text-gray-600">
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-orange-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -630,7 +665,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-orange-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -638,7 +673,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-orange-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -649,7 +684,7 @@
                             </div>
 
                             <!-- Step 5: Application Review -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105"
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform"
                                 data-aos="fade-up" data-aos-delay="500">
                                 <div class="h-2 bg-teal-600"></div>
                                 <div class="p-6">
@@ -666,7 +701,7 @@
                                     <ul class="space-y-2 text-gray-600">
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-teal-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -674,7 +709,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-teal-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -682,7 +717,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-teal-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -693,7 +728,7 @@
                             </div>
 
                             <!-- Step 6: Schedule & Next Steps -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105"
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform"
                                 data-aos="fade-up" data-aos-delay="600">
                                 <div class="h-2 bg-pink-600"></div>
                                 <div class="p-6">
@@ -710,7 +745,7 @@
                                     <ul class="space-y-2 text-gray-600">
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-pink-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -718,7 +753,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-pink-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -726,7 +761,7 @@
                                         </li>
                                         <li class="flex items-start">
                                             <svg class="w-5 h-5 text-pink-500 mr-2 mt-0.5" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -744,7 +779,7 @@
                                     class="px-8 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors font-medium inline-flex items-center">
                                     Start Your Application
                                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                        viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                     </svg>
@@ -790,7 +825,8 @@
                                 <div class="relative h-60 sm:h-72 lg:h-auto" data-aos="fade-left"
                                     data-aos-duration="1000">
                                     <img src="{{ asset('img/cmuadmin.png') }}" alt="CMU Admin Building"
-                                        class="w-full h-full object-cover">
+                                        class="w-full h-full object-cover lazy-image" loading="lazy"
+                                        decoding="async">
                                     <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
                                 </div>
                             </div>
@@ -804,7 +840,8 @@
                                 <div class="relative h-60 sm:h-72 lg:h-auto order-2 lg:order-1" data-aos="fade-right"
                                     data-aos-duration="1000">
                                     <img src="{{ asset('img/main_gate.png') }}" alt="CMU Main Gate"
-                                        class="w-full h-full object-cover">
+                                        class="w-full h-full object-cover lazy-image" loading="lazy"
+                                        decoding="async">
                                     <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
                                 </div>
                                 <div class="relative p-6 sm:p-8 lg:p-12 order-1 lg:order-2" data-aos="fade-left"
@@ -834,26 +871,75 @@
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <!-- Bootstrap Bundle JS -->
-    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-    <!-- AdminLTE JS -->
-    <script src="{{ asset('js/adminlte.min.js') }}"></script>
+
     <script src="{{ asset('js/aos.js') }}"></script>
-    <script src="{{ asset('js/sweetalert2.js') }}"></script>
 
     <script>
         // Initialize AOS
         AOS.init();
 
-        // Handle mobile menu
+        // Handle mobile menu and implement lazy loading
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             const hamburgerIcon = document.getElementById('hamburger-icon');
             const closeIcon = document.getElementById('close-icon');
             let isMobileMenuOpen = false;
+
+            // Enhanced Lazy Loading for Images
+            const lazyLoadImages = () => {
+                const lazyImages = document.querySelectorAll('.lazy-image');
+
+                if ('IntersectionObserver' in window) {
+                    const imageObserver = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const image = entry.target;
+
+                                // Handle data-src if present (for deferred loading)
+                                if (image.dataset.src) {
+                                    image.src = image.dataset.src;
+                                    delete image.dataset.src;
+                                }
+
+                                // Handle data-srcset for responsive images
+                                if (image.dataset.srcset) {
+                                    image.srcset = image.dataset.srcset;
+                                    delete image.dataset.srcset;
+                                }
+
+                                // Mark as loaded
+                                image.classList.add('loaded');
+
+                                // Stop observing once loaded
+                                observer.unobserve(image);
+                            }
+                        });
+                    }, {
+                        // Root margin gives images 200px head start
+                        rootMargin: '200px 0px',
+                        threshold: 0.01
+                    });
+
+                    lazyImages.forEach(img => {
+                        imageObserver.observe(img);
+
+                        // Add load event listener for transition effects
+                        img.addEventListener('load', () => {
+                            img.classList.add('loaded');
+                        });
+                    });
+                } else {
+                    // Fallback for browsers that don't support IntersectionObserver
+                    lazyImages.forEach(img => {
+                        img.src = img.dataset.src || img.src;
+                        img.classList.add('loaded');
+                    });
+                }
+            };
+
+            // Run lazy loading
+            lazyLoadImages();
 
             function toggleMobileMenu() {
                 isMobileMenuOpen = !isMobileMenuOpen;
