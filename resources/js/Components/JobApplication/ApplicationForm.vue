@@ -127,10 +127,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
-import { useForm, router, usePage } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { useForm } from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
-import axios from "axios";
 
 // Import our new components
 import EducationSection from "./EducationSection.vue";

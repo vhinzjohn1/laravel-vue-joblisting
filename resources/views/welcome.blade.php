@@ -15,100 +15,26 @@
     {{-- Favicon --}}
     <link rel="icon" type="image/x-icon" href="{{ asset('/cmu-favicon.png') }}">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Use Vite for CSS including Tailwind -->
+    @vite(['resources/css/app.css'])
+
     <!-- Fonts -->
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
 
     <!-- CSS Resources -->
     <link rel="stylesheet" href="{{ asset('css/aos.css') }}">
 
-
     <style>
-        /* Global styles to prevent horizontal scroll */
-        html,
-        body {
-            overflow-x: hidden;
-            width: 100%;
-            position: relative;
-        }
-
-        /* Container styles */
-        .container {
-            width: 100%;
-            max-width: 80rem;
-            /* max-w-7xl equivalent */
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Section spacing */
+        /* Custom styles that extend Tailwind */
+        /* These styles can be moved to your app.css file if preferred */
         section {
             scroll-margin-top: 5rem;
             width: 100%;
         }
 
-        /* Full height sections */
-        .min-h-screen {
-            min-height: 100vh;
-        }
-
-        /* Ensure images don't cause overflow */
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
         /* Optimize SVG rendering */
         svg {
-            display: inline-block;
             shape-rendering: geometricPrecision;
-        }
-
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Custom button styles */
-        .btn-primary {
-            @apply bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition-colors duration-200;
-        }
-
-        .btn-outline {
-            @apply border-2 border-green-800 text-green-800 px-6 py-2 rounded-lg hover:bg-green-800 hover:text-white transition-colors duration-200;
-        }
-
-        /* Enhanced card hover effects */
-        .process-card:hover {
-            @apply shadow-lg transform -translate-y-1 transition-all duration-300;
-        }
-
-        /* Mobile-specific optimizations */
-        @media (max-width: 1023px) {
-            .small-screen-only {
-                display: block;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .small-screen-only {
-                display: none;
-            }
-        }
-
-        /* Enhanced typography */
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            @apply font-bold text-gray-900;
-        }
-
-        p {
-            @apply text-gray-600;
         }
     </style>
 
@@ -159,7 +85,7 @@
 
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}"
-                                    class="px-6 py-2 bg-green-800 text-white border-2 border-green-800 rounded-md hover:text-green-800 transition-colors">
+                                    class="px-6 py-2 bg-green-800 text-white border-2 border-green-800 rounded-md hover:text-white hover:bg-green-900 transition-colors">
                                     Register
                                 </a>
                             @endif
