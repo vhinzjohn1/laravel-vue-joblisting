@@ -61,7 +61,6 @@ const checkScreenSize = () => {
     </Head>
 
     <div class="relative min-h-screen bg-white overflow-hidden">
-        
         <!-- Navigation -->
         <header class="fixed w-full bg-white shadow-md z-50">
             <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -1184,7 +1183,7 @@ const checkScreenSize = () => {
                                     data-aos-duration="1000"
                                 >
                                     <img
-                                        :src="asset('img/cmuadmin.png')"
+                                        :src="asset('img/cmuadmin.jpg')"
                                         alt="CMU Admin Building"
                                         class="w-full h-full object-cover"
                                     />
@@ -1208,7 +1207,7 @@ const checkScreenSize = () => {
                                     data-aos-duration="1000"
                                 >
                                     <img
-                                        :src="asset('img/main_gate.png')"
+                                        :src="asset('img/main_gate.jpg')"
                                         alt="CMU Main Gate"
                                         class="w-full h-full object-cover"
                                     />

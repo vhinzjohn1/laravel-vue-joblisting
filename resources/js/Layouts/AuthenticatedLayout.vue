@@ -17,7 +17,11 @@ const toggleMobileMenu = () => {
 };
 
 const handleLogout = () => {
-    router.post(route('logout'));
+    router.post(route('logout'), {}, {
+        onSuccess: () => {
+            window.location.href = '/';
+        }
+    });
 };
 </script>
 

@@ -27,7 +27,7 @@ use App\Http\Controllers\Applicant\ScheduleController as ApplicantScheduleContro
 use App\Http\Controllers\HR\SelectionLineupController;
 use App\Http\Controllers\ProfileCompletionController;
 
-
+// Server Side Welcome Page (Blade)
 Route::get('/', function () {
     // If the user is authenticated, redirect based on role
     if (auth()->check()) {
@@ -47,11 +47,18 @@ Route::get('/', function () {
     // Otherwise, show the welcome page for guests as a Blade template (server-side rendered)
     return view('welcome', [
         'canLogin'       => Route::has('login'),
-        'canRegister'    => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion'     => PHP_VERSION,
+        'canRegister'    => Route::has('register')
     ]);
 })->name('/');
+
+// Client Side Welcome Page (Inertia)
+Route::get('welcome', function () {
+    // with canLoign and canRegister
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+    ]);
+})->name('welcome');
 
 
 // Authentication route group
@@ -94,14 +101,6 @@ Route::middleware(['auth', 'role:applicant'])->group(function () {
     Route::post('my-schedules/{schedule}/status', [ApplicantScheduleController::class, 'updateStatus'])->name('my-schedules.update-status');
 });
 
-Route::resource('position', PositionController::class);
-
-Route::get('/php-info', function () {
-    return [
-        'upload_max_filesize' => ini_get('upload_max_filesize'),
-        'post_max_size'      => ini_get('post_max_size'),
-    ];
-});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('send-email', EmailController::class);
@@ -116,13 +115,23 @@ Route::middleware(['auth'])->group(function () {
     Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
     Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
-});
 
-Route::resource('complete-profile', ProfileCompletionController::class)
-    ->middleware(['auth']);
+    // Position routes
+    Route::resource('position', PositionController::class);
+
+    // Profile completion routes
+    Route::resource('complete-profile', ProfileCompletionController::class);
+});
 
 // Fallback to root
 Route::fallback(function () {
     return redirect('/');
 });
 require __DIR__ . '/auth.php';
+
+// Route::get('/php-info', function () {
+//     return [
+//         'upload_max_filesize' => ini_get('upload_max_filesize'),
+//         'post_max_size'      => ini_get('post_max_size'),
+//     ];
+// });

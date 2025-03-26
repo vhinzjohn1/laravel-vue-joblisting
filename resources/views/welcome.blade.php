@@ -59,27 +59,6 @@
             height: auto;
         }
 
-        /* Image optimization */
-        img:not(.critical-image) {
-            content-visibility: auto;
-        }
-
-        /* Lazy image loading with background placeholder */
-        .lazy-image {
-            background-color: #f3f4f6;
-            /* Light gray placeholder */
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        /* Prevent content layout shift (CLS) */
-        img.lazy-image[loading] {
-            opacity: 0;
-        }
-
-        img.lazy-image.loaded {
-            opacity: 1;
-        }
-
         /* Optimize SVG rendering */
         svg {
             display: inline-block;
@@ -824,10 +803,8 @@
                                 </div>
                                 <div class="relative h-60 sm:h-72 lg:h-auto" data-aos="fade-left"
                                     data-aos-duration="1000">
-                                    <img src="{{ asset('img/cmuadmin.png') }}" alt="CMU Admin Building"
-                                        class="w-full h-full object-cover lazy-image" loading="lazy"
-                                        decoding="async">
-                                    <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
+                                    <img src="{{ asset('img/cmuadmin.jpg') }}" alt="CMU Admin Building"
+                                        class="w-full h-full object-cover" loading="lazy">
                                 </div>
                             </div>
                         </div>
@@ -839,10 +816,8 @@
                             <div class="grid grid-cols-1 lg:grid-cols-2">
                                 <div class="relative h-60 sm:h-72 lg:h-auto order-2 lg:order-1" data-aos="fade-right"
                                     data-aos-duration="1000">
-                                    <img src="{{ asset('img/main_gate.png') }}" alt="CMU Main Gate"
-                                        class="w-full h-full object-cover lazy-image" loading="lazy"
-                                        decoding="async">
-                                    <div class="absolute inset-0 bg-green-900 bg-opacity-20"></div>
+                                    <img src="{{ asset('img/main_gate.jpg') }}" alt="CMU Main Gate"
+                                        class="w-full h-full object-cover" loading="lazy">
                                 </div>
                                 <div class="relative p-6 sm:p-8 lg:p-12 order-1 lg:order-2" data-aos="fade-left"
                                     data-aos-duration="1000">
@@ -885,61 +860,6 @@
             const hamburgerIcon = document.getElementById('hamburger-icon');
             const closeIcon = document.getElementById('close-icon');
             let isMobileMenuOpen = false;
-
-            // Enhanced Lazy Loading for Images
-            const lazyLoadImages = () => {
-                const lazyImages = document.querySelectorAll('.lazy-image');
-
-                if ('IntersectionObserver' in window) {
-                    const imageObserver = new IntersectionObserver((entries, observer) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                const image = entry.target;
-
-                                // Handle data-src if present (for deferred loading)
-                                if (image.dataset.src) {
-                                    image.src = image.dataset.src;
-                                    delete image.dataset.src;
-                                }
-
-                                // Handle data-srcset for responsive images
-                                if (image.dataset.srcset) {
-                                    image.srcset = image.dataset.srcset;
-                                    delete image.dataset.srcset;
-                                }
-
-                                // Mark as loaded
-                                image.classList.add('loaded');
-
-                                // Stop observing once loaded
-                                observer.unobserve(image);
-                            }
-                        });
-                    }, {
-                        // Root margin gives images 200px head start
-                        rootMargin: '200px 0px',
-                        threshold: 0.01
-                    });
-
-                    lazyImages.forEach(img => {
-                        imageObserver.observe(img);
-
-                        // Add load event listener for transition effects
-                        img.addEventListener('load', () => {
-                            img.classList.add('loaded');
-                        });
-                    });
-                } else {
-                    // Fallback for browsers that don't support IntersectionObserver
-                    lazyImages.forEach(img => {
-                        img.src = img.dataset.src || img.src;
-                        img.classList.add('loaded');
-                    });
-                }
-            };
-
-            // Run lazy loading
-            lazyLoadImages();
 
             function toggleMobileMenu() {
                 isMobileMenuOpen = !isMobileMenuOpen;
