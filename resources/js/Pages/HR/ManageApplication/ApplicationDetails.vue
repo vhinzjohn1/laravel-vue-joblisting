@@ -26,16 +26,6 @@
                     ]"
                 />
 
-                <!-- Success Message -->
-                <div
-                    v-if="$page.props.flash && $page.props.flash.success"
-                    class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
-                >
-                    <span class="block sm:inline">{{
-                        $page.props.flash.success
-                    }}</span>
-                </div>
-
                 <!-- Main Content Relative Wrapper -->
                 <div class="relative">
                     <!-- Main Content without Sidebar Margin -->
@@ -61,7 +51,7 @@
                             <div class="p-6">
                                 <!-- Application Status -->
                                 <div
-                                    class="mb-6 flex items-center justify-between"
+                                    class="mb-4 flex items-center justify-between"
                                 >
                                     <h1
                                         class="text-2xl font-bold text-gray-900"
@@ -86,7 +76,7 @@
                                     <div class="md:col-span-2 space-y-8">
                                         <!-- Applicant Information -->
                                         <div
-                                            class="bg-gray-50 p-5 rounded-lg mt-4 border border-gray-200 shadow-sm hover:shadow transition-shadow duration-200"
+                                            class="bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow duration-200"
                                         >
                                             <div
                                                 @click="
@@ -1078,7 +1068,7 @@
                                                 application.status_history
                                                     .length > 0
                                             "
-                                            class="bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm"
+                                            class="bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm h-96 overflow-y-auto"
                                         >
                                             <div
                                                 @click="
@@ -1086,7 +1076,7 @@
                                                         'statusHistory',
                                                     )
                                                 "
-                                                class="flex justify-between items-center cursor-pointer mb-3"
+                                                class="flex justify-between items-center cursor-pointer mb-1"
                                             >
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
@@ -1134,16 +1124,18 @@
                                                 "
                                                 class="section-content"
                                             >
-                                                <div class="space-y-6">
+                                                <div
+                                                    class="space-y-6 pl-[10px]"
+                                                >
                                                     <div
                                                         v-for="(
                                                             history, index
                                                         ) in application.status_history"
                                                         :key="index"
-                                                        class="border-l-2 border-gray-300 pl-5 pb-5 relative"
+                                                        class="border-l-2 border-gray-300 pl-5 relative"
                                                     >
                                                         <div
-                                                            class="absolute w-3 h-3 bg-blue-500 rounded-full -left-[7px]"
+                                                            class="absolute w-3 h-3 bg-green-600 rounded-full -left-[5px] transform -translate-x-[1px]"
                                                         ></div>
                                                         <p
                                                             class="text-sm text-gray-500"
@@ -1521,7 +1513,8 @@ const closeDocumentSidebar = () => {
 };
 
 // Status update functionality
-const updateStatus = () => {
+const updateStatus = async () => {
+    console.log("this is the status change: ", form.status);
     // Check if the new status is the same as the current status
     if (form.status === application.value.status) {
         showToast({
@@ -1532,44 +1525,43 @@ const updateStatus = () => {
         return;
     }
 
-    form.put(route("applications.update", application.value.application_id), {
-        onSuccess: (response) => {
-            // Update the application data with the response from the server
-            if (response?.data) {
-                // If we have a response with updated data
-                const data = response.data;
+    try {
+        const response = await axios.put(
+            route("applications.update", application.value.application_id),
+            {
+                status: form.status,
+                remarks: form.remarks,
+            },
+        );
 
-                // Update the application status directly
-                application.value.status = form.status;
+        // Update the application data with the response from the server
+        if (response.data) {
+            const data = response.data;
+            console.log("this is the response: ", data.applications);
 
-                // If status history is in the response, update it
-                if (data.statusHistory) {
-                    application.value.status_history = data.statusHistory;
-                }
-
-                // If full application data is returned, update everything
-                if (data.application) {
-                    application.value = data.application;
-                }
-            }
+            application.value = data.applications;
 
             showToast({
                 icon: "success",
                 title: "Status updated successfully",
                 success: true,
             });
+        }
 
-            form.remarks = "";
-        },
-        onError: (error) => {
-            showToast({
-                icon: "error",
-                title: "Failed to update status",
-                text: error.message || "An error occurred",
-                success: false,
-            });
-        },
-    });
+        // Reset remarks field
+        form.remarks = "";
+    } catch (error) {
+        console.error("Error updating status:", error);
+        showToast({
+            icon: "error",
+            title: "Failed to update status",
+            text:
+                error.response?.data?.message ||
+                error.message ||
+                "An error occurred",
+            success: false,
+        });
+    }
 };
 
 // Helper Functions

@@ -121,22 +121,34 @@ class ManageApplicationController extends Controller
         $this->notifyApplicantStatusChange($application);
 
         // Get fresh applications data with relationships
-        $applications = Application::with([
+        $application = Application::with([
             'jobListing' => function ($query) {
-                $query->with(['position']);
+                $query->with(['position', 'creator']);
             },
             'user' => function ($query) {
                 $query->with('userDetail');
+
+                // Load user's educational backgrounds
+                $query->with('userDetail.educationalBackgrounds');
+
+                // Load user's trainings
+                $query->with('userDetail.trainings');
+
+                // Load user's work experiences
+                $query->with('userDetail.workExperiences');
             },
             'documents',
-            'statusHistory'
+            'statusHistory' => function ($query) {
+                $query->with('updater');
+                $query->orderBy('created_at', 'desc');
+            }
         ])
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->where('application_id', $id)
+            ->first();
 
         return response()->json([
             'message' => 'Application status updated successfully',
-            'applications' => $applications,
+            'applications' => $application,
             'statuses' => [
                 'Pending',
                 'Qualified',

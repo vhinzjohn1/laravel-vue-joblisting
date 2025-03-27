@@ -66,6 +66,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile/user-details', [ProfileController::class, 'getUserDetails'])->name('profile.user-details');
+    Route::post('/profile/store-details', [ProfileController::class, 'storeUserDetails'])->name('profile.store-details');
     Route::get('profile-details/{type}', [ProfileDetailsController::class, 'index'])->name('profile-details.index');
     Route::post('profile-details/{type}', [ProfileDetailsController::class, 'store'])->name('profile-details.store');
     Route::delete('profile-details/{type}/{id}', [ProfileDetailsController::class, 'destroy'])->name('profile-details.destroy');

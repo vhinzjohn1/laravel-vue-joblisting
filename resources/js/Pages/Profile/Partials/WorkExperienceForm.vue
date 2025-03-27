@@ -5,9 +5,16 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
+import {
+    TrashIcon,
+    BriefcaseIcon,
+    BuildingOfficeIcon,
+    CalendarIcon,
+} from "@heroicons/vue/24/outline";
 
 const experiences = ref([]);
 const showModal = ref(false);
+const isLoading = ref(true);
 
 const form = useForm({
     position: "",
@@ -21,10 +28,17 @@ const form = useForm({
 const emit = defineEmits(["step-completed"]);
 
 const fetchExperiences = async () => {
-    const response = await axios.get(
-        route("profile-details.index", "experience"),
-    );
-    experiences.value = response.data;
+    try {
+        isLoading.value = true;
+        const response = await axios.get(
+            route("profile-details.index", "experience"),
+        );
+        experiences.value = response.data;
+        isLoading.value = false;
+    } catch (error) {
+        console.error("Error fetching experience data:", error);
+        isLoading.value = false;
+    }
 };
 
 const addExperience = async () => {
@@ -72,23 +86,33 @@ const deleteExperience = async (id) => {
         showSuccessAlert("delete");
     }
 };
+
+// Format date for display
+const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+    });
+};
+
 // Show success alert function
 const showSuccessAlert = (action) => {
     let title;
 
     switch (action) {
         case "add":
-            title = "Experience Added Successfully!";
+            title = "Work Experience Added Successfully!";
             break;
         case "update":
-            title = "Experience Updated Successfully!";
+            title = "Work Experience Updated Successfully!";
             break;
         case "delete":
-            title = "Experience Deleted Successfully!";
+            title = "Work Experience Deleted Successfully!";
             break;
         default:
             title = "Action Completed!";
-            text = "The operation was successful.";
     }
 
     // Using SweetAlert2 toast with custom styling
@@ -104,6 +128,7 @@ const showSuccessAlert = (action) => {
         background: "#22c55e",
     });
 };
+
 onMounted(() => {
     fetchExperiences().then(() => {
         // Emit completion event if experience records already exist
@@ -116,63 +141,201 @@ onMounted(() => {
 
 <template>
     <section>
-        <PrimaryButton @click="showModal = true">Add Experience</PrimaryButton>
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold text-gray-800">Work Experience</h3>
+            <PrimaryButton
+                @click="showModal = true"
+                class="bg-green-700 hover:bg-green-800 flex items-center gap-2"
+            >
+                <span class="hidden sm:inline">Add Experience</span>
+                <span class="sm:hidden">Add</span>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+            </PrimaryButton>
+        </div>
 
+        <!-- Loading State -->
+        <div v-if="isLoading" class="flex justify-center my-8">
+            <div
+                class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-700"
+            ></div>
+        </div>
+
+        <!-- No Records State -->
+        <div
+            v-else-if="experiences.length === 0"
+            class="bg-white rounded-lg shadow-sm p-8 border border-gray-100 text-center"
+        >
+            <div class="flex justify-center">
+                <BriefcaseIcon class="h-16 w-16 text-gray-400" />
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-gray-900">
+                No Work Experience Added Yet
+            </h3>
+            <p class="mt-2 text-gray-600">
+                Start by adding your professional work experience.
+            </p>
+            <button
+                @click="showModal = true"
+                class="mt-4 inline-flex items-center px-4 py-2 bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25 transition"
+            >
+                Add Experience
+            </button>
+        </div>
+
+        <!-- Experience Records -->
+        <div v-else class="space-y-4">
+            <div
+                v-for="experience in experiences"
+                :key="experience.experience_id"
+                class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all"
+            >
+                <div class="flex justify-between">
+                    <div class="flex-grow">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1">
+                                <BriefcaseIcon class="h-6 w-6 text-green-700" />
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800">
+                                    {{ experience.position }}
+                                </h4>
+                                <div
+                                    class="flex items-center mt-1 text-gray-600"
+                                >
+                                    <BuildingOfficeIcon class="h-4 w-4 mr-1" />
+                                    <span>{{ experience.company_name }}</span>
+                                </div>
+                                <div
+                                    class="flex items-center mt-1 text-gray-500"
+                                >
+                                    <CalendarIcon class="h-4 w-4 mr-1" />
+                                    <span>
+                                        {{ formatDate(experience.start_date) }}
+                                        -
+                                        {{
+                                            experience.is_current_job
+                                                ? "Present"
+                                                : formatDate(
+                                                      experience.end_date,
+                                                  )
+                                        }}
+                                    </span>
+                                </div>
+                                <p
+                                    v-if="experience.responsibilities"
+                                    class="mt-2 text-sm text-gray-600"
+                                >
+                                    {{ experience.responsibilities }}
+                                </p>
+                                <div
+                                    class="mt-2"
+                                    v-if="experience.is_current_job"
+                                >
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                    >
+                                        Current Position
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button
+                            @click="deleteExperience(experience.experience_id)"
+                            class="text-red-500 hover:text-red-700 focus:outline-none"
+                            title="Delete"
+                        >
+                            <TrashIcon class="h-5 w-5" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Experience Modal -->
         <Modal
-            :title="'Add Experience'"
+            :title="'Add Work Experience'"
             :show="showModal"
             @close="showModal = false"
+            max-width="md"
         >
-            <template #default>
-                <form
-                    @submit.prevent="addExperience"
-                    class="space-y-6 px-10 py-4"
-                >
+            <div class="p-6">
+                <form @submit.prevent="addExperience" class="space-y-5">
                     <div>
-                        <InputLabel for="position" value="Position" />
+                        <InputLabel
+                            for="position"
+                            value="Position"
+                            class="text-gray-700 font-medium"
+                        />
                         <input
                             id="position"
                             type="text"
                             v-model="form.position"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            placeholder="Enter job title"
                             required
                         />
                         <InputError :message="form.errors.position" />
                     </div>
 
                     <div>
-                        <InputLabel for="company_name" value="Company Name" />
+                        <InputLabel
+                            for="company_name"
+                            value="Company Name"
+                            class="text-gray-700 font-medium"
+                        />
                         <input
                             id="company_name"
                             type="text"
                             v-model="form.company_name"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            placeholder="Enter company name"
                             required
                         />
                         <InputError :message="form.errors.company_name" />
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <InputLabel for="start_date" value="Start Date" />
+                            <InputLabel
+                                for="start_date"
+                                value="Start Date"
+                                class="text-gray-700 font-medium"
+                            />
                             <input
                                 id="start_date"
                                 type="date"
                                 v-model="form.start_date"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                                 required
                             />
                             <InputError :message="form.errors.start_date" />
                         </div>
 
                         <div>
-                            <InputLabel for="end_date" value="End Date" />
+                            <InputLabel
+                                for="end_date"
+                                value="End Date"
+                                class="text-gray-700 font-medium"
+                            />
                             <input
                                 id="end_date"
                                 type="date"
                                 v-model="form.end_date"
                                 :disabled="form.is_current_job"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                                 :required="!form.is_current_job"
                             />
                             <InputError :message="form.errors.end_date" />
@@ -184,11 +347,11 @@ onMounted(() => {
                             id="is_current_job"
                             type="checkbox"
                             v-model="form.is_current_job"
-                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                            class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
                         />
                         <label
                             for="is_current_job"
-                            class="ml-2 text-sm text-gray-600"
+                            class="ml-2 text-sm text-gray-700"
                             >This is my current job</label
                         >
                     </div>
@@ -196,73 +359,36 @@ onMounted(() => {
                     <div>
                         <InputLabel
                             for="responsibilities"
-                            value="Responsibilities"
+                            value="Responsibilities (Optional)"
+                            class="text-gray-700 font-medium"
                         />
                         <textarea
                             id="responsibilities"
                             v-model="form.responsibilities"
-                            rows="4"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                            required
+                            rows="3"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            placeholder="Describe your key responsibilities"
                         ></textarea>
                         <InputError :message="form.errors.responsibilities" />
                     </div>
 
-                    <div class="flex items-center gap-4">
-                        <PrimaryButton :disabled="form.processing"
-                            >Save</PrimaryButton
+                    <div class="flex items-center justify-end gap-3 mt-6">
+                        <button
+                            type="button"
+                            @click="showModal = false"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25 transition"
                         >
+                            Cancel
+                        </button>
+                        <PrimaryButton
+                            :disabled="form.processing"
+                            class="bg-green-700 hover:bg-green-800"
+                        >
+                            Save Experience
+                        </PrimaryButton>
                     </div>
                 </form>
-            </template>
-        </Modal>
-
-        <div class="mt-6">
-            <h3 class="text-lg font-medium text-gray-900">
-                Existing Work Experience
-            </h3>
-            <div class="mt-4 space-y-4">
-                <div
-                    v-for="experience in experiences"
-                    :key="experience.experience_id"
-                    class="bg-white p-4 rounded-lg shadow"
-                >
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-medium">
-                                {{ experience.position }}
-                            </h4>
-                            <p class="text-sm text-gray-600">
-                                {{ experience.company_name }}
-                            </p>
-                            <p class="text-sm text-gray-500">
-                                {{
-                                    new Date(
-                                        experience.start_date,
-                                    ).toLocaleDateString()
-                                }}
-                                -
-                                {{
-                                    experience.is_current_job
-                                        ? "Present"
-                                        : new Date(
-                                              experience.end_date,
-                                          ).toLocaleDateString()
-                                }}
-                            </p>
-                            <p class="text-sm text-gray-600 mt-2">
-                                {{ experience.responsibilities }}
-                            </p>
-                        </div>
-                        <button
-                            @click="deleteExperience(experience.experience_id)"
-                            class="text-red-600 hover:text-red-800"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                </div>
             </div>
-        </div>
+        </Modal>
     </section>
 </template>

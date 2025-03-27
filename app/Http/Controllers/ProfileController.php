@@ -69,9 +69,9 @@ class ProfileController extends Controller
         try {
             $user = $request->user();
 
-        // Update user's profile status
-        $user->tour_completed = true;
-        $user->save();
+            // Update user's profile status
+            $user->tour_completed = true;
+            $user->save();
 
             return response()->json(['tour_completed' => true], 201);
         } catch (\Exception $e) {
@@ -98,5 +98,55 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Get the user details.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserDetails()
+    {
+        $user = auth()->user();
+        $userDetails = \App\Models\UserDetail::where('user_id', $user->user_id)->first();
+
+        return response()->json($userDetails);
+    }
+
+    /**
+     * Store user details.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeUserDetails(Request $request)
+    {
+        $request->validate([
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'middle_initial' => 'nullable|string|max:1',
+            'phone_number' => 'nullable|string|max:20',
+            'eligibility' => 'nullable|string|max:255',
+        ]);
+
+        $user = auth()->user();
+
+        // Find or create user details
+        $userDetails = \App\Models\UserDetail::firstOrNew(['user_id' => $user->user_id]);
+
+        // Update details
+        $userDetails->firstname = $request->firstname;
+        $userDetails->lastname = $request->lastname;
+        $userDetails->middle_initial = $request->middle_initial;
+        $userDetails->phone_number = $request->phone_number;
+        $userDetails->eligibility = $request->eligibility;
+
+        $userDetails->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile details saved successfully!',
+            'data' => $userDetails
+        ]);
     }
 }

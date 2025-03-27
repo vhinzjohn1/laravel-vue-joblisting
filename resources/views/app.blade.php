@@ -14,9 +14,152 @@
     <!-- Fonts -->
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
 
-    <!-- CSS Resources -->
-    <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/aos.css') }}">
+
+    <!-- Loading Progress Indicator CSS -->
+    <style>
+        .ant-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 1);
+            /* Slightly transparent */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        .ant-loading-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .ant-progress-wrapper {
+            width: 450px;
+            padding: 28px 32px;
+            background: rgba(255, 255, 255, 0.8);
+            /* More transparent */
+            border-radius: 16px;
+            box-shadow: none;
+            /* Removed box shadow */
+            backdrop-filter: blur(8px);
+            /* Adds a nice blur effect */
+            transform: translateY(-30px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            /* Subtle border */
+        }
+
+        .ant-loading-overlay.visible .ant-progress-wrapper {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .ant-progress-container {
+            width: 100%;
+            height: 8px;
+            /* Slightly thinner */
+            background: rgba(226, 232, 240, 0.6);
+            /* More subtle background */
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .ant-progress-bar {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: width;
+        }
+
+        .ant-progress-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .ant-progress-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.5px;
+        }
+
+        .ant-progress-status {
+            font-size: 16px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .ant-progress-eta {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+        }
+
+        .ant-progress-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .ant-progress-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ant-progress-cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .ant-progress-pause {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .ant-progress-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .ant-progress-pause:hover {
+            background: #f59e0b;
+        }
+
+        .ant-progress-message {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 500;
+            padding: 14px;
+            background-color: rgba(241, 245, 249, 0.6);
+            /* More transparent */
+            border-radius: 8px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            /* Subtle border */
+        }
+    </style>
 
     <style>
         @media print {
@@ -30,6 +173,14 @@
                 display: none !important;
             }
         }
+
+        .vgt__close-btn {
+            font-size: 1.2rem !important;
+            outline: none !important;
+            /* Hide focus outline */
+            box-shadow: none !important;
+            /* In case the focus ring is a box-shadow */
+        }
     </style>
 
     @routes
@@ -40,12 +191,6 @@
 <body class="hold-transition sidebar-mini">
     @inertia
 
-    <!-- jQuery -->
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <!-- Bootstrap Bundle JS -->
-    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-    <!-- AdminLTE JS -->
-    <script src="{{ asset('js/adminlte.min.js') }}"></script>
     <script src="{{ asset('js/aos.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.js') }}"></script>
 

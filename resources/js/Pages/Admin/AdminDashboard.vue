@@ -9,7 +9,7 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <button
-                        class="btn btn-success float-right m-3"
+                        class="bg-green-700 text-white font-semibold py-2 px-4 rounded float-right m-3 hover:bg-green-600"
                         @click="showAddModal = true"
                     >
                         Add
@@ -47,10 +47,10 @@
             <div class="p-6">
                 <form @submit.prevent="saveChanges" class="space-y-4">
                     <div class="form-group">
-                        <label for="exampleInputUsername">Username</label>
+                        <label for="exampleInputUsername" class="block text-sm font-medium text-gray-700">Username</label>
                         <TextInput
                             type="text"
-                            class="form-control w-full"
+                            class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50 focus:ring-green-500"
                             id="exampleInputUsername"
                             v-model="form.username"
                             required
@@ -59,10 +59,10 @@
                         />
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputEmail">Email</label>
+                        <label for="exampleInputEmail" class="block text-sm font-medium text-gray-700">Email</label>
                         <TextInput
                             type="email"
-                            class="form-control w-full"
+                            class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50 focus:ring-green-500"
                             id="exampleInputEmail"
                             v-model="form.email"
                             required
@@ -70,10 +70,10 @@
                         />
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputPassword">Password</label>
+                        <label for="exampleInputPassword" class="block text-sm font-medium text-gray-700">Password</label>
                         <TextInput
                             type="password"
-                            class="form-control w-full"
+                            class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50 focus:ring-green-500"
                             id="exampleInputPassword"
                             v-model="form.password"
                             required
@@ -81,9 +81,9 @@
                         />
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputRole">Role</label>
+                        <label for="exampleInputRole" class="block text-sm font-medium text-gray-700">Role</label>
                         <select
-                            class="form-control"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50 focus:ring-green-500"
                             id="exampleInputRole"
                             v-model="form.role_name"
                             required
@@ -96,14 +96,14 @@
                     <div class="modal-footer">
                         <button
                             type="button"
-                            class="btn bg-gray-200 text-gray-800 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
+                            class="bg-gray-200 text-gray-800 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200 py-2 px-4 rounded"
                             @click="closeAddModal"
                         >
                             Close
                         </button>
                         <button
                             type="submit"
-                            class="btn bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                            class="bg-green-600 text-white hover:bg-green-700 transition-colors duration-200 py-2 px-4 rounded"
                         >
                             Save changes
                         </button>
@@ -117,10 +117,10 @@
             <div class="p-6">
                 <form @submit.prevent="editUser" class="space-y-4">
                     <div class="form-group">
-                        <label for="editUserName">Username</label>
+                        <label for="editUserName" class="block text-sm font-medium text-gray-700">Username</label>
                         <TextInput
                             type="text"
-                            class="form-control w-full"
+                            class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500"
                             id="editUserName"
                             v-model="form.username"
                             required
@@ -129,28 +129,28 @@
                         />
                     </div>
                     <div class="form-group">
-                        <label for="editEmail">Email</label>
+                        <label for="editEmail" class="block text-sm font-medium text-gray-700">Email</label>
                         <TextInput
                             type="email"
-                            class="form-control w-full"
+                            class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500"
                             id="editEmail"
                             v-model="form.email"
                             required
                         />
                     </div>
                     <div class="form-group">
-                        <label for="editPassword">Password</label>
+                        <label for="editPassword" class="block text-sm font-medium text-gray-700">Password</label>
                         <TextInput
                             type="password"
-                            class="form-control w-full"
+                            class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500"
                             id="editPassword"
                             v-model="form.password"
                         />
                     </div>
                     <div class="form-group">
-                        <label for="editRole">Role</label>
+                        <label for="editRole" class="block text-sm font-medium text-gray-700">Role</label>
                         <select
-                            class="form-control"
+                            class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-500"
                             id="editRole"
                             v-model="form.role_name"
                             required
@@ -163,14 +163,14 @@
                     <div class="modal-footer">
                         <button
                             type="button"
-                            class="btn bg-gray-200 text-gray-800 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
+                            class="bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors duration-200 py-2 px-4 rounded"
                             @click="closeEditModal"
                         >
                             Close
                         </button>
                         <button
                             type="submit"
-                            class="btn bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                            class="bg-green-600 text-white hover:bg-green-700 transition-colors duration-200 py-2 px-4 rounded"
                         >
                             Save changes
                         </button>

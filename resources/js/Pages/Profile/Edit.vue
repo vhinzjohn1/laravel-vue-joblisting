@@ -9,6 +9,7 @@ import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationFor
 import EducationalBackgroundForm from "./Partials/EducationalBackgroundForm.vue";
 import TrainingCertificationsForm from "./Partials/TrainingCertificationsForm.vue";
 import WorkExperienceForm from "./Partials/WorkExperienceForm.vue";
+import ProfileDetailsForm from "./Partials/ProfileDetailsForm.vue";
 import { Head, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 
@@ -186,8 +187,11 @@ const showSuccessAlert = (action) => {
                             <div
                                 class="p-4 sm:p-8 bg-white shadow sm:rounded-lg"
                             >
-                                <div class="max-w-xl">
-                                    <UpdateProfileInformationForm
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                                    Profile Information
+                                </h3>
+                                <div class="p-1">
+                                    <ProfileDetailsForm
                                         :must-verify-email="mustVerifyEmail"
                                         :status="status"
                                         :user-details="userDetails"
@@ -207,7 +211,7 @@ const showSuccessAlert = (action) => {
                             <div
                                 class="p-4 sm:p-8 bg-white shadow sm:rounded-lg"
                             >
-                                <div class="max-w-xl">
+                                <div class="p-1">
                                     <EducationalBackgroundForm />
                                 </div>
                             </div>
@@ -221,7 +225,7 @@ const showSuccessAlert = (action) => {
                             <div
                                 class="p-4 sm:p-8 bg-white shadow sm:rounded-lg"
                             >
-                                <div class="max-w-xl">
+                                <div class="p-1">
                                     <TrainingCertificationsForm />
                                 </div>
                             </div>
@@ -235,7 +239,7 @@ const showSuccessAlert = (action) => {
                             <div
                                 class="p-4 sm:p-8 bg-white shadow sm:rounded-lg"
                             >
-                                <div class="max-w-xl">
+                                <div class="p-1">
                                     <WorkExperienceForm />
                                 </div>
                             </div>
@@ -249,7 +253,7 @@ const showSuccessAlert = (action) => {
                             <div
                                 class="p-4 sm:p-8 bg-white shadow sm:rounded-lg"
                             >
-                                <div class="max-w-xl">
+                                <div class="p-1">
                                     <UpdatePasswordForm />
                                 </div>
                             </div>
@@ -263,7 +267,7 @@ const showSuccessAlert = (action) => {
                             <div
                                 class="p-4 sm:p-8 bg-white shadow sm:rounded-lg"
                             >
-                                <div class="max-w-xl">
+                                <div class="p-1">
                                     <DeleteUserForm />
                                 </div>
                             </div>
