@@ -10,6 +10,7 @@ const user = usePage().props.auth.user;
 const userDetails = ref(null);
 const emit = defineEmits(["step-completed"]);
 const isFormValid = ref(false);
+const userCredentials = ref();
 
 const form = useForm({
     firstname: "",
@@ -17,7 +18,9 @@ const form = useForm({
     middle_initial: "",
     phone_number: "",
     eligibility: "",
+    email: ""
 });
+
 
 // Computed property to check if required fields are filled
 const areRequiredFieldsFilled = computed(() => {
@@ -35,13 +38,18 @@ watch(areRequiredFieldsFilled, (newValue) => {
 const fetchUserDetails = async () => {
     try {
         const response = await axios.get(route("profile.user-details"));
+        console.log(response.data);
         if (response.data) {
-            userDetails.value = response.data;
-            form.firstname = response.data.firstname || "";
-            form.lastname = response.data.lastname || "";
-            form.middle_initial = response.data.middle_initial || "";
-            form.phone_number = response.data.phone_number || "";
-            form.eligibility = response.data.eligibility || "";
+            userDetails.value = response.data.userDetails; // Correctly assign userDetails
+            userCredentials.value = response.data.userCredentials; // Assign userCredentials
+
+            // Populate form fields with the fetched data
+            form.firstname = userDetails.value.firstname || "";
+            form.lastname = userDetails.value.lastname || "";
+            form.middle_initial = userDetails.value.middle_initial || "";
+            form.phone_number = userDetails.value.phone_number || "";
+            form.eligibility = userDetails.value.eligibility || "";
+            form.email = userCredentials.value.email || ""; // Use userCredentials for email
 
             // Check if required fields are filled and emit "step-completed" if they are
             if (form.firstname && form.lastname) {
@@ -185,6 +193,29 @@ onMounted(() => {
                         <InputError
                             class="mt-2"
                             :message="form.errors.phone_number"
+                        />
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <InputLabel
+                            for="email"
+                            value="Email"
+                            class="text-gray-700 font-medium"
+                        />
+                        <div class="relative mt-1 flex">
+
+                            <TextInput
+                                id="email"
+                                type="email"
+                                class="block w-full rounded-none rounded-r-md"
+                                v-model="form.email"
+                                placeholder="example@gmail.com"
+                            />
+                        </div>
+                        <InputError
+                            class="mt-2"
+                            :message="form.errors.email"
                         />
                     </div>
 

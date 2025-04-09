@@ -41,6 +41,11 @@ onMounted(() => {
         route().current("groups.index")
     ) {
         activeDropdown.value = "schedule";
+    } else if (
+        route().current("selection-lineup.index") ||
+        route().current("selection-lineup.show")
+    ) {
+        activeDropdown.value = "reports";
     }
 });
 
@@ -54,6 +59,11 @@ watch(
             newRoute === "groups.index"
         ) {
             activeDropdown.value = "schedule";
+        } else if (
+            newRoute === "selection-lineup.index" ||
+            newRoute === "selection-lineup.show"
+        ) {
+            activeDropdown.value = "reports";
         }
     },
 );
@@ -547,9 +557,8 @@ onMounted(async () => {
                                     class="fas fa-chevron-down text-xs"
                                     :class="{
                                         'text-white': isActiveGroup([
-                                            'schedules.index',
-                                            'schedules.show',
-                                            'groups.index',
+                                        'selection-lineup.index',
+                                        'selection-lineup.show',
                                         ]),
                                     }"
                                 ></i>
@@ -575,21 +584,24 @@ onMounted(async () => {
                                         class="dropdown-link flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
                                         :class="{
                                             'bg-[#ffc001] text-black font-medium':
-                                                isActive(
+                                                isActiveGroup([
                                                     'selection-lineup.index',
-                                                ),
+                                                    'selection-lineup.show',
+                                                ]),
                                             'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                                !isActive(
+                                                !isActiveGroup([
                                                     'selection-lineup.index',
-                                                ),
+                                                    'selection-lineup.show',
+                                                ]),
                                         }"
                                     >
                                         <i
                                             class="fas fa-calendar-check mr-2"
                                             :class="{
-                                                'text-black': isActive(
+                                                'text-black': isActiveGroup([
                                                     'selection-lineup.index',
-                                                ),
+                                                    'selection-lineup.show',
+                                                ]),
                                             }"
                                         ></i>
                                         <span>Selection Lineup</span>

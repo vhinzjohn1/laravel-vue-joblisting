@@ -33,6 +33,7 @@
                 Educational Background
             </h6>
             <CustomSelect
+                v-if="educationOptions.length > 0"
                 class="w-full sm:w-64"
                 placeholder="Select from existing education"
                 :options="educationOptions"
@@ -43,33 +44,36 @@
                 valueKey="education_id"
                 @select="onEducationSelect"
             />
+            <div v-else class="text-sm text-gray-500 w-full sm:w-64 text-right">
+                Select from existing education
+            </div>
         </div>
 
-        <!-- Compact display when education is selected from dropdown -->
-        <div v-if="selectedEducation.education_id" class="mb-4">
-            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+        <!-- List of selected education items -->
+        <div v-if="selectedEducations.length > 0" class="mb-4 space-y-3">
+            <div v-for="(edu, index) in selectedEducations" :key="edu.education_id || index" class="bg-green-50 rounded-lg p-4 border border-green-200">
                 <div class="flex justify-between">
                     <div>
                         <h3 class="text-base font-medium text-gray-900">
-                            {{ selectedEducation.degree_course }}
+                            {{ edu.degree_course }}
                         </h3>
                         <div class="mt-1 text-sm text-gray-600">
                             <p>
                                 <span class="font-medium">School:</span>
-                                {{ selectedEducation.school_name }}
+                                {{ edu.school_name }}
                             </p>
                             <p>
                                 <span class="font-medium">Level:</span>
-                                {{ selectedEducation.level }}
+                                {{ edu.level }}
                             </p>
                             <p>
                                 <span class="font-medium">Year Graduated:</span>
-                                {{ selectedEducation.year_graduated }}
+                                {{ edu.year_graduated }}
                             </p>
                         </div>
                     </div>
                     <button
-                        @click="clearEducation"
+                        @click="removeEducation(index)"
                         type="button"
                         class="text-xs text-gray-600 hover:text-gray-800 flex items-center h-6"
                     >
@@ -87,7 +91,7 @@
                                 d="M6 18L18 6M6 6l12 12"
                             />
                         </svg>
-                        Clear selection
+                        Remove
                     </button>
                 </div>
                 <div class="mt-2 text-xs text-green-700">
@@ -101,8 +105,8 @@
             v-else
             class="text-center py-6 bg-gray-50 rounded-lg border border-gray-200"
         >
-            <p class="text-gray-500">No educational background selected</p>
-            <p class="text-sm text-gray-400 mt-1">
+            <p class="text-gray-800">No educational background selected</p>
+            <p class="text-sm text-gray-700 mt-1">
                 Please select from the dropdown above
             </p>
         </div>
@@ -118,31 +122,35 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
-    selectedEducation: {
-        type: Object,
-        default: () => ({
-            education_id: "",
-            level: "",
-            school_name: "",
-            degree_course: "",
-            year_graduated: "",
-        }),
+    selectedEducations: {
+        type: Array,
+        default: () => [],
     },
 });
 
-const emit = defineEmits(["update:selectedEducation", "select"]);
+const emit = defineEmits(["update:selectedEducations", "select"]);
 
 const onEducationSelect = (selected) => {
-    emit("select", selected);
+
+    // If the selected option is "Select from existing education", do not continue
+    if (selected.education_id === "") {
+        return;
+    }
+
+    // Check if already exists in the array
+    const exists = props.selectedEducations.some(
+        edu => edu.education_id === selected.education_id
+    );
+
+    if (!exists) {
+        const updatedEducations = [...props.selectedEducations, selected];
+        emit("update:selectedEducations", updatedEducations);
+    }
 };
 
-const clearEducation = () => {
-    emit("update:selectedEducation", {
-        education_id: "",
-        level: "",
-        school_name: "",
-        degree_course: "",
-        year_graduated: "",
-    });
+const removeEducation = (index) => {
+    const updatedEducations = [...props.selectedEducations];
+    updatedEducations.splice(index, 1);
+    emit("update:selectedEducations", updatedEducations);
 };
 </script>

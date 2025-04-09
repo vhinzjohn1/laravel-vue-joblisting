@@ -520,7 +520,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head, usePage, router } from "@inertiajs/vue3";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
@@ -549,10 +549,7 @@ const userApplicationId = computed(() => {
 
 const viewApplicationDetails = () => {
     if (userApplicationId.value) {
-        window.location.href = route(
-            "my-applications.show",
-            userApplicationId.value,
-        );
+        router.visit(route("my-applications.show", userApplicationId.value));
     }
 };
 

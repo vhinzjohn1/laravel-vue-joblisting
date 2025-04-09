@@ -291,7 +291,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, router } from "@inertiajs/vue3";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
@@ -318,7 +318,7 @@ const jobListings = ref(props.applications.map((app) => app.job_listing));
 
 const viewDetails = (applicationId) => {
     // Instead of showing modal, redirect to the application details page
-    window.location.href = route("applications.show", applicationId);
+    router.visit(route("applications.show", applicationId));
 };
 
 const filteredApplications = computed(() => {

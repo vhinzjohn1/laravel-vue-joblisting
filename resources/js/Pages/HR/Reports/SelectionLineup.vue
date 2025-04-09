@@ -27,6 +27,12 @@ const filteredApplicants = computed(() => {
     return props.applicants.filter((app) => app.status === statusFilter.value);
 });
 
+// Utility function to ensure consistent data structure handling
+const ensureArray = (value) => {
+    if (!value) return [];
+    return Array.isArray(value) ? value : [value];
+};
+
 const asset = (path) => `/${path}`;
 
 // Check if we're on the index page or a specific job listing page
@@ -362,16 +368,18 @@ const print = () => {
                                                 class="border border-gray-300 px-4 py-2"
                                             >
                                                 <div v-if="applicant.education">
-
-                                                    <p
-                                                        class="text-sm text-gray-600"
-                                                    >
-                                                        {{
-                                                            applicant.education
-                                                                .course || "N/A"
-                                                        }}
-                                                    </p>
-                                                   
+                                                    <!-- Process education data consistently -->
+                                                    <div v-for="(edu, index) in ensureArray(applicant.education)"
+                                                         :key="index"
+                                                         class="mb-2 pb-2"
+                                                         :class="{'border-b border-gray-200': index < ensureArray(applicant.education).length - 1}">
+                                                        <p class="text-sm text-gray-600">
+                                                            {{ edu.course || "N/A" }}
+                                                        </p>
+                                                        <p v-if="edu.school" class="text-xs text-gray-500">
+                                                            {{ edu.school }}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                                 <span
                                                     v-else
@@ -383,21 +391,18 @@ const print = () => {
                                                 class="border border-gray-300 px-4 py-2"
                                             >
                                                 <div v-if="applicant.training">
-                                                    <p>
-                                                        {{
-                                                            applicant.training
-                                                                .hours || "N/A"
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        class="text-sm text-gray-600"
-                                                    >
-                                                        {{
-                                                            applicant.training
-                                                                .details ||
-                                                            "No details available"
-                                                        }}
-                                                    </p>
+                                                    <!-- Process training data consistently -->
+                                                    <div v-for="(train, index) in ensureArray(applicant.training)"
+                                                         :key="index"
+                                                         class="mb-2 pb-2"
+                                                         :class="{'border-b border-gray-200': index < ensureArray(applicant.training).length - 1}">
+                                                        <p>
+                                                            {{ train.hours || "N/A" }} hours
+                                                        </p>
+                                                        <p class="text-sm text-gray-600">
+                                                            {{ train.details || "No details available" }}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                                 <span
                                                     v-else
@@ -408,24 +413,19 @@ const print = () => {
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
-                                                <div
-                                                    v-if="applicant.experience"
-                                                >
-                                                    <p>
-                                                        {{
-                                                            applicant.experience
-                                                                .years || "N/A"
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        class="text-sm text-gray-600"
-                                                    >
-                                                        {{
-                                                            applicant.experience
-                                                                .details ||
-                                                            "No details available"
-                                                        }}
-                                                    </p>
+                                                <div v-if="applicant.experience">
+                                                    <!-- Process experience data consistently -->
+                                                    <div v-for="(exp, index) in ensureArray(applicant.experience)"
+                                                         :key="index"
+                                                         class="mb-2 pb-2"
+                                                         :class="{'border-b border-gray-200': index < ensureArray(applicant.experience).length - 1}">
+                                                        <p>
+                                                            {{ exp.years || "N/A" }} year(s)
+                                                        </p>
+                                                        <p class="text-sm text-gray-600">
+                                                            {{ exp.details || "No details available" }}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                                 <span
                                                     v-else
@@ -436,10 +436,17 @@ const print = () => {
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
-                                                {{
-                                                    applicant.eligibility ||
-                                                    "N/A"
-                                                }}
+                                                <!-- Process eligibility data consistently -->
+                                                <div v-if="applicant.eligibility">
+                                                    <ul class="list-disc pl-4">
+                                                        <li v-for="(elig, index) in ensureArray(applicant.eligibility)"
+                                                            :key="index"
+                                                            class="mb-1">
+                                                            {{ elig }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <span v-else class="text-gray-400">N/A</span>
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2 no-print"

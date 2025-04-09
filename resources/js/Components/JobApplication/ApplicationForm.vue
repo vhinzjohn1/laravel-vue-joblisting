@@ -21,43 +21,43 @@
                 <!-- Education Section -->
                 <education-section
                     :education-options="educationOptions"
-                    :selected-education="form.education[0]"
+                    :selected-educations="form.education"
+                    @update:selected-educations="updateEducations"
                     @select="onEducationSelect"
-                    @update:selected-education="updateEducation"
                 />
                 <p
                     v-if="showValidation && validationErrors.education"
                     class="text-red-500 text-sm mt-1"
                 >
-                    Please fill in all education details
+                    Please select at least one education record
                 </p>
 
                 <!-- Training Section -->
                 <training-section
                     :training-options="trainingOptions"
-                    :selected-training="form.trainings[0]"
+                    :selected-trainings="form.trainings"
+                    @update:selected-trainings="updateTrainings"
                     @select="onTrainingSelect"
-                    @update:selected-training="updateTraining"
                 />
                 <p
                     v-if="showValidation && validationErrors.trainings"
                     class="text-red-500 text-sm mt-1"
                 >
-                    Please fill in all training details
+                    Please select at least one training record
                 </p>
 
                 <!-- Experience Section -->
                 <experience-section
                     :experience-options="experienceOptions"
-                    :selected-experience="form.experiences[0]"
+                    :selected-experiences="form.experiences"
+                    @update:selected-experiences="updateExperiences"
                     @select="onExperienceSelect"
-                    @update:selected-experience="updateExperience"
                 />
                 <p
                     v-if="showValidation && validationErrors.experiences"
                     class="text-red-500 text-md mt-1"
                 >
-                    Please fill in all experience details
+                    Please select at least one experience record
                 </p>
 
                 <!-- Document Upload Section -->
@@ -170,29 +170,9 @@ const experienceOptions = computed(() => props.existingExperiences);
 // Form state
 const form = useForm({
     job_listing_id: props.job.job_listing_id,
-    education: [
-        {
-            education_id: "",
-            level: "",
-            school_name: "",
-            degree_course: "",
-            year_graduated: "",
-        },
-    ],
-    trainings: [
-        { training_id: "", title: "", institution: "", duration_hours: "" },
-    ],
-    experiences: [
-        {
-            experience_id: "",
-            position: "",
-            company_name: "",
-            start_date: "",
-            end_date: "",
-            is_current_job: false,
-            responsibilities: "",
-        },
-    ],
+    education: [],
+    trainings: [],
+    experiences: [],
     documents: {
         application_letter: null,
         personal_data_sheet: null,
@@ -229,48 +209,29 @@ const validationErrors = ref({
 const showValidation = ref(false);
 
 // Update handlers for child components
-const updateEducation = (education) => {
-    form.education[0] = education;
+const updateEducations = (educations) => {
+    form.education = educations;
 };
 
-const updateTraining = (training) => {
-    form.trainings[0] = training;
+const updateTrainings = (trainings) => {
+    form.trainings = trainings;
 };
 
-const updateExperience = (experience) => {
-    form.experiences[0] = experience;
+const updateExperiences = (experiences) => {
+    form.experiences = experiences;
 };
 
 // Selection handlers
 const onEducationSelect = (selected) => {
-    form.education[0] = {
-        education_id: selected.education_id,
-        level: selected.level,
-        school_name: selected.school_name,
-        degree_course: selected.degree_course,
-        year_graduated: selected.year_graduated,
-    };
+    // Now handled in the EducationSection component
 };
 
 const onTrainingSelect = (selected) => {
-    form.trainings[0] = {
-        training_id: selected.training_id,
-        title: selected.title,
-        institution: selected.institution,
-        duration_hours: selected.duration_hours,
-    };
+    // Now handled in the TrainingSection component
 };
 
 const onExperienceSelect = (selected) => {
-    form.experiences[0] = {
-        experience_id: selected.experience_id,
-        position: selected.position,
-        company_name: selected.company_name,
-        start_date: selected.start_date,
-        end_date: selected.end_date,
-        is_current_job: selected.is_current_job,
-        responsibilities: selected.responsibilities,
-    };
+    // Now handled in the ExperienceSection component
 };
 
 const closeModal = () => {
@@ -331,28 +292,15 @@ const handleDocumentRemove = (docType) => {
 
 // Validation functions
 const validateEducation = () => {
-    const education = form.education[0];
-    return (
-        education.level &&
-        education.school_name &&
-        education.degree_course &&
-        education.year_graduated
-    );
+    return form.education.length > 0;
 };
 
 const validateTraining = () => {
-    const training = form.trainings[0];
-    return training.title && training.institution && training.duration_hours;
+    return form.trainings.length > 0;
 };
 
 const validateExperience = () => {
-    const experience = form.experiences[0];
-    return (
-        experience.position &&
-        experience.company_name &&
-        experience.start_date &&
-        (experience.is_current_job || experience.end_date)
-    );
+    return form.experiences.length > 0;
 };
 
 const validateDocuments = () => {

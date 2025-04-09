@@ -60,14 +60,26 @@ class SelectionLineupController extends Controller
 
             $userDetail = UserDetail::where('user_id', $user->user_id)->first();
 
-            // Get educational background
-            $education = EducationalBackground::where('user_id', $user->user_id)
+            // Get ALL educational backgrounds instead of just the first one
+            $educations = EducationalBackground::where('user_id', $user->user_id)
                 ->orderByDesc('year_graduated')
-                ->first();
+                ->get()
+                ->map(function($education) {
+                    return [
+                        'level' => $education->level,
+                        'course' => $education->degree_course,
+                        'school' => $education->school_name,
+                        'year' => $education->year_graduated
+                    ];
+                })
+                ->toArray();
 
             // Calculate work experience correctly using date differences
             $workExperiences = WorkExperience::where('user_id', $user->user_id)->get();
             $totalYears = 0;
+
+            // Create an array of all work experiences with details
+            $experienceDetails = [];
 
             foreach ($workExperiences as $experience) {
                 // Calculate years between start and end dates
@@ -84,24 +96,49 @@ class SelectionLineupController extends Controller
                 $interval = $startDate->diff($endDate);
                 $years = $interval->y;
                 $totalYears += $years;
+
+                // Add this experience to the details array
+                $experienceDetails[] = [
+                    'years' => $years . ' year(s)',
+                    'details' => $experience->position . ' at ' . $experience->company_name,
+                    'start_date' => $experience->start_date,
+                    'end_date' => $experience->is_current_job ? 'Present' : $experience->end_date
+                ];
             }
 
-            // Get latest work experience for position details
-            $latestExperience = $workExperiences->sortByDesc('end_date')->first();
-            $experienceDetails = $latestExperience ?
-                $latestExperience->position . ' at ' . $latestExperience->company_name : '';
+            // Sort experiences by end date (most recent first)
+            usort($experienceDetails, function($a, $b) {
+                // If 'Present', it should come first
+                if ($a['end_date'] === 'Present') return -1;
+                if ($b['end_date'] === 'Present') return 1;
+                return strtotime($b['end_date']) - strtotime($a['end_date']);
+            });
 
-            // Get training details with specific training information
+            // Get ALL trainings with details
             $trainings = Training::where('user_id', $user->user_id)->get();
             $totalTrainingHours = $trainings->sum('duration_hours');
 
-            // Get latest training for details
-            $latestTraining = $trainings->sortByDesc('created_at')->first();
-            $trainingDetails = $latestTraining ?
-                $latestTraining->title . ' at ' . $latestTraining->institution : '';
+            // Create an array of all trainings with details
+            $trainingDetails = $trainings->map(function($training) {
+                return [
+                    'hours' => $training->duration_hours,
+                    'details' => $training->title . ' at ' . $training->institution,
+                    'date' => $training->date
+                ];
+            })->toArray();
+
+            // Sort trainings by date (most recent first)
+            usort($trainingDetails, function($a, $b) {
+                return strtotime($b['date'] ?? 0) - strtotime($a['date'] ?? 0);
+            });
 
             // Get eligibility info - use the eligibility field from user_details table
             $eligibility = $userDetail ? $userDetail->eligibility : null;
+
+            // If eligibility contains commas, split into array
+            if ($eligibility && strpos($eligibility, ',') !== false) {
+                $eligibility = array_map('trim', explode(',', $eligibility));
+            }
 
             // Create applicant info
             $applicantInfo = [
@@ -109,19 +146,14 @@ class SelectionLineupController extends Controller
                 'applicant_name' => $userDetail ?
                     trim($userDetail->firstname . ' ' . ($userDetail->middle_initial ? $userDetail->middle_initial . '. ' : '') . $userDetail->lastname) :
                     $user->name ?? 'Unknown',
-                'education' => $education ? [
-                    'level' => $education->level,
-                    'course' => $education->degree_course,
-                    'school' => $education->school_name,
-                    'year' => $education->year_graduated
-                ] : null,
-                'training' => [
+                'education' => !empty($educations) ? $educations : null,
+                'training' => !empty($trainingDetails) ? $trainingDetails : [
                     'hours' => $totalTrainingHours . ' hours',
-                    'details' => $trainingDetails
+                    'details' => 'No training details available'
                 ],
-                'experience' => [
+                'experience' => !empty($experienceDetails) ? $experienceDetails : [
                     'years' => $totalYears . ' year(s)',
-                    'details' => $experienceDetails
+                    'details' => 'No experience details available'
                 ],
                 'eligibility' => $eligibility ?: 'N/A',
                 'application_date' => $application->created_at->format('M d, Y'),

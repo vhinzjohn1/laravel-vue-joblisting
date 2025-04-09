@@ -21,6 +21,7 @@
                 Training & Certifications
             </h6>
             <CustomSelect
+                v-if="trainingOptions.length > 0"
                 class="w-full sm:w-64"
                 placeholder="Select from existing training"
                 :options="trainingOptions"
@@ -30,29 +31,32 @@
                 valueKey="training_id"
                 @select="onTrainingSelect"
             />
+            <div v-else class="text-sm text-gray-500 w-full sm:w-64 text-right">
+                Select from existing training
+            </div>
         </div>
 
-        <!-- Compact display when training is selected from dropdown -->
-        <div v-if="selectedTraining.training_id" class="mb-4">
-            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+        <!-- List of selected trainings -->
+        <div v-if="selectedTrainings.length > 0" class="mb-4 space-y-3">
+            <div v-for="(training, index) in selectedTrainings" :key="training.training_id || index" class="bg-green-50 rounded-lg p-4 border border-green-200">
                 <div class="flex justify-between">
                     <div>
                         <h3 class="text-base font-medium text-gray-900">
-                            {{ selectedTraining.title }}
+                            {{ training.title }}
                         </h3>
                         <div class="mt-1 text-sm text-gray-600">
                             <p>
                                 <span class="font-medium">Institution:</span>
-                                {{ selectedTraining.institution }}
+                                {{ training.institution }}
                             </p>
                             <p>
                                 <span class="font-medium">Duration:</span>
-                                {{ selectedTraining.duration_hours }} hours
+                                {{ training.duration_hours }} hours
                             </p>
                         </div>
                     </div>
                     <button
-                        @click="clearTraining"
+                        @click="removeTraining(index)"
                         type="button"
                         class="text-xs text-gray-600 hover:text-gray-800 flex items-center h-6"
                     >
@@ -70,7 +74,7 @@
                                 d="M6 18L18 6M6 6l12 12"
                             />
                         </svg>
-                        Clear selection
+                        Remove
                     </button>
                 </div>
                 <div class="mt-2 text-xs text-green-700">
@@ -84,8 +88,8 @@
             v-else
             class="text-center py-6 bg-gray-50 rounded-lg border border-gray-200"
         >
-            <p class="text-gray-500">No training or certification selected</p>
-            <p class="text-sm text-gray-400 mt-1">
+            <p class="text-gray-800">No training or certification selected</p>
+            <p class="text-sm text-gray-700 mt-1">
                 Please select from the dropdown above
             </p>
         </div>
@@ -101,29 +105,34 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
-    selectedTraining: {
-        type: Object,
-        default: () => ({
-            training_id: "",
-            title: "",
-            institution: "",
-            duration_hours: "",
-        }),
+    selectedTrainings: {
+        type: Array,
+        default: () => [],
     },
 });
 
-const emit = defineEmits(["update:selectedTraining", "select"]);
+const emit = defineEmits(["update:selectedTrainings", "select"]);
 
 const onTrainingSelect = (selected) => {
-    emit("select", selected);
+
+     // If the selected option is "Select from existing education", do not continue
+     if (selected.training_id === "") {
+        return;
+    }
+    // Check if already exists in the array
+    const exists = props.selectedTrainings.some(
+        training => training.training_id === selected.training_id
+    );
+
+    if (!exists) {
+        const updatedTrainings = [...props.selectedTrainings, selected];
+        emit("update:selectedTrainings", updatedTrainings);
+    }
 };
 
-const clearTraining = () => {
-    emit("update:selectedTraining", {
-        training_id: "",
-        title: "",
-        institution: "",
-        duration_hours: "",
-    });
+const removeTraining = (index) => {
+    const updatedTrainings = [...props.selectedTrainings];
+    updatedTrainings.splice(index, 1);
+    emit("update:selectedTrainings", updatedTrainings);
 };
 </script>

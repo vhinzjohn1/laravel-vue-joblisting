@@ -137,3 +137,6 @@ require __DIR__ . '/auth.php';
 //         'post_max_size'      => ini_get('post_max_size'),
 //     ];
 // });
+Route::get('/php-info', function () {
+    return phpinfo();
+});

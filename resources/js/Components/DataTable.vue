@@ -27,7 +27,7 @@
             <select
                 v-model="currentPageSize"
                 @change="onPageSizeChange"
-                class="appearance-none border rounded px-2 py-1 pr-10 w-20 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                class="appearance-none border rounded px-2 py-1 pr-10 w-20 focus:outline-none focus:ring-2 focus:ring-green-400"
             >
                 <option
                     v-for="option in pageSizeOptions"
@@ -98,7 +98,7 @@
                                 type="checkbox"
                                 :checked="allSelected"
                                 @change="toggleSelectAll"
-                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                             />
                         </th>
                         <!-- Render specified columns -->
@@ -140,7 +140,7 @@
                                 type="checkbox"
                                 v-model="selectedItems"
                                 :value="item.id"
-                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                             />
                         </td>
                         <!-- Render only specified columns -->
@@ -179,18 +179,20 @@
                                 }}
                             </template>
                         </td>
-                        <td class="px-4 py-2 border border-gray-200">
+                        <td class="px-4 py-2 border border-gray-200 flex justify-center">
                             <button
                                 @click="onEdit(item)"
-                                class="px-2 py-1 bg-green-800 text-white rounded hover:bg-green-600 mr-2 transition-colors"
+                                class="flex items-center p-2 bg-green-700 text-white rounded-md shadow-sm hover:bg-green-700 transition-colors"
                             >
-                                Edit
+                                <i class="fas fa-edit mr-1"></i>
+                                <span class="font-semibold text-xs">Edit</span>
                             </button>
                             <button
                                 @click="onDelete(item)"
-                                class="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-600 transition-colors"
+                                class="flex items-center p-2 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700 transition-colors ml-2"
                             >
-                                Delete
+                                <i class="fas fa-trash-alt mr-1"></i>
+                                <span class="font-semibold text-xs">Delete</span>
                             </button>
                         </td>
                     </tr>
@@ -231,7 +233,7 @@
                     :class="[
                         'px-3 py-1 rounded',
                         currentPage === page
-                            ? 'bg-blue-500 text-white'
+                            ? 'bg-green-600 text-white'
                             : 'bg-gray-200 hover:bg-gray-300',
                     ]"
                 >
@@ -320,7 +322,12 @@ const getNestedValue = (obj, path) => {
         pathCache.set(path, parts);
     }
 
-    return parts.reduce((acc, part) => acc && acc[part], obj);
+    let result = obj;
+    for (const part of parts) {
+        if (result == null) return undefined;
+        result = result[part];
+    }
+    return result;
 };
 
 // Helper function to quickly check common fields before doing a full search

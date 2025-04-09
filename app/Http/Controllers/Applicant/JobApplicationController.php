@@ -241,18 +241,23 @@ class JobApplicationController extends Controller
             'documents.training_certificates' => 'required|file|mimes:pdf|max:10240',
             'documents.employment_certificate' => 'required|file|mimes:pdf|max:10240',
 
-            // Validate education
+            // Validate education - now as an array
+            'education' => 'required|array|min:1',
             'education.*.education_id' => 'nullable|exists:educational_backgrounds,education_id',
             'education.*.level' => 'required_without:education.*.education_id|string',
             'education.*.school_name' => 'required_without:education.*.education_id|string',
             'education.*.degree_course' => 'required_without:education.*.education_id|string',
             'education.*.year_graduated' => 'nullable|numeric',
-            // Validate training
+            
+            // Validate training - now as an array
+            'trainings' => 'required|array|min:1',
             'trainings.*.training_id' => 'nullable|exists:trainings,training_id',
             'trainings.*.title' => 'required_without:trainings.*.training_id|string',
             'trainings.*.institution' => 'required_without:trainings.*.training_id|string',
             'trainings.*.duration_hours' => 'required_without:trainings.*.training_id|integer|min:1',
-            // Validate experience
+            
+            // Validate experience - now as an array
+            'experiences' => 'required|array|min:1',
             'experiences.*.experience_id' => 'nullable|exists:work_experiences,experience_id',
             'experiences.*.position' => 'required_without:experiences.*.experience_id|string',
             'experiences.*.company_name' => 'required_without:experiences.*.experience_id|string',

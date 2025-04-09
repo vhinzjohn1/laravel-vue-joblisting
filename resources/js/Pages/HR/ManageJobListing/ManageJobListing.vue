@@ -27,7 +27,7 @@
                                         class="px-4 bg-gray-100 text-gray-700 border border-l-0 border-gray-300 rounded-r-lg hover:bg-gray-200 transition-colors"
                                     >
                                         <i class="fas fa-search"></i>
-                                    </button>
+                                </button>
                                 </div>
                             </div>
                             <button

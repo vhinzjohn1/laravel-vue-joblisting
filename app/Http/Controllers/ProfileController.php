@@ -109,8 +109,12 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         $userDetails = \App\Models\UserDetail::where('user_id', $user->user_id)->first();
+        $userCredentials = User::select('email', 'password')->where('user_id', $user->user_id)->first();
 
-        return response()->json($userDetails);
+        return response()->json([
+            'userDetails' => $userDetails,
+            'userCredentials' => $userCredentials,
+        ]);
     }
 
     /**
@@ -127,9 +131,17 @@ class ProfileController extends Controller
             'middle_initial' => 'nullable|string|max:1',
             'phone_number' => 'nullable|string|max:20',
             'eligibility' => 'nullable|string|max:255',
+            'email' => 'required|string|email|max:255',
         ]);
 
         $user = auth()->user();
+
+        // Update email in the users table if it has changed
+        if ($request->email !== $user->email) {
+            $user->email = $request->email;
+            $user->email_verified_at = null; // Reset email verification if email changed
+            $user->save();
+        }
 
         // Find or create user details
         $userDetails = \App\Models\UserDetail::firstOrNew(['user_id' => $user->user_id]);

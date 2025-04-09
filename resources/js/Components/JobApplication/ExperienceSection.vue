@@ -21,6 +21,7 @@
                 Work Experience
             </h6>
             <CustomSelect
+                v-if="experienceOptions.length > 0"
                 class="w-full sm:w-64"
                 placeholder="Select from existing experience"
                 :options="experienceOptions"
@@ -30,34 +31,37 @@
                 valueKey="experience_id"
                 @select="onExperienceSelect"
             />
+            <div v-else class="text-sm text-gray-500 w-full sm:w-64 text-right">
+                Select from existing experience
+            </div>
         </div>
 
-        <!-- Compact display when experience is selected from dropdown -->
-        <div v-if="selectedExperience.experience_id" class="mb-4">
-            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+        <!-- List of selected experiences -->
+        <div v-if="selectedExperiences.length > 0" class="mb-4 space-y-3">
+            <div v-for="(experience, index) in selectedExperiences" :key="experience.experience_id || index" class="bg-green-50 rounded-lg p-4 border border-green-200">
                 <div class="flex justify-between">
                     <div>
                         <h3 class="text-base font-medium text-gray-900">
-                            {{ selectedExperience.position }}
+                            {{ experience.position }}
                         </h3>
                         <div class="mt-1 text-sm text-gray-600">
                             <p>
                                 <span class="font-medium">Company:</span>
-                                {{ selectedExperience.company_name }}
+                                {{ experience.company_name }}
                             </p>
                             <p>
                                 <span class="font-medium">Period:</span>
                                 {{
                                     formatDateDisplay(
-                                        selectedExperience.start_date,
+                                        experience.start_date,
                                     )
                                 }}
                                 —
                                 {{
-                                    selectedExperience.is_current_job
+                                    experience.is_current_job
                                         ? "Present"
                                         : formatDateDisplay(
-                                              selectedExperience.end_date,
+                                              experience.end_date,
                                           )
                                 }}
                             </p>
@@ -65,17 +69,17 @@
                         <div class="mt-2 text-sm">
                             <p
                                 class="text-gray-700 line-clamp-2"
-                                :title="selectedExperience.responsibilities"
+                                :title="experience.responsibilities"
                             >
                                 <span class="font-medium"
                                     >Responsibilities:</span
                                 >
-                                {{ selectedExperience.responsibilities }}
+                                {{ experience.responsibilities }}
                             </p>
                         </div>
                     </div>
                     <button
-                        @click="clearExperience"
+                        @click="removeExperience(index)"
                         type="button"
                         class="text-xs text-gray-600 hover:text-gray-800 flex items-center h-6"
                     >
@@ -93,7 +97,7 @@
                                 d="M6 18L18 6M6 6l12 12"
                             />
                         </svg>
-                        Clear selection
+                        Remove
                     </button>
                 </div>
                 <div class="mt-2 text-xs text-green-700">
@@ -107,8 +111,8 @@
             v-else
             class="text-center py-6 bg-gray-50 rounded-lg border border-gray-200"
         >
-            <p class="text-gray-500">No work experience selected</p>
-            <p class="text-sm text-gray-400 mt-1">
+            <p class="text-gray-800">No work experience selected</p>
+            <p class="text-sm text-gray-700 mt-1">
                 Please select from the dropdown above
             </p>
         </div>
@@ -124,21 +128,13 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
-    selectedExperience: {
-        type: Object,
-        default: () => ({
-            experience_id: "",
-            position: "",
-            company_name: "",
-            start_date: "",
-            end_date: "",
-            is_current_job: false,
-            responsibilities: "",
-        }),
+    selectedExperiences: {
+        type: Array,
+        default: () => [],
     },
 });
 
-const emit = defineEmits(["update:selectedExperience", "select"]);
+const emit = defineEmits(["update:selectedExperiences", "select"]);
 
 // Format date for display
 const formatDateDisplay = (dateString) => {
@@ -152,18 +148,25 @@ const formatDateDisplay = (dateString) => {
 };
 
 const onExperienceSelect = (selected) => {
-    emit("select", selected);
+
+    // If the selected option is "Select from existing education", do not continue
+    if (selected.experience_id === "") {
+        return;
+    }
+    // Check if already exists in the array
+    const exists = props.selectedExperiences.some(
+        exp => exp.experience_id === selected.experience_id
+    );
+
+    if (!exists) {
+        const updatedExperiences = [...props.selectedExperiences, selected];
+        emit("update:selectedExperiences", updatedExperiences);
+    }
 };
 
-const clearExperience = () => {
-    emit("update:selectedExperience", {
-        experience_id: "",
-        position: "",
-        company_name: "",
-        start_date: "",
-        end_date: "",
-        is_current_job: false,
-        responsibilities: "",
-    });
+const removeExperience = (index) => {
+    const updatedExperiences = [...props.selectedExperiences];
+    updatedExperiences.splice(index, 1);
+    emit("update:selectedExperiences", updatedExperiences);
 };
 </script>
