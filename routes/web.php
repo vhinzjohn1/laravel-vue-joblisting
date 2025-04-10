@@ -129,7 +129,6 @@ Route::middleware(['auth'])->group(function () {
 Route::fallback(function () {
     return redirect('/');
 });
-require __DIR__ . '/auth.php';
 
 // Route::get('/php-info', function () {
 //     return [
@@ -140,3 +139,6 @@ require __DIR__ . '/auth.php';
 Route::get('/php-info', function () {
     return phpinfo();
 });
+
+require __DIR__ . '/auth.php';
+

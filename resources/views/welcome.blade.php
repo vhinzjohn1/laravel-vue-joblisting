@@ -15,8 +15,8 @@
     {{-- Favicon --}}
     <link rel="icon" type="image/x-icon" href="{{ asset('/cmu-favicon.png') }}">
 
-    <!-- Use Vite for CSS including Tailwind -->
-    @vite(['resources/css/app.css'])
+    <!-- Use Tailwind.js on public folder js folder -->
+    <script src="{{ asset('js/tailwind.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
@@ -37,12 +37,6 @@
             shape-rendering: geometricPrecision;
         }
     </style>
-
-    <!-- Preload Inertia app assets for faster transitions when navigating to Login/Register -->
-    @php $appJsPath = vite_app_js(); @endphp
-    @if ($appJsPath)
-        <link rel="preload" href="{{ asset($appJsPath) }}" as="script" />
-    @endif
 </head>
 
 <body class="antialiased">
