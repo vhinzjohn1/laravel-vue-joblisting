@@ -227,166 +227,200 @@ class JobApplicationController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'job_listing_id' => 'required|exists:job_listings,job_listing_id',
+        // Increase memory limit and execution time for this request
+        ini_set('memory_limit', '256M');
+        ini_set('max_execution_time', 300);
+        
+        try {
+            // First validate non-file inputs
+            $request->validate([
+                'job_listing_id' => 'required|exists:job_listings,job_listing_id',
+                'education' => 'required|array|min:1',
+                'trainings' => 'required|array|min:1',
+                'experiences' => 'required|array|min:1',
+            ]);
 
-            // Document validation
-            'documents' => 'required|array',
-            'documents.application_letter' => 'required|file|mimes:pdf|max:10240',
-            'documents.personal_data_sheet' => 'required|file|mimes:pdf|max:10240',
-            'documents.work_experience_sheet' => 'required|file|mimes:pdf|max:10240',
-            'documents.transcript_and_diploma' => 'required|file|mimes:pdf|max:10240',
-            'documents.eligibility_proof' => 'required|file|mimes:pdf|max:10240',
-            'documents.performance_rating' => 'required|file|mimes:pdf|max:10240',
-            'documents.training_certificates' => 'required|file|mimes:pdf|max:10240',
-            'documents.employment_certificate' => 'required|file|mimes:pdf|max:10240',
+            // Validate each document separately to identify which one fails
+            $documentTypes = [
+                'application_letter' => 'Application Letter',
+                'personal_data_sheet' => 'Personal Data Sheet',
+                'work_experience_sheet' => 'Work Experience Sheet',
+                'transcript_and_diploma' => 'Transcript and Diploma',
+                'eligibility_proof' => 'Eligibility Proof',
+                'performance_rating' => 'Performance Rating',
+                'training_certificates' => 'Training Certificates',
+                'employment_certificate' => 'Employment Certificate'
+            ];
 
-            // Validate education - now as an array
-            'education' => 'required|array|min:1',
-            'education.*.education_id' => 'nullable|exists:educational_backgrounds,education_id',
-            'education.*.level' => 'required_without:education.*.education_id|string',
-            'education.*.school_name' => 'required_without:education.*.education_id|string',
-            'education.*.degree_course' => 'required_without:education.*.education_id|string',
-            'education.*.year_graduated' => 'nullable|numeric',
-            
-            // Validate training - now as an array
-            'trainings' => 'required|array|min:1',
-            'trainings.*.training_id' => 'nullable|exists:trainings,training_id',
-            'trainings.*.title' => 'required_without:trainings.*.training_id|string',
-            'trainings.*.institution' => 'required_without:trainings.*.training_id|string',
-            'trainings.*.duration_hours' => 'required_without:trainings.*.training_id|integer|min:1',
-            
-            // Validate experience - now as an array
-            'experiences' => 'required|array|min:1',
-            'experiences.*.experience_id' => 'nullable|exists:work_experiences,experience_id',
-            'experiences.*.position' => 'required_without:experiences.*.experience_id|string',
-            'experiences.*.company_name' => 'required_without:experiences.*.experience_id|string',
-            'experiences.*.start_date' => 'required_without:experiences.*.experience_id|date',
-            'experiences.*.end_date' => 'nullable|date|after:experiences.*.start_date',
-        ]);
-
-        // Create the application
-        $application = Application::create([
-            'job_listing_id' => $request->job_listing_id,
-            'user_id' => auth()->id(),
-            'status' => 'Pending',
-        ]);
-
-        // Store educational backgrounds
-        foreach ($request->education as $education) {
-            if (isset($education['education_id'])) {
-                // If education_id exists, just associate it
-                EducationalBackground::where('education_id', $education['education_id'])
-                    ->update(['user_id' => auth()->id()]);
-            } else {
-                // Create new educational background
-                EducationalBackground::create([
-                    'user_id' => auth()->id(),
-                    'level' => $education['level'],
-                    'school_name' => $education['school_name'],
-                    'degree_course' => $education['degree_course'],
-                    'year_graduated' => $education['year_graduated'] ?? null,
-                ]);
+            foreach ($documentTypes as $key => $label) {
+                try {
+                    $request->validate([
+                        "documents.$key" => 'required|file|mimes:pdf|max:51200'
+                    ], [
+                        "documents.$key.required" => "$label is required",
+                        "documents.$key.file" => "$label must be a valid file",
+                        "documents.$key.mimes" => "$label must be a PDF file",
+                        "documents.$key.max" => "$label size must not exceed 50MB"
+                    ]);
+                } catch (\Illuminate\Validation\ValidationException $e) {
+                    return response()->json([
+                        'message' => 'File Upload Error',
+                        'errors' => [
+                            'document_name' => $label,
+                            'error' => $e->validator->errors()->first()
+                        ]
+                    ], 422);
+                }
             }
+
+            // Validate remaining fields
+            $request->validate([
+                'education.*.education_id' => 'nullable|exists:educational_backgrounds,education_id',
+                'education.*.level' => 'required_without:education.*.education_id|string',
+                'education.*.school_name' => 'required_without:education.*.education_id|string',
+                'education.*.degree_course' => 'required_without:education.*.education_id|string',
+                'education.*.year_graduated' => 'nullable|numeric',
+                
+                'trainings.*.training_id' => 'nullable|exists:trainings,training_id',
+                'trainings.*.title' => 'required_without:trainings.*.training_id|string',
+                'trainings.*.institution' => 'required_without:trainings.*.training_id|string',
+                'trainings.*.duration_hours' => 'required_without:trainings.*.training_id|integer|min:1',
+                
+                'experiences.*.experience_id' => 'nullable|exists:work_experiences,experience_id',
+                'experiences.*.position' => 'required_without:experiences.*.experience_id|string',
+                'experiences.*.company_name' => 'required_without:experiences.*.experience_id|string',
+                'experiences.*.start_date' => 'required_without:experiences.*.experience_id|date',
+                'experiences.*.end_date' => 'nullable|date|after:experiences.*.start_date',
+            ]);
+
+            // Create the application
+            $application = Application::create([
+                'job_listing_id' => $request->job_listing_id,
+                'user_id' => auth()->id(),
+                'status' => 'Pending',
+            ]);
+
+            // Store educational backgrounds
+            foreach ($request->education as $education) {
+                if (isset($education['education_id'])) {
+                    // If education_id exists, just associate it
+                    EducationalBackground::where('education_id', $education['education_id'])
+                        ->update(['user_id' => auth()->id()]);
+                } else {
+                    // Create new educational background
+                    EducationalBackground::create([
+                        'user_id' => auth()->id(),
+                        'level' => $education['level'],
+                        'school_name' => $education['school_name'],
+                        'degree_course' => $education['degree_course'],
+                        'year_graduated' => $education['year_graduated'] ?? null,
+                    ]);
+                }
+            }
+
+            // Store trainings
+            foreach ($request->trainings as $training) {
+                if (isset($training['training_id'])) {
+                    // If training_id exists, just associate it
+                    Training::where('training_id', $training['training_id'])
+                        ->update(['user_id' => auth()->id()]);
+                } else {
+                    // Create new training
+                    Training::create([
+                        'user_id' => auth()->id(),
+                        'title' => $training['title'],
+                        'institution' => $training['institution'],
+                        'duration_hours' => $training['duration_hours'] ?? null,
+                    ]);
+                }
+            }
+
+            // Store work experiences
+            foreach ($request->experiences as $experience) {
+                if (isset($experience['experience_id'])) {
+                    // If experience_id exists, just associate it
+                    WorkExperience::where('experience_id', $experience['experience_id'])
+                        ->update(['user_id' => auth()->id()]);
+                } else {
+                    // Create new work experience
+                    WorkExperience::create([
+                        'user_id' => auth()->id(),
+                        'position' => $experience['position'],
+                        'company_name' => $experience['company_name'],
+                        'start_date' => $experience['start_date'],
+                        'end_date' => $experience['end_date'] ?? null,
+                        'is_current_job' => $experience['is_current_job'] ?? false,
+                        'responsibilities' => $experience['responsibilities'] ?? null,
+                    ]);
+                }
+            }
+
+            // Handle multiple document uploads
+            $documentTypes = [
+                'application_letter' => 'Application Letter',
+                'personal_data_sheet' => 'Personal Data Sheet',
+                'work_experience_sheet' => 'Work Experience Sheet',
+                'transcript_and_diploma' => 'Transcript and Diploma',
+                'eligibility_proof' => 'Eligibility Proof',
+                'performance_rating' => 'Performance Rating',
+                'training_certificates' => 'Training Certificates',
+                'employment_certificate' => 'Employment Certificate'
+            ];
+
+            foreach ($documentTypes as $key => $label) {
+                if ($request->hasFile("documents.$key")) {
+                    $file = $request->file("documents.$key");
+                    $documentName = $label . ' - ' . $file->getClientOriginalName();
+                    $documentPath = $file->store('application_documents', 'public');
+
+                    ApplicantDocument::create([
+                        'user_id' => auth()->id(),
+                        'application_id' => $application->application_id,
+                        'document_name' => $documentName,
+                        'document_type' => $key,
+                        'file_path' => $documentPath,
+                        'is_verified' => false,
+                    ]);
+                }
+            }
+
+            // Notify HR about new application
+            $this->notifyHRNewApplication($application);
+
+            $job = JobListing::with([
+                'position' => function ($query) {
+                    $query->with(['salaryGrade', 'minimumRequirement']);
+                },
+                'creator',
+                'applications' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                }
+            ])->findOrFail($request->job_listing_id);
+
+            // Get user's existing data
+            $userData = [
+                'education' => EducationalBackground::where('user_id', auth()->id())->get(),
+                'trainings' => Training::where('user_id', auth()->id())->get(),
+                'experiences' => WorkExperience::where('user_id', auth()->id())->get(),
+            ];
+
+            // Check if user meets minimum requirements
+            $meetsRequirements = $this->checkRequirementsMet($job, $userData);
+
+            // Return JSON response with application and job data
+            return response()->json([
+                'success' => true,
+                'message' => 'Application submitted successfully',
+                'job' => $job,
+                'meetsRequirements' => $meetsRequirements,
+                'redirect_url' => route('my-applications.index')
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation Error',
+                'errors' => $e->validator->errors()
+            ], 422);
         }
-
-        // Store trainings
-        foreach ($request->trainings as $training) {
-            if (isset($training['training_id'])) {
-                // If training_id exists, just associate it
-                Training::where('training_id', $training['training_id'])
-                    ->update(['user_id' => auth()->id()]);
-            } else {
-                // Create new training
-                Training::create([
-                    'user_id' => auth()->id(),
-                    'title' => $training['title'],
-                    'institution' => $training['institution'],
-                    'duration_hours' => $training['duration_hours'] ?? null,
-                ]);
-            }
-        }
-
-        // Store work experiences
-        foreach ($request->experiences as $experience) {
-            if (isset($experience['experience_id'])) {
-                // If experience_id exists, just associate it
-                WorkExperience::where('experience_id', $experience['experience_id'])
-                    ->update(['user_id' => auth()->id()]);
-            } else {
-                // Create new work experience
-                WorkExperience::create([
-                    'user_id' => auth()->id(),
-                    'position' => $experience['position'],
-                    'company_name' => $experience['company_name'],
-                    'start_date' => $experience['start_date'],
-                    'end_date' => $experience['end_date'] ?? null,
-                    'is_current_job' => $experience['is_current_job'] ?? false,
-                    'responsibilities' => $experience['responsibilities'] ?? null,
-                ]);
-            }
-        }
-
-        // Handle multiple document uploads
-        $documentTypes = [
-            'application_letter' => 'Application Letter',
-            'personal_data_sheet' => 'Personal Data Sheet',
-            'work_experience_sheet' => 'Work Experience Sheet',
-            'transcript_and_diploma' => 'Transcript and Diploma',
-            'eligibility_proof' => 'Eligibility Proof',
-            'performance_rating' => 'Performance Rating',
-            'training_certificates' => 'Training Certificates',
-            'employment_certificate' => 'Employment Certificate'
-        ];
-
-        foreach ($documentTypes as $key => $label) {
-            if ($request->hasFile("documents.$key")) {
-                $file = $request->file("documents.$key");
-                $documentName = $label . ' - ' . $file->getClientOriginalName();
-                $documentPath = $file->store('application_documents', 'public');
-
-                ApplicantDocument::create([
-                    'user_id' => auth()->id(),
-                    'application_id' => $application->application_id,
-                    'document_name' => $documentName,
-                    'document_type' => $key,
-                    'file_path' => $documentPath,
-                    'is_verified' => false,
-                ]);
-            }
-        }
-
-        // Notify HR about new application
-        $this->notifyHRNewApplication($application);
-
-        $job = JobListing::with([
-            'position' => function ($query) {
-                $query->with(['salaryGrade', 'minimumRequirement']);
-            },
-            'creator',
-            'applications' => function ($query) {
-                $query->where('user_id', auth()->id());
-            }
-        ])->findOrFail($request->job_listing_id);
-
-        // Get user's existing data
-        $userData = [
-            'education' => EducationalBackground::where('user_id', auth()->id())->get(),
-            'trainings' => Training::where('user_id', auth()->id())->get(),
-            'experiences' => WorkExperience::where('user_id', auth()->id())->get(),
-        ];
-
-        // Check if user meets minimum requirements
-        $meetsRequirements = $this->checkRequirementsMet($job, $userData);
-
-        // Return JSON response with application and job data
-        return response()->json([
-            'success' => true,
-            'message' => 'Application submitted successfully',
-            'job' => $job,
-            'meetsRequirements' => $meetsRequirements,
-            'redirect_url' => route('my-applications.index')
-        ]);
     }
 
     /**

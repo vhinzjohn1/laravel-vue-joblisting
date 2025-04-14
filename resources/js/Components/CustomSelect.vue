@@ -31,6 +31,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  required: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const emit = defineEmits(["update:modelValue", "select"]);
@@ -44,19 +48,14 @@ const selectRef = ref(null);
 const dropdownRef = ref(null); // For detecting clicks inside dropdown
 
 /**
- * 1) Create a special "All" option.
- *    If `valueKey` is used, set it to "".
- *    Otherwise, store the entire option as "".
+ * Create a filtered list of options
  */
 const computedOptions = computed(() => {
-  const allOption = props.valueKey
-    ? { [props.valueKey]: "", isAll: true }
-    : { value: "", isAll: true };
-  return [allOption, ...props.options];
+  return props.options;
 });
 
 /**
- * 2) Filter options based on search input
+ * Filter options based on search input
  */
 const filteredOptions = computed(() => {
   if (!search.value || !props.searchable) return computedOptions.value;
@@ -69,12 +68,10 @@ const filteredOptions = computed(() => {
 });
 
 /**
- * 3) Return display text, or "All" if it's the special option
+ * Return display text for an option
  */
  const getDisplayText = (option) => {
   if (!option) return "";
-  // Use the placeholder as the display text for the special option.
-  if (option.isAll) return props.placeholder;
 
   if (props.displayFormat) {
     if (typeof props.displayFormat === "function") {
@@ -89,16 +86,15 @@ const filteredOptions = computed(() => {
 
 
 /**
- * 4) Get the value from an option or "All" if it's the special one
+ * Get the value from an option
  */
 const getValue = (option) => {
   if (!option) return "";
-  if (option.isAll) return ""; // "All" emits ""
   return props.valueKey ? option[props.valueKey] : option;
 };
 
 /**
- * 5) Handle selecting an option
+ * Handle selecting an option
  */
 const selectOption = (option) => {
   selectedOption.value = option;
@@ -109,41 +105,59 @@ const selectOption = (option) => {
 };
 
 /**
- * 6) Computed display value
+ * Computed display value
  */
 const displayValue = computed(() => {
   return selectedOption.value ? getDisplayText(selectedOption.value) : "";
 });
 
 /**
- * 7) Update dropdown position
+ * Update dropdown position
  */
 const updateDropdownPosition = () => {
   if (selectRef.value) {
     const rect = selectRef.value.getBoundingClientRect();
-    dropdownStyles.value = {
-      position: "absolute",
-      top: `${rect.bottom + window.scrollY}px`,
-      left: `${rect.left + window.scrollX}px`,
-      width: `${rect.width}px`,
-    };
+    const windowHeight = window.innerHeight;
+    const bottomSpace = windowHeight - rect.bottom;
+    // Decide whether to open upward or downward based on available space
+    const openUpward = bottomSpace < 200 && rect.top > 200;
+
+    if (openUpward) {
+      dropdownStyles.value = {
+        position: "absolute",
+        bottom: `${window.innerHeight - rect.top + window.scrollY}px`,
+        left: `${rect.left + window.scrollX}px`,
+        width: `${rect.width}px`,
+        maxHeight: `${Math.min(rect.top - 10, 300)}px`,
+      };
+    } else {
+      dropdownStyles.value = {
+        position: "absolute",
+        top: `${rect.bottom + window.scrollY}px`,
+        left: `${rect.left + window.scrollX}px`,
+        width: `${rect.width}px`,
+        maxHeight: `${Math.min(windowHeight - rect.bottom - 10, 300)}px`,
+      };
+    }
   }
 };
 
 /**
- * 8) Toggle dropdown open/close, focus search if open
+ * Toggle dropdown open/close, focus search if open
  */
 const toggleDropdown = async () => {
   isOpen.value = !isOpen.value;
-  if (isOpen.value && props.searchable) {
+  if (isOpen.value) {
     await nextTick();
-    searchInputRef.value?.focus();
+    if (props.searchable && searchInputRef.value) {
+      searchInputRef.value.focus();
+    }
     updateDropdownPosition();
   }
 };
 
 /**
- * 9) Close dropdown if clicking outside select or dropdown
+ * Close dropdown if clicking outside select or dropdown
  */
 const handleClickOutside = (event) => {
   if (
@@ -158,65 +172,95 @@ const handleClickOutside = (event) => {
 };
 
 /**
- * 10) Watch for parent changes to modelValue
- *     Convert both sides to string to ensure type consistency
+ * Watch for parent changes to modelValue
  */
 watch(
   () => props.modelValue,
   (newValue) => {
-    selectedOption.value =
-      computedOptions.value.find(
-        (option) => String(getValue(option)) === String(newValue)
-      ) ?? null;
+    // Find the option that matches the modelValue
+    const option = props.options.find(opt =>
+      String(getValue(opt)) === String(newValue)
+    );
+
+    if (option) {
+      selectedOption.value = option;
+    } else {
+      selectedOption.value = null;
+    }
   },
   { immediate: true }
 );
 
 /**
- * 11) Lifecycle: mount/unmount
+ * Watch for options changes and update selected option if needed
+ */
+watch(
+  () => props.options,
+  (newOptions) => {
+    if (props.modelValue) {
+      const option = newOptions.find(opt =>
+        String(getValue(opt)) === String(props.modelValue)
+      );
+
+      if (option) {
+        selectedOption.value = option;
+      }
+    }
+  }
+);
+
+/**
+ * Lifecycle: mount/unmount
  */
 onMounted(() => {
-  document.addEventListener("pointerdown", handleClickOutside);
+  document.addEventListener("mousedown", handleClickOutside);
   window.addEventListener("resize", updateDropdownPosition);
   window.addEventListener("scroll", updateDropdownPosition, true);
 });
 
 onUnmounted(() => {
-  document.removeEventListener("pointerdown", handleClickOutside);
+  document.removeEventListener("mousedown", handleClickOutside);
   window.removeEventListener("resize", updateDropdownPosition);
   window.removeEventListener("scroll", updateDropdownPosition, true);
 });
 </script>
 
 <template>
-  <div ref="selectRef" class="relative">
+  <div ref="selectRef" class="relative w-full">
     <!-- Main input field -->
     <div
       @click="toggleDropdown"
       tabindex="0"
-      class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full cursor-pointer bg-white flex items-center justify-between transition-all duration-200 p-2"
-      :class="{ 'ring-2 ring-indigo-500 border-indigo-500': isOpen }"
+      class="w-full p-2 text-sm rounded-lg border cursor-pointer bg-white flex items-center justify-between transition-all duration-200"
+      :class="[
+        isOpen ? 'border-green-700 ring-2 ring-green-700' : 'border-gray-300 focus:ring-green-700',
+      ]"
     >
       <span v-if="selectedOption" class="text-gray-900 truncate">
         {{ displayValue }}
       </span>
-      <span v-else class="text-gray-500">
+      <span 
+        v-else 
+        class="text-gray-500 truncate overflow-hidden whitespace-nowrap w-full"
+        >
         {{ placeholder }}
       </span>
-      <svg
-        class="w-5 h-5 text-gray-400 flex-shrink-0 ml-2"
-        :class="{ 'rotate-180': isOpen }"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-          clip-rule="evenodd"
-        />
-      </svg>
+      <i class="fas fa-chevron-down text-gray-400"></i>
     </div>
+
+    <!-- Hidden real select for form validation -->
+    <select
+      :required="required"
+      :value="modelValue"
+      class="opacity-0 h-0 w-0 absolute overflow-hidden"
+    >
+      <option
+        v-for="option in options"
+        :key="getValue(option)"
+        :value="getValue(option)"
+        :selected="String(modelValue) === String(getValue(option))"
+      ></option>
+    </select>
 
     <!-- Teleport dropdown to avoid being cut off -->
     <Teleport to="body">
@@ -224,36 +268,37 @@ onUnmounted(() => {
         v-if="isOpen"
         ref="dropdownRef"
         :style="dropdownStyles"
-        class="absolute z-50 border bg-white border-gray-300 rounded-md shadow-lg"
+        class="absolute z-50 border bg-white border-gray-300 rounded-md shadow-lg overflow-hidden"
       >
         <!-- Search input -->
         <div v-if="searchable" class="p-2 border-b">
-          <TextInput
+          <input
             v-model="search"
             ref="searchInputRef"
             placeholder="Search..."
-            class="w-full"
+            class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+            type="text"
           />
         </div>
 
         <!-- Options list -->
-        <div class="overflow-y-auto" :style="{ maxHeight: props.optionsHeight }">
+        <div class="overflow-y-auto">
           <template v-if="filteredOptions.length">
             <div
               v-for="(option, index) in filteredOptions"
               :key="index"
               @click="selectOption(option)"
-              class="px-4 py-2 cursor-pointer hover:bg-indigo-50 text-sm"
+              class="px-4 py-2 cursor-pointer hover:bg-green-50 text-sm"
               :class="{
-                'bg-indigo-50 text-indigo-700': selectedOption &&
+                'bg-green-50 text-green-700': selectedOption &&
                   String(getValue(option)) === String(getValue(selectedOption))
               }"
             >
               {{ getDisplayText(option) }}
             </div>
           </template>
-          <div v-else class="px-4 py-2 text-sm text-gray-500">
-            No results found
+          <div v-else class="px-4 py-3 text-sm text-gray-500 text-center">
+            No options found
           </div>
         </div>
       </div>
@@ -262,7 +307,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.max-h-60 {
-  max-height: 15rem;
+.border-gray-300 {
+  border: 1px solid #d1d5db;
 }
 </style>

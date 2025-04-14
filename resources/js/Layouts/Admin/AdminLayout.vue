@@ -8,6 +8,7 @@ import NotificationBell from "@/Components/NotificationBell.vue";
 const showMobileMenu = ref(false);
 const sidebarOpen = ref(true);
 const showLogoutModal = ref(false);
+const showProfileDropdown = ref(false);
 
 console.log(usePage().props);
 
@@ -25,6 +26,19 @@ const handleLogout = () => {
 
 const isActive = (routeName) => {
     return route().current(routeName);
+};
+
+const toggleProfileDropdown = () => {
+    showProfileDropdown.value = !showProfileDropdown.value;
+};
+
+const toggleMenu = () => {
+  const isMobile = window.innerWidth < 1024;
+  if (isMobile) {
+    showMobileMenu.value = !showMobileMenu.value;
+  } else {
+    sidebarOpen.value = !sidebarOpen.value;
+  }
 };
 </script>
 
@@ -160,44 +174,6 @@ const isActive = (routeName) => {
                     </li>
                 </ul>
             </nav>
-
-            <!-- User Menu -->
-            <div
-                class="border-t border-[#023d17] p-4 mt-auto user-profile-section"
-            >
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <span
-                                v-if="sidebarOpen"
-                                class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200"
-                            >
-                                <span
-                                    class="text-sm font-medium leading-none text-gray-600"
-                                >
-                                    {{
-                                        $page.props.auth.user.username.charAt(0)
-                                    }}
-                                </span>
-                            </span>
-                        </div>
-                        <div v-if="sidebarOpen" class="ml-3">
-                            <p
-                                class="text-sm text-white max-w-[150px] truncate"
-                                title="{{ $page.props.auth.user.email }}"
-                            >
-                                {{ $page.props.auth.user.email }}
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        @click="showLogoutModal = true"
-                        class="rounded-lg p-1.5 text-white hover:bg-[#ffc001] hover:text-black transition-colors duration-200"
-                    >
-                        <i class="fas fa-sign-out-alt h-5 w-5"></i>
-                    </button>
-                </div>
-            </div>
         </aside>
 
         <!-- Mobile Overlay -->
@@ -207,8 +183,8 @@ const isActive = (routeName) => {
             @click="toggleMobileMenu"
         ></div>
 
-        <!-- Logout Modal -->
-        <div
+       <!-- Logout Modal -->
+       <div
             v-if="showLogoutModal"
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 transition-opacity"
         >
@@ -250,49 +226,63 @@ const isActive = (routeName) => {
             class="transition-all duration-300 ease-in-out"
         >
             <!-- Page Header -->
-            <header
-                class="bg-white shadow-sm sticky top-0 z-10"
-                v-if="$slots.header"
-            >
-                <div
-                    class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5"
-                >
+            <header class="bg-white shadow-sm sticky top-0 z-10" v-if="$slots.header">
+                <div class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5">
+
+                    <!-- One Toggle Button for Both Views -->
                     <button
-                        @click="toggleSidebar"
-                        class="hidden lg:flex rounded-full w-8 h-8 items-center justify-center text-gray-600 hover:bg-[#034b1c] hover:text-white transition-colors duration-200 ml-4 flex-shrink-0"
+                    @click="toggleMenu"
+                    class="rounded-full w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-[#034b1c] hover:text-white transition-colors duration-200 ml-4 flex-shrink-0"
                     >
-                        <i
-                            :class="[
-                                sidebarOpen
-                                    ? 'fa-chevron-left'
-                                    : 'fa-chevron-right',
-                                'fas text-xs',
-                            ]"
-                        ></i>
+                    <i
+                        class="text-base fas fa-bars"
+                    ></i>
                     </button>
+
                     <div class="flex-grow">
-                        <slot name="header" />
+                    <slot name="header" />
                     </div>
 
-                    <NotificationBell
-                        class="mr-20"
-                        :notifications="$page.props.notifications"
-                    />
-                    <!-- Mobile hamburger -->
-                    <div class="lg:hidden">
-                        <button
-                            @click="toggleMobileMenu"
-                            class="rounded-lg bg-green-600 p-1 m-1 text-white shadow-lg hover:bg-green-500 focus:outline-none"
-                        >
-                            <i
-                                class="fas fa-bars h-6 w-6"
-                                v-if="!showMobileMenu"
-                            ></i>
-                            <i class="fas fa-times h-6 w-6" v-else></i>
-                        </button>
+                    <div class="flex items-center">
+                        <NotificationBell
+                            :notifications="$page.props.notifications"
+                        />
+
+                        <!-- Profile Dropdown -->
+                        <div class="relative ml-3">
+                            <button
+                                @click="toggleProfileDropdown"
+                                class="flex items-center gap-2 hover:bg-gray-100 rounded-full p-1.5 transition-colors"
+                            >
+                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <span class="text-sm font-medium text-gray-600">
+                                        {{ $page.props.auth.user.username.charAt(0) }}
+                                    </span>
+                                </div>
+                                <i class="fas fa-angle-down text-gray-600 text-sm"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div v-if="showProfileDropdown" 
+                                class="absolute right-0 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                <Link
+                                    :href="route('profile.edit')"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                    Profile
+                                </Link>
+                                <button
+                                    @click="showLogoutModal = true"
+                                    class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
+
             <!-- Page Content -->
             <main class="py-1">
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

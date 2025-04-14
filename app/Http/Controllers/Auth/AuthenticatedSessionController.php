@@ -4,12 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +28,7 @@ class AuthenticatedSessionController extends Controller
     {
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
-            'status' => session('status'),
+            'status' => Session::get('status'),
         ]);
     }
 
@@ -32,33 +38,38 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
+
         $request->session()->regenerate();
 
-        // Retrieve the authenticated user and ensure the roles relationship is loaded
-        $user = $request->user();
+        return redirect()->intended(RouteServiceProvider::HOME);
+    }
 
-        // Retrieve the user's role; assuming each user has one role attached:
-        $role = $user->role_name ?? null;
+    /**
+     * Validate login credentials without performing actual login.
+     */
+    public function validateCredentials(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'login' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
 
-        Log::info('User authenticated.', ['role' => $role]);
-
-        // Determine redirection based on the user's role
-        switch ($role) {
-            case 'admin':
-                $redirectTo = route('admin.index');
-                break;
-            case 'hr':
-                $redirectTo = route('hr.index');
-                break;
-            case 'applicant':
-                $redirectTo = route('applicant.index');
-                break;
-            default:
-                $redirectTo = RouteServiceProvider::HOME;
-                break;
+        if ($validator->fails()) {
+            throw ValidationException::withMessages($validator->errors()->toArray());
         }
 
-        return redirect()->intended($redirectTo);
+        // Check if credentials are valid
+        $user = User::where('email', $request->input('login'))
+                   ->orWhere('username', $request->input('login'))
+                   ->first();
+
+        if (!$user || !Hash::check($request->input('password'), $user->password)) {
+            throw ValidationException::withMessages([
+                'login' => __('auth.failed'),
+            ]);
+        }
+
+        return response()->json(['message' => 'Credentials valid']);
     }
 
     /**

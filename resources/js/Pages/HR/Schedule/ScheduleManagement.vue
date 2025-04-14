@@ -14,13 +14,12 @@
                     <div class="card-header bg-white py-4 px-4 border-b">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-semibold">Schedules</h2>
-                            <button
+                            <PrimaryButton
                                 @click="showCreateModal = true"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                             >
                                 <i class="fas fa-plus mr-2"></i>
                                 Create Schedule
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </div>
 
@@ -295,9 +294,8 @@
                         >
                             Cancel
                         </button>
-                        <button
+                        <PrimaryButton
                             type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                             :disabled="processing"
                         >
                             {{
@@ -305,7 +303,7 @@
                                     ? "Update Schedule"
                                     : "Create Schedule"
                             }}
-                        </button>
+                        </PrimaryButton>
                     </div>
                 </form>
             </div>
@@ -472,6 +470,7 @@ import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     schedules: {
@@ -774,17 +773,17 @@ const deleteSchedule = (schedule) => {
 
 <style scoped>
 /* Calendar View Styling */
-:deep(.fc) {
+/* :deep(.fc) {
     --fc-border-color: #e5e7eb;
-    --fc-button-bg-color: #3b82f6;
-    --fc-button-border-color: #3b82f6;
-    --fc-button-hover-bg-color: #2563eb;
-    --fc-button-hover-border-color: #2563eb;
-    --fc-button-active-bg-color: #1d4ed8;
-    --fc-button-active-border-color: #1d4ed8;
+    --fc-button-bg-color: #2baf19;
+    --fc-button-border-color: #34c921;
+    --fc-button-hover-bg-color: #34c921;
+    --fc-button-hover-border-color: #34c921;
+    --fc-button-active-bg-color: #34c921;
+    --fc-button-active-border-color: #34c921;
     --fc-event-border-color: transparent;
     --fc-today-bg-color: #eff6ff;
-}
+} */
 
 :deep(.fc-toolbar-title) {
     font-size: 1.25rem !important;

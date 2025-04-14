@@ -16,62 +16,45 @@
 <!-- :sortable - boolean -->
 <!-- :enableRowCheckbox - boolean -->
 <!-- :conditionalColumns - object -->
+<!-- :rowClick - string - key path to get value from clicked row -->
+<!-- :action - string or array - determines which action buttons to show -->
 <!-- @edit - edit event -->
 <!-- @delete - delete event -->
+<!-- @view - view event -->
+<!-- @row-click - row click event -->
 
 <template>
     <div class="p-4">
         <!-- Items per page dropdown -->
-        <div class="mb-4 flex items-center space-x-2">
-            <label for="pageSize" class="font-medium">Items per page:</label>
-            <select
-                v-model="currentPageSize"
-                @change="onPageSizeChange"
-                class="appearance-none border rounded px-2 py-1 pr-10 w-20 focus:outline-none focus:ring-2 focus:ring-green-400"
-            >
-                <option
-                    v-for="option in pageSizeOptions"
-                    :key="option"
-                    :value="option"
+        <div class="mb-4 flex items-center justify-between">
+            <!-- Left: Items per page dropdown -->
+            <div>
+                <select
+                    v-model="currentPageSize"
+                    @change="onPageSizeChange"
+                    class="appearance-none border rounded px-2 py-1 pr-10 w-20 h-10 focus:outline-none focus:ring-2 focus:ring-green-400"
                 >
-                    {{ option }}
-                </option>
-            </select>
-        </div>
+                    <option
+                        v-for="option in pageSizeOptions"
+                        :key="option"
+                        :value="option"
+                    >
+                        {{ option }}
+                    </option>
+                </select>
+            </div>
 
-        <!-- Search Field with indicator -->
-        <div class="mb-4 relative">
-            <TextInput
-                type="text"
-                :modelValue="searchQuery"
-                @update:modelValue="immediateSearch"
-                placeholder="Search..."
-                class="pr-8"
-            />
-            <div
-                v-if="isSearching"
-                class="absolute right-3 top-1/2 transform -translate-y-1/2"
-            >
-                <svg
-                    class="animate-spin h-4 w-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                >
-                    <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                    ></circle>
-                    <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                </svg>
+            <!-- Right: Search Field -->
+            <div class="relative">
+                <InputField
+                    type="text"
+                    :modelValue="searchQuery"
+                    @update:modelValue="immediateSearch"
+                    placeholder="Search..."
+                    icon="fas fa-search"
+                    id="table-search"
+                    name="table-search"
+                />
             </div>
         </div>
 
@@ -84,15 +67,15 @@
         </div>
 
         <!-- Table Container with fixed height and vertical scrolling -->
-        <div v-else class="overflow-x-auto" style="max-height: calc(60vh)">
+        <div v-else class="overflow-x-auto border border-gray-200 rounded-sm" style="max-height: calc(60vh)">
             <!-- Data Table (only rendered if no error) -->
-            <table class="min-w-full border-collapse border border-gray-200">
-                <thead class="bg-gray-100 sticky top-0 z-10">
+            <table class="min-w-full border-collapse">
+                <thead class="bg-gray-100 sticky top-0">
                     <tr>
                         <!-- Checkbox header: select all -->
                         <th
                             v-if="enableRowCheckbox"
-                            class="px-4 py-2 border border-gray-200 text-center"
+                            class="px-4 py-2 border-b border-gray-200 text-center w-10"
                         >
                             <input
                                 type="checkbox"
@@ -106,7 +89,7 @@
                             v-for="col in visibleColumns"
                             :key="col.key"
                             @click="sortable && sortBy(col.key)"
-                            class="px-4 py-2 border border-gray-200 cursor-pointer select-none"
+                            class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium cursor-pointer select-none text-left"
                         >
                             <div class="flex items-center space-x-1">
                                 <span>{{ col.title }}</span>
@@ -120,8 +103,8 @@
                             </div>
                         </th>
                         <!-- Actions Column -->
-                        <th class="px-4 py-2 border border-gray-200">
-                            Actions
+                        <th v-if="showActionsColumn" class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                            ACTION
                         </th>
                     </tr>
                 </thead>
@@ -130,11 +113,17 @@
                         v-for="(item, index) in virtualItems"
                         :key="item.id || index"
                         :style="getItemStyle(startIndex + index)"
+                        @click="handleRowClick(item)"
+                        :class="[
+                            'hover:bg-gray-50',
+                            { 'cursor-pointer': props.rowClick }
+                        ]"
+                        class="hover:bg-gray-50"
                     >
                         <!-- Checkbox cell for each row -->
                         <td
                             v-if="enableRowCheckbox"
-                            class="px-4 py-2 border border-gray-200 text-center"
+                            class="px-4 py-2 border-b border-gray-200 text-center"
                         >
                             <input
                                 type="checkbox"
@@ -147,7 +136,7 @@
                         <td
                             v-for="col in visibleColumns"
                             :key="col.key"
-                            class="px-4 py-2 border border-gray-200 text-center"
+                            class="px-4 py-2 border-b border-gray-200"
                         >
                             <template v-if="conditionalColumns[col.key]">
                                 <span
@@ -179,31 +168,52 @@
                                 }}
                             </template>
                         </td>
-                        <td class="px-4 py-2 border border-gray-200 flex justify-center">
-                            <button
-                                @click="onEdit(item)"
-                                class="flex items-center p-2 bg-green-700 text-white rounded-md shadow-sm hover:bg-green-700 transition-colors"
-                            >
-                                <i class="fas fa-edit mr-1"></i>
-                                <span class="font-semibold text-xs">Edit</span>
-                            </button>
-                            <button
-                                @click="onDelete(item)"
-                                class="flex items-center p-2 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700 transition-colors ml-2"
-                            >
-                                <i class="fas fa-trash-alt mr-1"></i>
-                                <span class="font-semibold text-xs">Delete</span>
-                            </button>
+                        <!-- Actions Column -->
+                        <td v-if="showActionsColumn" class="px-4 py-2 border-b border-gray-200">
+                            <div class="flex space-x-2">
+                                <template v-if="Array.isArray(props.action)">
+                                    <button
+                                        v-for="actionType in props.action"
+                                        :key="actionType"
+                                        @click="handleAction(actionType, item)"
+                                        class="px-4 py-1 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 transition-colors text-sm font-medium"
+                                    >
+                                        {{ actionType.charAt(0).toUpperCase() + actionType.slice(1) }}
+                                    </button>
+                                </template>
+                                <template v-else-if="props.action">
+                                    <button
+                                        @click="handleAction(props.action, item)"
+                                        class="px-4 py-1 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 transition-colors text-sm font-medium"
+                                    >
+                                        {{ props.action.charAt(0).toUpperCase() + props.action.slice(1) }}
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <button
+                                        @click="onEdit(item)"
+                                        class="px-4 py-1 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 transition-colors text-sm font-medium"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        @click="onDelete(item)"
+                                        class="px-4 py-1 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700 transition-colors text-sm font-medium"
+                                    >
+                                        Delete
+                                    </button>
+                                </template>
+                            </div>
                         </td>
                     </tr>
                     <tr v-if="paginatedItems.length === 0">
                         <td
                             :colspan="
                                 enableRowCheckbox
-                                    ? visibleColumns.length + 2
-                                    : visibleColumns.length + 1
+                                    ? visibleColumns.length + (showActionsColumn ? 2 : 1)
+                                    : visibleColumns.length + (showActionsColumn ? 1 : 0)
                             "
-                            class="text-center py-4"
+                            class="text-center py-4 border-b border-gray-200"
                         >
                             No matching records found.
                         </td>
@@ -215,47 +225,58 @@
         <!-- Pagination Controls -->
         <div
             v-if="!errorMessage"
-            class="flex items-center justify-center space-x-2 mt-4"
+            class="flex items-center justify-between mt-4 text-sm"
         >
-            <button
-                @click="changePage(currentPage - 1)"
-                :disabled="currentPage === 1"
-                class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
-            >
-                Prev
-            </button>
+            <!-- Showing X to Y of Z results -->
+            <div class="text-gray-600">
+                Showing {{ filteredItems.length > 0 ? (currentPage - 1) * currentPageSize + 1 : 0 }}
+                to {{ Math.min(currentPage * currentPageSize, filteredItems.length) }}
+                of {{ filteredItems.length }} results
+            </div>
 
-            <!-- Dynamic Pagination Buttons -->
-            <template v-for="(page, index) in visiblePages" :key="index">
+            <!-- Pagination Buttons -->
+            <div class="flex items-center space-x-1">
                 <button
-                    v-if="page !== '...'"
-                    @click="changePage(page)"
-                    :class="[
-                        'px-3 py-1 rounded',
-                        currentPage === page
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300',
-                    ]"
+                    @click="changePage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-50"
                 >
-                    {{ page }}
+                    <span>&lt;</span>
                 </button>
-                <span v-else class="px-3 py-1">...</span>
-            </template>
 
-            <button
-                @click="changePage(currentPage + 1)"
-                :disabled="currentPage === totalPages"
-                class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
-            >
-                Next
-            </button>
+                <!-- Dynamic Pagination Buttons -->
+                <template v-for="(page, index) in visiblePages" :key="index">
+                    <button
+                        v-if="page !== '...'"
+                        @click="changePage(page)"
+                        :class="[
+                            'w-8 h-8 flex items-center justify-center rounded border',
+                            currentPage === page
+                                ? 'bg-green-600 text-white border-green-600'
+                                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100',
+                        ]"
+                    >
+                        {{ page }}
+                    </button>
+                    <span v-else class="px-1">...</span>
+                </template>
+
+                <button
+                    @click="changePage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                >
+                    <span>&gt;</span>
+                </button>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, shallowRef, nextTick } from "vue";
+import { ref, computed, watch, onMounted, shallowRef, useSlots } from "vue";
 import TextInput from "@/Components/TextInput.vue";
+import InputField from "@/Components/InputField.vue";
 
 // Props definition including conditionalColumns prop
 const props = defineProps({
@@ -265,12 +286,23 @@ const props = defineProps({
     pageSizeOptions: { type: Array, default: () => [10, 20, 50, 100] },
     enableRowCheckbox: { type: Boolean, default: false },
     sortable: { type: Boolean, default: true },
+    rowClick: { type: String, default: '' },
+    action: { 
+        type: [String, Array],
+        default: null,
+        validator: (value) => {
+            if (Array.isArray(value)) {
+                return value.every(action => typeof action === 'string');
+            }
+            return typeof value === 'string' || value === null;
+        }
+    },
     // conditionalColumns: an object where keys are column names and values are mappings of cell value to CSS class
     conditionalColumns: { type: Object, default: () => ({}) },
 });
 
-// Emits for actions (edit and delete)
-const emit = defineEmits(["edit", "delete"]);
+// Emits for actions and row click
+const emit = defineEmits(["edit", "delete", "view", "row-click"]);
 
 // Use shallowRef for primitive values
 const searchQuery = shallowRef("");
@@ -557,6 +589,22 @@ const onDelete = (item) => {
     emit("delete", item);
 };
 
+// Handle row click event
+const handleRowClick = (item) => {
+    if (props.rowClick) {
+        emit('row-click', {
+            value: getNestedValue(item, props.rowClick),
+            key: props.rowClick,
+            item
+        });
+    }
+};
+
+// Handle different action types
+const handleAction = (actionType, item) => {
+    emit(actionType.toLowerCase(), item);
+};
+
 // Function to return conditional class for a given column and value
 // Memoized for performance
 const classCache = new Map();
@@ -578,6 +626,17 @@ const getConditionalClass = (column, value) => {
     classCache.set(cacheKey, result);
     return result;
 };
+
+// Computed property to determine if actions column should be shown
+const showActionsColumn = computed(() => {
+    // Always show if action prop is set
+    if (props.action !== null) {
+        return true;
+    }
+    
+    // If no action prop is set, show if we have the default edit/delete buttons
+    return true; // Default to showing actions column for backward compatibility
+});
 
 // Watch for changes in props.data to clear caches when data changes completely
 watch(
@@ -632,27 +691,11 @@ const getItemStyle = (index) => {
     return {};
 };
 
-// Add a function to defer heavy operations until after rendering
-const deferOperation = (callback) => {
-    nextTick().then(() => {
-        setTimeout(callback, 0);
-    });
-};
-
 // Update when page or data changes
 watch([currentPage, () => sortedItems.value.length], calculateVirtualWindow);
 
-// Add a loading indicator for visual feedback
-const isSearching = ref(false);
-
 // Replace debounced search with immediate search
 const immediateSearch = (value) => {
-    isSearching.value = true;
     searchQuery.value = value;
-
-    // Clear the loading indicator on the next tick after the filter completes
-    nextTick(() => {
-        isSearching.value = false;
-    });
 };
 </script>

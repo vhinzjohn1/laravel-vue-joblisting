@@ -23,7 +23,7 @@
             <CustomSelect
                 v-if="trainingOptions.length > 0"
                 class="w-full sm:w-64"
-                placeholder="Select from existing training"
+                placeholder="Existing training"
                 :options="trainingOptions"
                 :displayFormat="
                     (option) => `${option.title} - ${option.institution}`

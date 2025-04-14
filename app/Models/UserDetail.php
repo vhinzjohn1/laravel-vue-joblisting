@@ -15,7 +15,7 @@ class UserDetail extends Model
         'user_id',
         'firstname',
         'lastname',
-        'middle_initial',
+        'middle_name',
         'phone_number',
         'eligibility'
     ];

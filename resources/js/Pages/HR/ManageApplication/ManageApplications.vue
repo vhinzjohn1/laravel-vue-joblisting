@@ -8,61 +8,45 @@
 
         <div class="py-5">
             <div class="container-fluid px-4">
-                <Breadcrumbs
-                    :items="[
-                        { name: 'Home', href: route('applications.index') },
-                        {
-                            name: 'Manage Applications',
-                            href: route('applications.index'),
-                            active: true,
-                        },
-                    ]"
-                />
 
                 <div
-                    class="card shadow-sm rounded-lg overflow-hidden bg-white mb-6"
+                    class="card shadow-sm rounded-lg overflow-hidden bg-white"
                 >
-                    <div class="card-header bg-white py-4 px-4 border-b">
+                    <div class="card-header bg-white py-2 px-4 border-b">
                         <div
                             class="flex flex-col md:flex-row justify-center items-center gap-3"
                         >
-                            <div class="relative w-full md:w-1/2 max-w-xl">
-                                <div class="flex">
-                                    <TextInput
-                                        type="text"
-                                        class="w-full rounded-r-none"
-                                        placeholder="Search applications..."
-                                        v-model="searchQuery"
-                                    />
-                                    <button
-                                        class="px-4 bg-gray-100 text-gray-700 border border-l-0 border-gray-300 rounded-r-lg hover:bg-gray-200 transition-colors"
+                            <div class="w-full flex flex-col md:flex-row items-center justify-between">
+                                <div class="px-2">
+                                    <h1
+                                        class="text-2xl font-bold uppercase tracking-wider sm:mb-0"
                                     >
-                                        <i class="fas fa-search"></i>
-                                    </button>
+                                        Manage Applications
+                                    </h1>
                                 </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <CustomSelect
-                                    v-model="statusFilter"
-                                    :options="statuses"
-                                    :displayFormat="(option) => option"
-                                    placeholder="All Statuses"
-                                    class="w-72"
-                                />
+                                <div class="flex gap-3 items-center justify-center">
+                                    <CustomSelect
+                                        v-model="statusFilter"
+                                        :options="statuses"
+                                        :displayFormat="(option) => option"
+                                        placeholder="All Statuses"
+                                        class="w-full sm:w-72"
+                                    />
 
-                                <CustomSelect
-                                    v-model="jobTitleFilter"
-                                    :options="jobListings"
-                                    :displayFormat="
-                                        (option) =>
-                                            option.job_listing_id === ''
-                                                ? option.title
-                                                : option.title
-                                    "
-                                    valueKey="job_listing_id"
-                                    placeholder="All Job Titles"
-                                    class="w-72"
-                                />
+                                    <CustomSelect
+                                        v-model="jobTitleFilter"
+                                        :options="jobListings"
+                                        :displayFormat="
+                                            (option) =>
+                                                option.job_listing_id === ''
+                                                    ? option.title
+                                                    : option.title
+                                        "
+                                        valueKey="job_listing_id"
+                                        placeholder="All Job Titles"
+                                        class="w-72"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -97,189 +81,42 @@
 
                         <div v-else>
                             <div class="overflow-x-auto">
-                                <table
-                                    class="min-w-full divide-y divide-gray-200"
-                                >
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th
-                                                scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Applicant
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Job Title
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Position
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Applied Date
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Status
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        class="bg-white divide-y divide-gray-200"
-                                    >
-                                        <tr
-                                            v-for="application in filteredApplications"
-                                            :key="application.application_id"
-                                            class="hover:bg-gray-50 cursor-pointer"
-                                            @click="
-                                                viewDetails(
-                                                    application.application_id,
-                                                )
-                                            "
-                                        >
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap"
-                                            >
-                                                <div class="flex items-center">
-                                                    <div
-                                                        class="flex-shrink-0 h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center"
-                                                    >
-                                                        <span
-                                                            class="text-sm font-medium text-gray-600"
-                                                        >
-                                                            {{
-                                                                application.user.user_detail.firstname.charAt(
-                                                                    0,
-                                                                )
-                                                            }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="ml-4">
-                                                        <div
-                                                            class="text-sm font-medium text-gray-900"
-                                                        >
-                                                            {{
-                                                                `${application.user.user_detail.firstname} ${application.user.user_detail.lastname}`
-                                                            }}
-                                                        </div>
-                                                        <div
-                                                            class="text-sm text-gray-500"
-                                                        >
-                                                            {{
-                                                                application.user
-                                                                    .email
-                                                            }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap"
-                                            >
-                                                <div
-                                                    class="text-sm font-medium text-gray-900"
-                                                >
-                                                    {{
-                                                        application.job_listing
-                                                            .title
-                                                    }}
-                                                </div>
-                                            </td>
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap"
-                                            >
-                                                <div
-                                                    class="text-sm text-gray-500"
-                                                >
-                                                    {{
-                                                        application.job_listing
-                                                            .position
-                                                            .position_name
-                                                    }}
-                                                </div>
-                                            </td>
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap"
-                                            >
-                                                <div
-                                                    class="text-sm text-gray-500"
-                                                >
-                                                    {{
-                                                        formatDate(
-                                                            application.created_at,
-                                                        )
-                                                    }}
-                                                </div>
-                                            </td>
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap"
-                                            >
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                                    :class="{
-                                                        'bg-yellow-100 text-yellow-800':
-                                                            application.status ===
-                                                            'Pending',
-                                                        'bg-green-100 text-green-800':
-                                                            application.status ===
-                                                            'Qualified',
-                                                        'bg-red-100 text-red-800':
-                                                            application.status ===
-                                                            'Rejected',
-                                                        'bg-blue-100 text-blue-800':
-                                                            application.status ===
-                                                            'Competency Exam',
-                                                        'bg-purple-100 text-purple-800':
-                                                            application.status ===
-                                                            'Interview',
-                                                        'bg-gray-100 text-gray-800':
-                                                            ![
-                                                                'Pending',
-                                                                'Qualified',
-                                                                'Rejected',
-                                                                'Competency Exam',
-                                                                'Interview',
-                                                            ].includes(
-                                                                application.status,
-                                                            ),
-                                                    }"
-                                                >
-                                                    {{ application.status }}
-                                                </span>
-                                            </td>
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                            >
-                                                <button
-                                                    @click.stop="
-                                                        viewDetails(
-                                                            application.application_id,
-                                                        )
-                                                    "
-                                                    class="text-green-800 hover:text-green-900"
-                                                >
-                                                    View Details
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <DataTable
+                                    :data="filteredApplications"
+                                    :columns="[
+                                        {
+                                            key: 'user.user_detail.firstname',
+                                            title: 'First Name',
+                                        },
+                                        {
+                                            key: 'user.user_detail.lastname',
+                                            title: 'Last Name',
+                                        },
+                                        {
+                                            key: 'user.email',
+                                            title: 'Email',
+                                        },
+                                        {
+                                            key: 'job_listing.title',
+                                            title: 'Job Title',
+                                        },
+                                        {
+                                            key: 'job_listing.position.position_name',
+                                            title: 'Position Name',
+                                        },
+                                        {
+                                            key: 'created_at',
+                                            title: 'Applied Date',
+                                        },
+                                        {
+                                            key: 'status',
+                                            title: 'Status',
+                                        }
+                                    ]"
+                                    action="view"
+                                    :row-click="'application_id'"
+                                    @row-click="({ value }) => viewDetails(value)"
+                                />
                             </div>
                         </div>
                     </div>
@@ -291,12 +128,11 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
-import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
-import TextInput from "@/Components/TextInput.vue";
+import DataTable from "@/Components/DataTable.vue";
 
 const props = defineProps({
     applications: {
@@ -363,6 +199,8 @@ const filteredApplications = computed(() => {
 
     return filtered;
 });
+
+console.log("Filtered Applications:",filteredApplications.value);
 
 const formatDate = (dateString) => {
     if (!dateString) return "N/A";

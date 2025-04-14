@@ -18,9 +18,7 @@ class MyApplicationsController extends Controller
         $applications = Application::with([
             'jobListing' => function ($query) {
                 $query->with(['position']);
-            },
-            'documents',
-            'statusHistory'
+            }
         ])
             ->where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')

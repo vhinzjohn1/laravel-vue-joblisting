@@ -9,25 +9,6 @@
 
         <div class="py-5">
             <div class="container-fluid px-4">
-                <!-- Breadcrumbs -->
-                <Breadcrumbs
-                    :items="[
-                        { name: 'Home', href: route('applicant.index') },
-                        {
-                            name: 'My Applications',
-                            href: route('my-applications.index'),
-                        },
-                        {
-                            name: application.job_listing.title,
-                            href: route(
-                                'my-applications.show',
-                                application.application_id,
-                            ),
-                            active: true,
-                        },
-                    ]"
-                />
-
                 <!-- Success Message -->
                 <div
                     v-if="$page.props.flash && $page.props.flash.success"
@@ -85,7 +66,7 @@
                                     'bg-yellow-50 border border-yellow-200':
                                         application.status === 'Pending' ||
                                         application.status === 'Interview' ||
-                                        application.status === 'Qualified' ||
+                                        application.status === 'qualified' ||
                                         application.status ===
                                             'Competency Exam',
                                     'bg-red-50 border border-red-200':
@@ -103,9 +84,9 @@
                                             application.status ===
                                                 'Interview' ||
                                             application.status ===
-                                                'Qualified' ||
+                                                'qualified' ||
                                             application.status ===
-                                                'Competency Exam',
+                                                'competency exam',
                                         'text-red-500':
                                             application.status === 'Rejected' ||
                                             application.status ===
@@ -361,9 +342,9 @@
                                                         history.new_status ===
                                                             'Interview' ||
                                                         history.new_status ===
-                                                            'Qualified' ||
+                                                            'qualified' ||
                                                         history.new_status ===
-                                                            'Competency Exam',
+                                                            'competency exam',
                                                     'bg-red-500':
                                                         history.new_status ===
                                                             'Rejected' ||
@@ -388,9 +369,9 @@
                                                                 history.new_status ===
                                                                     'Interview' ||
                                                                 history.new_status ===
-                                                                    'Qualified' ||
+                                                                    'qualified' ||
                                                                 history.new_status ===
-                                                                    'Competency Exam',
+                                                                    'competency exam',
                                                             'bg-red-100 text-red-800':
                                                                 history.new_status ===
                                                                     'Rejected' ||

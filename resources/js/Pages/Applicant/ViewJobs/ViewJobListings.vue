@@ -289,7 +289,8 @@ import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 // Fetching Props that was sent by controller
 const jobs = ref(usePage().props.jobListings);
 
-console.log("This is the props ", usePage().props);
+// Check if user is logged in the dynamically change the layout
+const user = ref(usePage().props.auth.user);
 // Search functionality
 const searchQuery = ref("");
 const filteredJobs = computed(() => {

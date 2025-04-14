@@ -1,28 +1,9 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
-import { ref, onMounted } from "vue";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 const asset = (path) => {
     return `/${path}`;
-};
-
-const isMobileMenuOpen = ref(false);
-const mobileMenuClasses = ref("opacity-0 -translate-y-10 hidden");
-
-const toggleMobileMenu = () => {
-    isMobileMenuOpen.value = !isMobileMenuOpen.value;
-    if (isMobileMenuOpen.value) {
-        mobileMenuClasses.value = "opacity-100 translate-y-0 block";
-    } else {
-        // Set to transitioning out state first
-        mobileMenuClasses.value = "opacity-0 -translate-y-10 block";
-        // Then hide after transition completes
-        setTimeout(() => {
-            if (!isMobileMenuOpen.value) {
-                mobileMenuClasses.value = "opacity-0 -translate-y-10 hidden";
-            }
-        }, 300);
-    }
 };
 
 defineProps({
@@ -41,151 +22,19 @@ defineProps({
         required: true,
     },
 });
-
-// Check screen size on mount and when resized
-const isSmallScreen = ref(false);
-
-onMounted(() => {
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-});
-
-const checkScreenSize = () => {
-    isSmallScreen.value = window.innerWidth < 1024; // lg breakpoint
-};
 </script>
 
 <template>
     <Head>
         <title>CMU Job Listing</title>
+        <meta name="description" content="Streamlined HR job posting and application management system. Empower HR teams with efficient tools while making it easier for applicants to find and apply for opportunities." />
     </Head>
 
-    <div class="relative min-h-screen bg-white overflow-hidden">
-        <!-- Navigation -->
-        <header class="fixed w-full bg-white shadow-md z-50">
-            <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                <div class="flex justify-between items-center">
-                    <a href="#" class="flex items-center space-x-3">
-                        <img
-                            :src="asset('img/cmulogo.png')"
-                            alt="CMU Logo"
-                            class="w-10 h-10 sm:w-12 sm:h-12"
-                        />
-                        <span
-                            class="font-semibold text-green-800 text-sm sm:text-base lg:text-xl"
-                        >
-                            Central Mindanao University
-                        </span>
-                    </a>
-
-                    <!-- Hamburger Menu Button -->
-                    <button @click="toggleMobileMenu" class="lg:hidden">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6 text-green-800"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                v-if="!isMobileMenuOpen"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"
-                            />
-                            <path
-                                v-else
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-
-                    <!-- Desktop Menu -->
-                    <div class="hidden lg:flex items-center space-x-8">
-                        <a
-                            href="#home"
-                            class="text-green-800 hover:text-green-600"
-                            >Home</a
-                        >
-                        <a
-                            href="#how-to-apply"
-                            class="text-green-800 hover:text-green-600"
-                            >How to Apply</a
-                        >
-                        <a
-                            href="#about"
-                            class="text-green-800 hover:text-green-600"
-                            >About</a
-                        >
-                        <div class="flex space-x-4">
-                            <Link
-                                v-if="canLogin"
-                                :href="route('login')"
-                                class="px-6 py-2 border-2 border-green-800 text-green-800 rounded-md hover:bg-green-800 hover:text-white transition-colors"
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                v-if="canRegister"
-                                :href="route('register')"
-                                class="px-6 py-2 bg-green-800 text-white border-2 border-green-800 rounded-md hover:text-green-800 transition-colors"
-                            >
-                                Register
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mobile Menu -->
-                <div
-                    :class="mobileMenuClasses"
-                    class="lg:hidden mt-4 transition-all duration-300 ease-in-out"
-                >
-                    <div class="flex flex-col space-y-4">
-                        <a
-                            href="#home"
-                            class="text-green-800 hover:text-green-600"
-                            >Home</a
-                        >
-                        <a
-                            href="#how-to-apply"
-                            class="text-green-800 hover:text-green-600"
-                            >How to Apply</a
-                        >
-                        <a
-                            href="#about"
-                            class="text-green-800 hover:text-green-600"
-                            >About</a
-                        >
-                        <div class="flex flex-col space-y-2">
-                            <Link
-                                v-if="canLogin"
-                                :href="route('login')"
-                                class="px-6 py-2 border-2 border-green-800 text-green-800 rounded-md hover:bg-green-800 hover:text-white transition-colors text-center"
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                v-if="canRegister"
-                                :href="route('register')"
-                                class="px-6 py-2 bg-green-800 text-white border-2 border-green-800 rounded-md hover:text-green-800 transition-colors text-center"
-                            >
-                                Register
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
+    <GuestLayout :can-login="canLogin" :can-register="canRegister">
         <!-- Main Content Wrapper -->
         <div class="relative w-full">
             <!-- Hero Section -->
-            <section id="home" class="min-h-screen flex items-center pt-16">
+            <section id="home" class="min-h-screen flex items-center">
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div
                         class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center py-12 lg:py-0"
@@ -224,8 +73,7 @@ const checkScreenSize = () => {
 
                         <!-- Right Content - Animated Showcase (Only visible on large screens) -->
                         <div
-                            v-if="!isSmallScreen"
-                            class="relative mt-8 lg:mt-0 hidden lg:block"
+                            class="relative mt-8 lg:mt-0 lg:block"
                             data-aos="fade-left"
                             data-aos-duration="1000"
                             data-aos-mirror="true"
@@ -428,7 +276,6 @@ const checkScreenSize = () => {
             <section
                 id="process"
                 class="min-h-screen bg-gray-50 py-16 lg:py-20"
-                v-if="isSmallScreen"
                 data-aos="fade-up"
                 data-aos-mirror="true"
             >
@@ -1253,45 +1100,53 @@ const checkScreenSize = () => {
                 </p>
             </footer>
         </div>
-    </div>
+    </GuestLayout>
 </template>
 
 <style>
 /* Global styles to prevent horizontal scroll */
 html,
 body {
+    max-width: 100vw;
     overflow-x: hidden;
-    width: 100%;
-    position: relative;
 }
 
-/* Container styles */
-.container {
-    width: 100%;
-    max-width: 80rem; /* max-w-7xl equivalent */
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Section spacing */
+/* Section styles */
 section {
     scroll-margin-top: 5rem;
     width: 100%;
 }
 
-/* Full height sections */
-.min-h-screen {
-    min-height: 100vh;
+/* Optimize SVG rendering */
+svg {
+    shape-rendering: geometricPrecision;
 }
 
-/* Ensure images don't cause overflow */
-img {
-    max-width: 100%;
-    height: auto;
+/* Custom transitions */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
 }
 
-/* Smooth scrolling */
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* Smooth scroll behavior */
 html {
     scroll-behavior: smooth;
+}
+
+/* Mobile menu transition */
+.mobile-menu-enter-active,
+.mobile-menu-leave-active {
+    transition: all 0.3s ease-out;
+}
+
+.mobile-menu-enter-from,
+.mobile-menu-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
 }
 </style>

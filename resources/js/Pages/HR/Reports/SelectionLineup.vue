@@ -1,8 +1,9 @@
 <script setup>
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, router } from "@inertiajs/vue3";
 import Header from "@/Components/Header/Header.vue";
 import { computed, ref } from "vue";
+import DataTable from "@/Components/DataTable.vue";
 
 const props = defineProps({
     jobListings: Array,
@@ -49,6 +50,10 @@ const formatDate = (dateString) => {
     });
 };
 
+const viewDetails = (id) => {
+    router.visit(route('selection-lineup.show', id));
+};
+
 const print = () => {
     window.print();
 };
@@ -83,75 +88,35 @@ const print = () => {
                                 lineup
                             </p>
                         </div>
-                        <div class="card-body p-4">
-                            <div
-                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-                            >
-                                <div
-                                    v-for="job in jobListings"
-                                    :key="job.job_listing_id"
-                                    class="bg-white rounded-xl border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col"
-                                >
-                                    <div class="p-6 flex flex-col h-full">
-                                        <!-- Job Title and Position -->
-                                        <div class="mb-4">
-                                            <h5
-                                                class="font-bold text-gray-900 text-lg mb-2"
-                                            >
-                                                {{ job.title }}
-                                            </h5>
-                                            <p class="text-gray-600">
-                                                {{ job.position.position_name }}
-                                            </p>
-                                        </div>
-
-                                        <!-- Job Details -->
-                                        <div class="flex flex-wrap gap-2 mb-4">
-                                            <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-green-50 text-green-900"
-                                            >
-                                                &#x20B1;{{
-                                                    job.position.salary_grade.amount.toLocaleString()
-                                                }}
-                                            </span>
-                                            <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-900"
-                                            >
-                                                {{ job.category }}
-                                            </span>
-                                        </div>
-
-                                        <!-- Closing Date -->
-                                        <div class="mb-4 text-sm text-gray-600">
-                                            <span class="font-medium"
-                                                >Closing Date:</span
-                                            >
-                                            {{ formatDate(job.closing_date) }}
-                                        </div>
-
-                                        <!-- Action Button -->
-                                        <div
-                                            class="mt-auto pt-4 border-t border-gray-100"
-                                        >
-                                            <Link
-                                                :href="
-                                                    route(
-                                                        'selection-lineup.show',
-                                                        job.job_listing_id,
-                                                    )
-                                                "
-                                                class="w-full inline-flex justify-center items-center px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors"
-                                            >
-                                                <i
-                                                    class="fas fa-users mr-2"
-                                                ></i>
-                                                View Selection Lineup
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Data Table for Selection Lineup -->
+                        <DataTable
+                            :data="jobListings"
+                            :columns="[
+                                {
+                                    key: 'title',
+                                    title: 'Job Title',
+                                },
+                                {
+                                    key: 'position.position_name',
+                                    title: 'Position Name',
+                                },
+                                {
+                                    key: 'position.item_number',
+                                    title: 'Item No.',
+                                },
+                                {
+                                    key: 'category',
+                                    title: 'Category',
+                                },
+                                {
+                                    key: 'closing_date',
+                                    title: 'Closing Date',
+                                },
+                            ]"
+                            action="view"
+                            :row-click="'job_listing_id'"
+                            @row-click="({ value }) => viewDetails(value)"
+                        />
                     </div>
 
                     <!-- Show View - Selection Lineup for specific job -->

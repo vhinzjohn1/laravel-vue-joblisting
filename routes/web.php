@@ -26,30 +26,32 @@ use App\Models\User;
 use App\Http\Controllers\Applicant\ScheduleController as ApplicantScheduleController;
 use App\Http\Controllers\HR\SelectionLineupController;
 use App\Http\Controllers\ProfileCompletionController;
+use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 // Server Side Welcome Page (Blade)
 Route::get('/', function () {
     // If the user is authenticated, redirect based on role
     if (auth()->check()) {
-        $user = auth()->user();
-        $role = $user->role_name ?? null;
-
-        switch ($role) {
-            case 'admin':
-                return redirect()->route('admin.index');
-            case 'hr':
-                return redirect()->route('hr.index');
-            case 'applicant':
-                return redirect()->route('applicant.index');
-        }
+        return redirect()->route(auth()->user()->role_name . '.index');
     }
-
-    // Otherwise, show the welcome page for guests as a Blade template (server-side rendered)
-    return view('welcome', [
-        'canLogin'       => Route::has('login'),
-        'canRegister'    => Route::has('register')
-    ]);
+    else {  
+        $jobListings = (new WelcomeController)->index();
+        // Otherwise, show the welcome page for guests as a Blade template (server-side rendered) with welcome controller index
+        return view('welcome', [
+            'canLogin'       => Route::has('login'),
+            'canRegister'    => Route::has('register'),
+            'jobListings'    => $jobListings
+        ]);
+    }
 })->name('/');
+
+// Fallback to root if route is not found
+Route::fallback(function () {
+    return redirect('/');
+});
+
 
 // Client Side Welcome Page (Inertia)
 Route::get('welcome', function () {
@@ -73,6 +75,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('profile-details/{type}/{id}', [ProfileDetailsController::class, 'destroy'])->name('profile-details.destroy');
 });
 
+Route::post('login/validate', [AuthenticatedSessionController::class, 'validateCredentials'])
+    ->middleware('guest')
+    ->name('login.validate');
+
+Route::post('register/validate', [RegisteredUserController::class, 'validateRegistration'])
+    ->middleware('guest')
+    ->name('register.validate');
 
 // Admin Route Group
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -104,31 +113,27 @@ Route::middleware(['auth', 'role:applicant'])->group(function () {
 });
 
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::resource('send-email', EmailController::class);
     Route::get('test-notification-email', [EmailController::class, 'sendTestNotification'])->name('email.test-notification');
     Route::post('notify-applicant', [EmailController::class, 'notifyApplicant'])->name('email.notify-applicant');
     Route::resource('schedules', ScheduleController::class);
+
+     // Notification routes
+     Route::resource('notifications', NotificationController::class)->only(['index']);
+     Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+     Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+ 
+     // Position routes
+     Route::resource('position', PositionController::class);
+ 
+     // Profile completion routes
+     Route::resource('complete-profile', ProfileCompletionController::class);
 });
 
-Route::middleware(['auth'])->group(function () {
-    // Notification routes
-    Route::resource('notifications', NotificationController::class)->only(['index']);
-    Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
-    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
-    Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
 
-    // Position routes
-    Route::resource('position', PositionController::class);
-
-    // Profile completion routes
-    Route::resource('complete-profile', ProfileCompletionController::class);
-});
-
-// Fallback to root
-Route::fallback(function () {
-    return redirect('/');
-});
+Route::resource('server-side-home', WelcomeController::class);
 
 // Route::get('/php-info', function () {
 //     return [
@@ -141,4 +146,3 @@ Route::get('/php-info', function () {
 });
 
 require __DIR__ . '/auth.php';
-

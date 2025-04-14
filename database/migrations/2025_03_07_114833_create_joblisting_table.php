@@ -66,7 +66,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('firstname')->nullable();
             $table->string('lastname')->nullable();
-            $table->string('middle_initial')->nullable();
+            $table->string('middle_name')->nullable();
             $table->string('phone_number')->nullable();
             $table->string('eligibility')->nullable();
             $table->timestamps();
@@ -80,7 +80,7 @@ return new class extends Migration
             'user_id'        => $applicantId,
             'firstname'      => 'Vhinz John',
             'lastname'       => 'Balinas',
-            'middle_initial' => 'H',
+            'middle_name'    => 'Hinoay',
             'phone_number'   => '0912345678',
             'eligibility'    => null,
             'created_at'     => now(),

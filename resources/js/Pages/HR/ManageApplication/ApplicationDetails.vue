@@ -8,24 +8,6 @@
 
         <div class="py-5">
             <div class="container-fluid px-4">
-                <Breadcrumbs
-                    :items="[
-                        { name: 'Home', href: route('applications.index') },
-                        {
-                            name: 'Manage Applications',
-                            href: route('applications.index'),
-                        },
-                        {
-                            name: 'Application Details',
-                            href: route(
-                                'applications.show',
-                                application.application_id,
-                            ),
-                            active: true,
-                        },
-                    ]"
-                />
-
                 <!-- Main Content Relative Wrapper -->
                 <div class="relative">
                     <!-- Main Content without Sidebar Margin -->
@@ -87,42 +69,10 @@
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 mr-2 text-gray-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                        />
-                                                    </svg>
+                                                   <i class="fas fa-user mr-2"></i>
                                                     Applicant Information
                                                 </h2>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    :class="[
-                                                        'h-5 w-5 text-gray-500 section-toggle',
-                                                        {
-                                                            collapsed:
-                                                                !sectionStates.applicant,
-                                                        },
-                                                    ]"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-chevron-down section-toggle" :class="{ 'fa-chevron-up': sectionStates.applicant }"></i>
                                             </div>
                                             <div
                                                 v-show="sectionStates.applicant"
@@ -195,42 +145,10 @@
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 mr-2 text-gray-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                                        />
-                                                    </svg>
+                                                    <i class="fas fa-briefcase mr-2"></i>
                                                     Job Information
                                                 </h2>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    :class="[
-                                                        'h-5 w-5 text-gray-500 section-toggle',
-                                                        {
-                                                            collapsed:
-                                                                !sectionStates.job,
-                                                        },
-                                                    ]"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-chevron-down section-toggle" :class="{ 'fa-chevron-up': sectionStates.job }"></i>
                                             </div>
                                             <div
                                                 v-show="sectionStates.job"
@@ -309,48 +227,10 @@
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 mr-2 text-gray-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            d="M12 14l9-5-9-5-9 5 9 5z"
-                                                        />
-                                                        <path
-                                                            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-                                                        />
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
-                                                        />
-                                                    </svg>
+                                                    <i class="fas fa-graduation-cap mr-2"></i>
                                                     Educational Background
                                                 </h2>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    :class="[
-                                                        'h-5 w-5 text-gray-500 section-toggle',
-                                                        {
-                                                            collapsed:
-                                                                !sectionStates.education,
-                                                        },
-                                                    ]"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-chevron-down section-toggle" :class="{ 'fa-chevron-up': sectionStates.education }"></i>
                                             </div>
                                             <div
                                                 v-show="sectionStates.education"
@@ -470,42 +350,10 @@
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 mr-2 text-gray-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                                                        />
-                                                    </svg>
+                                                    <i class="fas fa-certificate mr-2"></i>
                                                     Training & Certifications
                                                 </h2>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    :class="[
-                                                        'h-5 w-5 text-gray-500 section-toggle',
-                                                        {
-                                                            collapsed:
-                                                                !sectionStates.training,
-                                                        },
-                                                    ]"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-chevron-down section-toggle" :class="{ 'fa-chevron-up': sectionStates.training }"></i>
                                             </div>
                                             <div
                                                 v-show="sectionStates.training"
@@ -616,42 +464,10 @@
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 mr-2 text-gray-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                                        />
-                                                    </svg>
+                                                    <i class="fas fa-briefcase mr-2"></i>
                                                     Work Experience
                                                 </h2>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    :class="[
-                                                        'h-5 w-5 text-gray-500 section-toggle',
-                                                        {
-                                                            collapsed:
-                                                                !sectionStates.workExperience,
-                                                        },
-                                                    ]"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-chevron-down section-toggle" :class="{ 'fa-chevron-up': sectionStates.workExperience }"></i>
                                             </div>
                                             <div
                                                 v-show="
@@ -768,42 +584,10 @@
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 mr-2 text-gray-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                                        />
-                                                    </svg>
+                                                    <i class="fas fa-file-alt mr-2"></i>
                                                     Application Documents
                                                 </h2>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    :class="[
-                                                        'h-5 w-5 text-gray-500 section-toggle',
-                                                        {
-                                                            collapsed:
-                                                                !sectionStates.documents,
-                                                        },
-                                                    ]"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-chevron-down section-toggle" :class="{ 'fa-chevron-up': sectionStates.documents }"></i>
                                             </div>
                                             <div
                                                 v-show="sectionStates.documents"
@@ -839,20 +623,7 @@
                                                                 :for="`doc-${doc.document_id}`"
                                                                 class="flex items-center cursor-pointer"
                                                             >
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    class="h-5 w-5 text-gray-500 mr-2"
-                                                                    fill="none"
-                                                                    viewBox="0 0 24 24"
-                                                                    stroke="currentColor"
-                                                                >
-                                                                    <path
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                                                    />
-                                                                </svg>
+                                                                <i class="fas fa-file-alt mr-2 text-gray-600"></i>
                                                                 <span
                                                                     class="text-gray-800"
                                                                     >{{
@@ -876,26 +647,7 @@
                                                             "
                                                             class="text-green-800 hover:text-green-700 px-3 py-1 rounded hover:bg-green-50 transition-colors flex items-center"
                                                         >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                class="h-4 w-4 mr-1"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke="currentColor"
-                                                            >
-                                                                <path
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                />
-                                                                <path
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                />
-                                                            </svg>
+                                                            <i class="fas fa-eye mr-1"></i>
                                                             View
                                                         </button>
                                                     </div>
@@ -918,20 +670,7 @@
                                             <h2
                                                 class="text-lg font-semibold mb-4 text-gray-800 flex items-center"
                                             >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    class="h-5 w-5 mr-2 text-gray-600"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-clipboard-list mr-2"></i>
                                                 Application Summary
                                             </h2>
                                             <div class="space-y-4">
@@ -993,20 +732,7 @@
                                             <h2
                                                 class="text-lg font-semibold mb-4 text-gray-800 flex items-center"
                                             >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    class="h-5 w-5 mr-2 text-gray-600"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-edit mr-2"></i>
                                                 Update Status
                                             </h2>
                                             <form
@@ -1081,47 +807,13 @@
                                                 <h2
                                                     class="text-lg font-semibold text-gray-800 flex items-center"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 mr-2 text-gray-600"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                                                        />
-                                                    </svg>
+                                                    <i class="fas fa-history mr-2"></i>
                                                     Status History
                                                 </h2>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    :class="[
-                                                        'h-5 w-5 text-gray-500 section-toggle',
-                                                        {
-                                                            collapsed:
-                                                                !sectionStates.statusHistory,
-                                                        },
-                                                    ]"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
+                                                <i class="fas fa-chevron-down section-toggle" :class="{ 'fa-chevron-up': sectionStates.statusHistory }"></i>
                                             </div>
                                             <div
-                                                v-show="
-                                                    sectionStates.statusHistory
-                                                "
+                                                v-show="sectionStates.statusHistory"
                                                 class="section-content"
                                             >
                                                 <div
@@ -1209,20 +901,7 @@
                                 <h3
                                     class="text-lg font-medium text-gray-800 flex items-center"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 mr-2 text-gray-600"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                        />
-                                    </svg>
+                                    <i class="fas fa-file-alt mr-2 text-gray-600"></i>
                                     {{
                                         currentDocument
                                             ? currentDocument.document_type
@@ -1238,20 +917,7 @@
                                     @click="closeDocumentSidebar"
                                     class="text-gray-500 hover:text-gray-700 focus:outline-none p-2 rounded-full hover:bg-gray-100 transition-colors"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-6 w-6"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"
-                                        />
-                                    </svg>
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </div>
 
@@ -1268,26 +934,7 @@
                                     class="flex items-center justify-center h-full"
                                 >
                                     <p class="text-gray-500">
-                                        <svg
-                                            class="animate-spin h-8 w-8 text-gray-400 mx-auto mb-2"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle
-                                                class="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                stroke-width="4"
-                                            ></circle>
-                                            <path
-                                                class="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                            ></path>
-                                        </svg>
+                                        <i class="fas fa-spinner animate-spin h-8 w-8 text-gray-400 mx-auto mb-2"></i>
                                         Loading document...
                                     </p>
                                 </div>
@@ -1300,20 +947,7 @@
                                         @click="closeDocumentSidebar"
                                         class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-4 mr-1"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"
-                                            />
-                                        </svg>
+                                        <i class="fas fa-times mr-2"></i>
                                         Close
                                     </button>
                                     <a
@@ -1322,20 +956,7 @@
                                         target="_blank"
                                         class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-800 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-4 mr-1"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                            />
-                                        </svg>
+                                        <i class="fas fa-external-link-alt mr-2"></i>
                                         Open in new tab
                                     </a>
                                 </div>
@@ -1353,7 +974,6 @@ import { ref, computed, onMounted, watch } from "vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
-import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 
 const props = defineProps({
     application: {

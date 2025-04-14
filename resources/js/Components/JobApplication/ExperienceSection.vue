@@ -23,7 +23,7 @@
             <CustomSelect
                 v-if="experienceOptions.length > 0"
                 class="w-full sm:w-64"
-                placeholder="Select from existing experience"
+                placeholder="Existing experience"
                 :options="experienceOptions"
                 :displayFormat="
                     (option) => `${option.position} at ${option.company_name}`

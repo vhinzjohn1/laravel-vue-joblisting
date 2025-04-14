@@ -25,9 +25,7 @@ class ManageApplicationController extends Controller
             },
             'user' => function ($query) {
                 $query->with('userDetail');
-            },
-            'documents',
-            'statusHistory'
+            }
         ])
             ->orderBy('created_at', 'desc')
             ->get();

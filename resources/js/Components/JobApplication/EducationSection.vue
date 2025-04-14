@@ -35,7 +35,7 @@
             <CustomSelect
                 v-if="educationOptions.length > 0"
                 class="w-full sm:w-64"
-                placeholder="Select from existing education"
+                placeholder="Existing education"
                 :options="educationOptions"
                 :displayFormat="
                     (option) =>

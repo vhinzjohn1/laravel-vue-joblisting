@@ -6,16 +6,16 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 
-const user = usePage().props.auth.user;
 const userDetails = ref(null);
 const emit = defineEmits(["step-completed"]);
 const isFormValid = ref(false);
 const userCredentials = ref();
+const currentRoute = usePage().url;
 
 const form = useForm({
     firstname: "",
     lastname: "",
-    middle_initial: "",
+    middle_name: "",
     phone_number: "",
     eligibility: "",
     email: ""
@@ -46,7 +46,7 @@ const fetchUserDetails = async () => {
             // Populate form fields with the fetched data
             form.firstname = userDetails.value.firstname || "";
             form.lastname = userDetails.value.lastname || "";
-            form.middle_initial = userDetails.value.middle_initial || "";
+            form.middle_name = userDetails.value.middle_name || "";
             form.phone_number = userDetails.value.phone_number || "";
             form.eligibility = userDetails.value.eligibility || "";
             form.email = userCredentials.value.email || ""; // Use userCredentials for email
@@ -147,25 +147,25 @@ onMounted(() => {
 
                     <div>
                         <InputLabel
-                            for="middle_initial"
-                            value="Middle Initial"
+                            for="middle_name"
+                            value="Middle Name"
                             class="text-gray-700 font-medium"
                         />
                         <TextInput
-                            id="middle_initial"
+                            id="middle_name"
                             type="text"
                             class="mt-1 block w-full"
-                            v-model="form.middle_initial"
+                            v-model="form.middle_name"
                             maxlength="1"
-                            placeholder="M"
+                            placeholder="Enter Middle Name"
                             @input="
-                                form.middle_initial =
+                                form.middle_name =
                                     $event.target.value.toUpperCase()
                             "
                         />
                         <InputError
                             class="mt-2"
-                            :message="form.errors.middle_initial"
+                            :message="form.errors.middle_name"
                         />
                     </div>
 
@@ -196,8 +196,8 @@ onMounted(() => {
                         />
                     </div>
 
-                    <!-- Email -->
-                    <div>
+                    <!-- Email if current route is complete-profile not show -->
+                    <div v-if="currentRoute !== '/complete-profile'">
                         <InputLabel
                             for="email"
                             value="Email"
