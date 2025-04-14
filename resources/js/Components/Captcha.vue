@@ -24,7 +24,7 @@
         </svg>
       </button>
     </div>
-    
+
     <div class="input-container">
       <input
         type="text"
@@ -37,9 +37,17 @@
       />
       <input type="hidden" :name="tokenName" :value="token" />
     </div>
-    
+
     <div v-if="error" class="error-message">
-      {{ error }}
+      <div class="flex items-center text-red-600">
+        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+      <div v-if="retryAfter" class="text-sm text-gray-600 mt-1">
+        Please wait {{ retryAfter }} seconds before trying again.
+      </div>
     </div>
   </div>
 </template>
@@ -66,20 +74,36 @@ const token = ref('');
 const attempt = ref('');
 const error = ref('');
 const loading = ref(false);
+const retryAfter = ref(null);
 
 const refreshCaptcha = async () => {
   try {
     loading.value = true;
     error.value = '';
-    
+    retryAfter.value = null;
+
     const response = await axios.post('/api/captcha/generate');
     imageData.value = response.data.image_data;
     token.value = response.data.token;
     attempt.value = '';
-    
+
     emit('update:modelValue', '');
   } catch (e) {
-    error.value = 'Failed to load CAPTCHA. Please try again.';
+    const responseData = e.response?.data;
+
+    if (e.response?.status === 429) {
+      error.value = responseData.message || 'Too many requests. Please wait before trying again.';
+      retryAfter.value = responseData.retry_after;
+    } else {
+      error.value = responseData?.message ||
+                   'Failed to load CAPTCHA. Please try refreshing the page.';
+
+      // Log error details if in development
+      if (responseData?.debug) {
+        console.error('CAPTCHA Error:', responseData.debug);
+      }
+    }
+
     emit('error', error.value);
   } finally {
     loading.value = false;
@@ -88,6 +112,7 @@ const refreshCaptcha = async () => {
 
 const onInput = () => {
   error.value = '';
+  retryAfter.value = null;
   emit('update:modelValue', attempt.value);
 };
 
@@ -138,6 +163,7 @@ defineExpose({
   border-radius: 0.375rem;
   border-color: #d1d5db;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
 }
 
 .captcha-input:focus {
@@ -151,8 +177,8 @@ defineExpose({
 }
 
 .error-message {
+  margin-top: 0.5rem;
   font-size: 0.875rem;
-  color: #dc2626;
 }
 
 .input-container {

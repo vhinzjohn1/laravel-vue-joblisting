@@ -32,26 +32,19 @@ const form = useForm({
 const submit = async () => {
     if (form.processing) return;
 
-    // First validate credentials without CAPTCHA
     try {
-        await axios.post(route('login.validate'), {
+        // Validate credentials first
+        const response = await axios.post(route('login.validate'), {
             login: form.login,
             password: form.password,
         });
-        
-        // If validation passes, show CAPTCHA
-        if (!form.captcha_token || !form.captcha_code) {
+
+        if (response.data.message === 'Credentials valid') {
+            // Show CAPTCHA if credentials are valid
             showCaptcha.value = true;
-            return;
         }
-        
-        // If we have CAPTCHA, proceed with login
-        form.post(route('login'), {
-            onFinish: () => {
-                form.reset('password', 'captcha_token', 'captcha_code');
-            },
-        });
     } catch (error) {
+        console.log('Validation error:', error);
         if (error.response?.data?.errors) {
             form.setError('login', error.response.data.errors.login);
             form.setError('password', error.response.data.errors.password);
@@ -59,10 +52,49 @@ const submit = async () => {
     }
 };
 
-const handleCaptchaVerified = ({ token, code }) => {
-    form.captcha_token = token;
-    form.captcha_code = code;
-    submit(); // Now submit with CAPTCHA
+const handleCaptchaVerified = async ({ token, code }) => {
+    console.log('CAPTCHA verified:', { token, code });
+
+    // First verify the CAPTCHA
+    try {
+        const verifyResponse = await axios.post('/api/captcha/verify', {
+            token: token,
+            code: code
+        });
+
+        if (verifyResponse.data.success) {
+            // CAPTCHA verified, proceed with login
+            form.captcha_token = token;
+            form.captcha_code = code;
+            form.clearErrors();
+
+            // Submit the login form
+            form.post(route('login'), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    form.reset('password', 'captcha_token', 'captcha_code');
+                    showCaptcha.value = false;
+                },
+                onError: (errors) => {
+                    console.log('Login errors:', errors);
+                    if (errors.captcha_code) {
+                        // Reset CAPTCHA if validation failed
+                        form.captcha_token = '';
+                        form.captcha_code = '';
+                        showCaptcha.value = true;
+                    }
+                },
+            });
+        } else {
+            // CAPTCHA verification failed
+            form.setError('captcha_code', 'Invalid CAPTCHA code. Please try again.');
+            showCaptcha.value = true;
+        }
+    } catch (error) {
+        console.log('CAPTCHA verification error:', error);
+        form.setError('captcha_code', error.response?.data?.message || 'Failed to verify CAPTCHA. Please try again.');
+        showCaptcha.value = true;
+    }
 };
 </script>
 

@@ -88,7 +88,10 @@ class LoginRequest extends FormRequest
         }
 
         // Credentials are valid, attempt to log in
-        if (!Auth::login($user, (bool) $this->validated('remember', false))) {
+        if (!Auth::attempt([
+            $loginType => $this->validated('login'),
+            'password' => $this->validated('password'),
+        ], (bool) ($this->validated('remember') ?? false))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
