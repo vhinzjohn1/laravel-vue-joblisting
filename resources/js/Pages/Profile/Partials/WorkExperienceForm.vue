@@ -145,13 +145,13 @@ onMounted(() => {
             <h3 class="text-xl font-semibold text-gray-800">Work Experience</h3>
             <PrimaryButton
                 @click="showModal = true"
-                class="bg-green-700 hover:bg-green-800 flex items-center gap-2"
+                class="flex gap-2 items-center bg-green-700 hover:bg-green-800"
             >
                 <span class="hidden sm:inline">Add Experience</span>
                 <span class="sm:hidden">Add</span>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
+                    class="w-5 h-5"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                 >
@@ -167,17 +167,17 @@ onMounted(() => {
         <!-- Loading State -->
         <div v-if="isLoading" class="flex justify-center my-8">
             <div
-                class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-700"
+                class="w-10 h-10 rounded-full border-t-2 border-b-2 border-green-700 animate-spin"
             ></div>
         </div>
 
         <!-- No Records State -->
         <div
             v-else-if="experiences.length === 0"
-            class="bg-white rounded-lg shadow-sm p-8 border border-gray-100 text-center"
+            class="p-8 text-center bg-white rounded-lg border border-gray-100 shadow-sm"
         >
             <div class="flex justify-center">
-                <BriefcaseIcon class="h-16 w-16 text-gray-400" />
+                <BriefcaseIcon class="w-16 h-16 text-gray-400" />
             </div>
             <h3 class="mt-4 text-lg font-medium text-gray-900">
                 No Work Experience Added Yet
@@ -187,7 +187,7 @@ onMounted(() => {
             </p>
             <button
                 @click="showModal = true"
-                class="mt-4 inline-flex items-center px-4 py-2 bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25 transition"
+                class="inline-flex items-center px-4 py-2 mt-4 text-xs font-semibold tracking-widest text-white uppercase bg-green-700 rounded-md border border-transparent transition hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25"
             >
                 Add Experience
             </button>
@@ -198,28 +198,28 @@ onMounted(() => {
             <div
                 v-for="experience in experiences"
                 :key="experience.experience_id"
-                class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all"
+                class="p-5 bg-white rounded-lg border border-gray-100 shadow-sm transition-all hover:shadow-md"
             >
                 <div class="flex justify-between">
                     <div class="flex-grow">
-                        <div class="flex items-start gap-3">
+                        <div class="flex gap-3 items-start">
                             <div class="mt-1">
-                                <BriefcaseIcon class="h-6 w-6 text-green-700" />
+                                <BriefcaseIcon class="w-6 h-6 text-green-700" />
                             </div>
                             <div>
-                                <h4 class="font-semibold text-lg text-gray-800">
+                                <h4 class="text-lg font-semibold text-gray-800">
                                     {{ experience.position }}
                                 </h4>
                                 <div
                                     class="flex items-center mt-1 text-gray-600"
                                 >
-                                    <BuildingOfficeIcon class="h-4 w-4 mr-1" />
+                                    <BuildingOfficeIcon class="mr-1 w-4 h-4" />
                                     <span>{{ experience.company_name }}</span>
                                 </div>
                                 <div
                                     class="flex items-center mt-1 text-gray-500"
                                 >
-                                    <CalendarIcon class="h-4 w-4 mr-1" />
+                                    <CalendarIcon class="mr-1 w-4 h-4" />
                                     <span>
                                         {{ formatDate(experience.start_date) }}
                                         -
@@ -243,7 +243,7 @@ onMounted(() => {
                                     v-if="experience.is_current_job"
                                 >
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                        class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium text-green-800 bg-green-100 rounded-full"
                                     >
                                         Current Position
                                     </span>
@@ -257,7 +257,7 @@ onMounted(() => {
                             class="text-red-500 hover:text-red-700 focus:outline-none"
                             title="Delete"
                         >
-                            <TrashIcon class="h-5 w-5" />
+                            <TrashIcon class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
@@ -277,14 +277,14 @@ onMounted(() => {
                         <InputLabel
                             for="position"
                             value="Position"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <input
                             id="position"
                             type="text"
                             v-model="form.position"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
-                            placeholder="Enter job title"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            placeholder="e.g. Science Teacher"
                             required
                         />
                         <InputError :message="form.errors.position" />
@@ -294,31 +294,31 @@ onMounted(() => {
                         <InputLabel
                             for="company_name"
                             value="Company Name"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <input
                             id="company_name"
                             type="text"
                             v-model="form.company_name"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
-                            placeholder="Enter company name"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            placeholder="e.g. School Name"
                             required
                         />
                         <InputError :message="form.errors.company_name" />
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <InputLabel
                                 for="start_date"
                                 value="Start Date"
-                                class="text-gray-700 font-medium"
+                                class="font-medium text-gray-700"
                             />
                             <input
                                 id="start_date"
                                 type="date"
                                 v-model="form.start_date"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                                 required
                             />
                             <InputError :message="form.errors.start_date" />
@@ -328,14 +328,14 @@ onMounted(() => {
                             <InputLabel
                                 for="end_date"
                                 value="End Date"
-                                class="text-gray-700 font-medium"
+                                class="font-medium text-gray-700"
                             />
                             <input
                                 id="end_date"
                                 type="date"
                                 v-model="form.end_date"
                                 :disabled="form.is_current_job"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                                 :required="!form.is_current_job"
                             />
                             <InputError :message="form.errors.end_date" />
@@ -347,7 +347,7 @@ onMounted(() => {
                             id="is_current_job"
                             type="checkbox"
                             v-model="form.is_current_job"
-                            class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                            class="text-green-600 rounded border-gray-300 shadow-sm focus:ring-green-500"
                         />
                         <label
                             for="is_current_job"
@@ -360,23 +360,23 @@ onMounted(() => {
                         <InputLabel
                             for="responsibilities"
                             value="Responsibilities (Optional)"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <textarea
                             id="responsibilities"
                             v-model="form.responsibilities"
                             rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             placeholder="Describe your key responsibilities"
                         ></textarea>
                         <InputError :message="form.errors.responsibilities" />
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 mt-6">
+                    <div class="flex gap-3 justify-end items-center mt-6">
                         <button
                             type="button"
                             @click="showModal = false"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25 transition"
+                            class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase rounded-md border border-gray-300 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25"
                         >
                             Cancel
                         </button>

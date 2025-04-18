@@ -20,6 +20,7 @@ defineProps({
     },
 });
 
+const isLoading = ref(false);
 const showCaptcha = ref(false);
 const form = useForm({
     login: '',
@@ -30,8 +31,8 @@ const form = useForm({
 });
 
 const submit = async () => {
+    isLoading.value = true;
     if (form.processing) return;
-
     try {
         // Validate credentials first
         const response = await axios.post(route('login.validate'), {
@@ -42,54 +43,48 @@ const submit = async () => {
         if (response.data.message === 'Credentials valid') {
             // Show CAPTCHA if credentials are valid
             showCaptcha.value = true;
+            isLoading.value = false;
+            form.clearErrors();
         }
     } catch (error) {
         console.log('Validation error:', error);
+        isLoading.value = false;
         if (error.response?.data?.errors) {
-            form.setError('login', error.response.data.errors.login);
-            form.setError('password', error.response.data.errors.password);
+            form.setError('login', error.response.data.errors.login?.[0]);
+            form.setError('password', error.response.data.errors.password?.[0]);
         }
     }
 };
 
 const handleCaptchaVerified = async ({ token, code }) => {
+    isLoading.value = true;
     console.log('CAPTCHA verified:', { token, code });
 
     // First verify the CAPTCHA
     try {
-        const verifyResponse = await axios.post('/api/captcha/verify', {
-            token: token,
-            code: code
+        // CAPTCHA verified, proceed with login
+        form.captcha_token = token;
+        form.captcha_code = code;
+        form.clearErrors();
+
+        // Submit the login form
+        form.post(route('login'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                form.reset('password', 'captcha_token', 'captcha_code');
+                showCaptcha.value = false;
+            },
+            onError: (errors) => {
+                console.log('Login errors:', errors);
+                if (errors.captcha_code) {
+                    // Reset CAPTCHA if validation failed
+                    form.captcha_token = '';
+                    form.captcha_code = '';
+                    showCaptcha.value = true;
+
+                }
+            },
         });
-
-        if (verifyResponse.data.success) {
-            // CAPTCHA verified, proceed with login
-            form.captcha_token = token;
-            form.captcha_code = code;
-            form.clearErrors();
-
-            // Submit the login form
-            form.post(route('login'), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    form.reset('password', 'captcha_token', 'captcha_code');
-                    showCaptcha.value = false;
-                },
-                onError: (errors) => {
-                    console.log('Login errors:', errors);
-                    if (errors.captcha_code) {
-                        // Reset CAPTCHA if validation failed
-                        form.captcha_token = '';
-                        form.captcha_code = '';
-                        showCaptcha.value = true;
-                    }
-                },
-            });
-        } else {
-            // CAPTCHA verification failed
-            form.setError('captcha_code', 'Invalid CAPTCHA code. Please try again.');
-            showCaptcha.value = true;
-        }
     } catch (error) {
         console.log('CAPTCHA verification error:', error);
         form.setError('captcha_code', error.response?.data?.message || 'Failed to verify CAPTCHA. Please try again.');
@@ -103,9 +98,9 @@ const handleCaptchaVerified = async ({ token, code }) => {
 
     <GuestLayout :can-login="true" :can-register="true">
         <!-- Main Content Wrapper centered -->
-        <div class="flex justify-center p-20">
+        <div class="flex justify-center p-4 md:mt-10">
             <FormContainer class="w-full max-w-md">
-                <h1 class="text-3xl font-bold text-center mb-6">Login Page</h1>
+                <h1 class="mb-6 text-3xl font-bold text-center">Login Page</h1>
 
                 <form @submit.prevent="submit">
                     <div>
@@ -113,7 +108,7 @@ const handleCaptchaVerified = async ({ token, code }) => {
                         <InputField
                             id="login"
                             type="text"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.login"
                             placeholder="Enter email or username"
                             required
@@ -129,7 +124,7 @@ const handleCaptchaVerified = async ({ token, code }) => {
                         <InputField
                             id="password"
                             type="password"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             placeholder="Enter Password"
                             v-model="form.password"
                             required
@@ -144,26 +139,26 @@ const handleCaptchaVerified = async ({ token, code }) => {
                             <Link
                                 v-if="canResetPassword"
                                 :href="route('password.request')"
-                                class="text-green-800 hover:text-green-500 transition-colors"
+                                class="text-green-800 transition-colors hover:text-green-500"
                             >
                                 Forgot password?
                             </Link>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
+                    <div class="flex justify-between items-center">
                         <div class="block mt-4">
                             <label class="flex items-center">
                                 <Checkbox name="remember" v-model:checked="form.remember" />
-                                <span class="ms-2 text-sm text-gray-600">Remember me</span>
+                                <span class="text-sm text-gray-600 ms-2">Remember me</span>
                             </label>
                         </div>
 
-                        <div class="flex items-center justify-end mt-4">
+                        <div class="flex justify-end items-center mt-4">
                             <PrimaryButton
+                                type="submit"
                                 class="mt-4"
-                                :class="{ 'opacity-25': form.processing }"
-                                :disabled="form.processing"
+                                :loading="isLoading"
                             >
                                 Log in
                             </PrimaryButton>
@@ -171,9 +166,9 @@ const handleCaptchaVerified = async ({ token, code }) => {
                     </div>
 
                     <div class="flex justify-between items-center">
-                        <p class="pt-4 flex items-center text-md">
+                        <p class="flex items-center pt-4 text-md">
                             Don't have an account yet?
-                            <Link :href="route('register')" class="text-green-800 hover:text-green-500 transition-colors">Register</Link>
+                            <Link :href="route('register')" class="text-green-800 transition-colors hover:text-green-500">Register</Link>
                         </p>
                     </div>
                 </form>
@@ -182,7 +177,7 @@ const handleCaptchaVerified = async ({ token, code }) => {
 
         <!-- CAPTCHA Verification Modal Centered -->
         <CaptchaVerification
-            class="fixed inset-0 z-50 overflow-y-auto"
+            class="overflow-y-auto fixed inset-0 z-50"
             :is-open="showCaptcha"
             @close="showCaptcha = false"
             @verified="handleCaptchaVerified"

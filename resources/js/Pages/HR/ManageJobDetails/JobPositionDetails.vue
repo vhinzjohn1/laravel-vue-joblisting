@@ -5,26 +5,26 @@
             <Header title="Job Position Details" />
         </template>
         <div>
-            <div class="bg-white p-4 rounded-lg shadow-md mt-4">
-                <div class="flex flex-col sm:flex-row justify-between items-center">
+            <div class="p-4 mt-4 bg-white rounded-lg shadow-md">
+                <div class="flex flex-col justify-between items-center sm:flex-row">
                     <h1
-                        class="text-2xl font-bold uppercase tracking-wider mb-4 sm:mb-0"
+                        class="mb-4 text-2xl font-bold tracking-wider uppercase sm:mb-0"
                     >
-                        Job Position
+                        Job Position Details
                     </h1>
                     <PrimaryButton  @click="showAddModal = true">Add Position</PrimaryButton>
                 </div>
             </div>
-            <div class="max-w-full mt-3">
+            <div class="mt-3 max-w-full">
                     <div
-                        class="bg-white overflow-hidden shadow-sm sm:rounded-lg"
+                        class="overflow-hidden bg-white shadow-sm sm:rounded-lg"
                     >
                         <div class="p-6 text-gray-900">
 
 
                             <div
                                 v-if="localJobPosition.length === 0"
-                                class="text-center py-8 text-gray-500"
+                                class="py-8 text-center text-gray-500"
                             >
                                 No job positions found, please add one to
                                 proceed
@@ -86,15 +86,15 @@
         >
         <form @submit.prevent="saveJobPosition">
             <div class="p-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <!-- Left Column -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200">
-                <h4 class="font-medium text-gray-800 mb-4 text-lg border-b pb-2">
+                <div class="p-6 bg-white rounded-lg border border-gray-200">
+                <h4 class="pb-2 mb-4 text-lg font-medium text-gray-800 border-b">
                     Position Details
                 </h4>
                 <div class="space-y-4">
                     <div class="form-group">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="name" class="block mb-1 text-sm font-medium text-gray-700">
                         Position Name
                     </label>
                     <TextInput
@@ -107,7 +107,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="item_number" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="item_number" class="block mb-1 text-sm font-medium text-gray-700">
                         Item Number
                     </label>
                     <TextInput
@@ -119,7 +119,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="amount" class="block mb-1 text-sm font-medium text-gray-700">
                         Salary Grade
                     </label>
                     <TextInput
@@ -135,13 +135,13 @@
                 </div>
 
                 <!-- Right Column -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200">
-                <h4 class="font-medium text-gray-800 mb-4 text-lg border-b pb-2">
+                <div class="p-6 bg-white rounded-lg border border-gray-200">
+                <h4 class="pb-2 mb-4 text-lg font-medium text-gray-800 border-b">
                     Minimum Requirements
                 </h4>
                 <div class="space-y-4">
                     <div class="form-group">
-                    <label for="education_level" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="education_level" class="block mb-1 text-sm font-medium text-gray-700">
                         Education
                     </label>
                     <select
@@ -157,7 +157,7 @@
                     </select>
                     </div>
                     <div class="form-group">
-                    <label for="training_hours" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="training_hours" class="block mb-1 text-sm font-medium text-gray-700">
                         Training (Hours)
                     </label>
                     <TextInput
@@ -168,7 +168,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="years_experience" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="years_experience" class="block mb-1 text-sm font-medium text-gray-700">
                         Years Of Experience
                     </label>
                     <TextInput
@@ -179,7 +179,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="eligibility" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="eligibility" class="block mb-1 text-sm font-medium text-gray-700">
                         Eligibility
                     </label>
                     <select
@@ -204,20 +204,21 @@
                 </div>
             </div>
 
-            <div class="flex justify-end gap-4 mt-6">
+            <div class="flex gap-4 justify-end mt-6">
                 <button
                 type="button"
                 @click="closeModal('add')"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg transition-colors duration-200 hover:bg-gray-300"
                 >
                 Cancel
                 </button>
-                <button
+                <PrimaryButton
                 type="submit"
-                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                :loading="form.processing"
+                :disabled="form.processing"
                 >
                 Save Job Listing
-                </button>
+                </PrimaryButton>
             </div>
             </div>
         </form>
@@ -232,15 +233,15 @@
         >
         <form @submit.prevent="editJobPosition">
             <div class="p-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <!-- Left Column -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200">
-                <h4 class="font-medium text-gray-800 mb-4 text-lg border-b pb-2">
+                <div class="p-6 bg-white rounded-lg border border-gray-200">
+                <h4 class="pb-2 mb-4 text-lg font-medium text-gray-800 border-b">
                     Position Details
                 </h4>
                 <div class="space-y-4">
                     <div class="form-group">
-                    <label for="edit_name" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="edit_name" class="block mb-1 text-sm font-medium text-gray-700">
                         Position Name
                     </label>
                     <TextInput
@@ -253,7 +254,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="edit_item_number" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="edit_item_number" class="block mb-1 text-sm font-medium text-gray-700">
                         Item Number
                     </label>
                     <TextInput
@@ -265,7 +266,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="edit_amount" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="edit_amount" class="block mb-1 text-sm font-medium text-gray-700">
                         Salary Grade
                     </label>
                     <TextInput
@@ -281,13 +282,13 @@
                 </div>
 
                 <!-- Right Column -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200">
-                <h4 class="font-medium text-gray-800 mb-4 text-lg border-b pb-2">
+                <div class="p-6 bg-white rounded-lg border border-gray-200">
+                <h4 class="pb-2 mb-4 text-lg font-medium text-gray-800 border-b">
                     Minimum Requirements
                 </h4>
                 <div class="space-y-4">
                     <div class="form-group">
-                    <label for="edit_education_level" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="edit_education_level" class="block mb-1 text-sm font-medium text-gray-700">
                         Education
                     </label>
                     <select
@@ -303,7 +304,7 @@
                     </select>
                     </div>
                     <div class="form-group">
-                    <label for="edit_training_hours" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="edit_training_hours" class="block mb-1 text-sm font-medium text-gray-700">
                         Training (Hours)
                     </label>
                     <TextInput
@@ -314,7 +315,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="edit_years_experience" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="edit_years_experience" class="block mb-1 text-sm font-medium text-gray-700">
                         Years Of Experience
                     </label>
                     <TextInput
@@ -325,7 +326,7 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="edit_eligibility" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="edit_eligibility" class="block mb-1 text-sm font-medium text-gray-700">
                         Eligibility
                     </label>
                     <select
@@ -350,20 +351,21 @@
                 </div>
             </div>
 
-            <div class="flex justify-end gap-4 mt-6">
+            <div class="flex gap-4 justify-end mt-6">
                 <button
                 type="button"
                 @click="closeModal('edit')"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg transition-colors duration-200 hover:bg-gray-300"
                 >
                 Cancel
                 </button>
-                <button
+                <PrimaryButton
                 type="submit"
-                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                :loading="form.processing"
+                :disabled="form.processing"
                 >
                 Save Job Listing
-                </button>
+                </PrimaryButton>
             </div>
             </div>
         </form>

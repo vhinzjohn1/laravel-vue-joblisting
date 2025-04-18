@@ -30,9 +30,10 @@
         type="text"
         v-model="attempt"
         :placeholder="placeholder"
-        class="captcha-input"
+        class="w-full p-2 text-sm rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-700"
         :class="{ 'error': error }"
         maxlength="6"
+        autofocus
         @input="onInput"
       />
       <input type="hidden" :name="tokenName" :value="token" />
@@ -154,26 +155,6 @@ defineExpose({
 .refresh-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.captcha-input {
-  margin-top: 0.25rem;
-  display: block;
-  width: 100%;
-  border-radius: 0.375rem;
-  border-color: #d1d5db;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 0.5rem;
-}
-
-.captcha-input:focus {
-  border-color: #6366f1;
-  outline: 2px solid #6366f1;
-  outline-offset: 2px;
-}
-
-.captcha-input.error {
-  border-color: #ef4444;
 }
 
 .error-message {

@@ -3,9 +3,9 @@
 
     <GuestLayout :can-login="true" :can-register="true">
         <!-- Main Content Wrapper centered -->
-        <div class="flex justify-center p-20">
+        <div class="flex justify-center p-4 md:mt-10">
             <FormContainer class="w-full max-w-md">
-                <h1 class="text-3xl font-bold text-center mb-6">Register Page</h1>
+                <h1 class="mb-6 text-3xl font-bold text-center">Register Page</h1>
 
                 <form @submit.prevent="submit">
                     <div>
@@ -13,7 +13,7 @@
                         <InputField
                             id="name"
                             type="text"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.name"
                             placeholder="Enter your full name"
                             required
@@ -29,7 +29,7 @@
                         <InputField
                             id="username"
                             type="text"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.username"
                             placeholder="Choose a username"
                             required
@@ -43,7 +43,7 @@
                         <InputField
                             id="email"
                             type="email"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.email"
                             placeholder="Enter your email"
                             required
@@ -57,7 +57,7 @@
                         <InputField
                             id="password"
                             type="password"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.password"
                             placeholder="Create a password"
                             required
@@ -72,7 +72,7 @@
                         <InputField
                             id="password_confirmation"
                             type="password"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.password_confirmation"
                             placeholder="Confirm your password"
                             required
@@ -82,15 +82,15 @@
                         <InputError class="mt-2" :message="form.errors.password_confirmation" />
                     </div>
 
-                    <div class="flex items-center justify-end mt-4">
+                    <div class="flex justify-end items-center mt-4">
                         <Link
                             :href="route('login')"
-                            class="text-green-800 hover:text-green-500 transition-colors"
+                            class="text-green-800 transition-colors hover:text-green-500"
                         >
                             Already registered?
                         </Link>
 
-                        <PrimaryButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                        <PrimaryButton class="ml-4" :loading="form.processing" :disabled="form.processing">
                             Register
                         </PrimaryButton>
                     </div>
@@ -141,13 +141,13 @@ const submit = async () => {
             password: form.password,
             password_confirmation: form.password_confirmation,
         });
-        
+
         // If validation passes, show CAPTCHA
         if (!form.captcha_token || !form.captcha_code) {
             showCaptcha.value = true;
             return;
         }
-        
+
         // If we have CAPTCHA, proceed with registration
         form.post(route('register'), {
             onFinish: () => {

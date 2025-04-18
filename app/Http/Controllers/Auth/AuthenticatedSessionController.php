@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -49,23 +50,36 @@ class AuthenticatedSessionController extends Controller
      */
     public function validateCredentials(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'login' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ]);
+        // Store input values to avoid repeated method calls
+        $login = $request->input('login');
+        $password = $request->input('password');
 
-        if ($validator->fails()) {
-            throw ValidationException::withMessages($validator->errors()->toArray());
+        // Fast validation
+        if (!is_string($login) || !is_string($password) || empty($login) || empty($password)) {
+            throw ValidationException::withMessages([
+                'login' => __('validation.required', ['attribute' => 'login']),
+                'password' => __('validation.required', ['attribute' => 'password'])
+            ]);
         }
 
-        // Check if credentials are valid
-        $user = User::where('email', $request->input('login'))
-                   ->orWhere('username', $request->input('login'))
-                   ->first();
+        // Efficient user lookup: use raw query for performance
+        $user = DB::table('users')
+            ->select('user_id', 'password', 'email', 'username')
+            ->where('email', $login)
+            ->orWhere('username', $login)
+            ->first();
 
-        if (!$user || !Hash::check($request->input('password'), $user->password)) {
+        if (!$user) {
+            $loginType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
             throw ValidationException::withMessages([
-                'login' => __('auth.failed'),
+                'login' => 'No account found with this ' . $loginType . '. Please check your information or register.',
+            ]);
+        }
+
+        // Hash check
+        if (!Hash::check($password, $user->password)) {
+            throw ValidationException::withMessages([
+                'password' => 'The password is incorrect.',
             ]);
         }
 

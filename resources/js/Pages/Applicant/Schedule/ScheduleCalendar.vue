@@ -7,7 +7,7 @@
         </template>
 
         <div class="py-5">
-            <div class="container-fluid px-4">
+            <div class="px-4 container-fluid">
                 <Breadcrumbs
                     :items="[
                         { name: 'Home', href: route('applicant.index') },
@@ -20,9 +20,9 @@
                 />
 
                 <div
-                    class="card shadow-sm rounded-lg overflow-hidden bg-white mb-6"
+                    class="overflow-hidden mb-6 bg-white rounded-lg shadow-sm card"
                 >
-                    <div class="card-header bg-white py-4 px-4 border-b">
+                    <div class="px-4 py-4 bg-white border-b card-header">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-semibold">
                                 My Interview Schedules
@@ -31,100 +31,106 @@
                     </div>
 
                     <div class="p-4">
-                        <!-- Calendar View -->
-                        <div class="mb-6">
-                            <FullCalendar :options="calendarOptions" />
-                        </div>
+                        <!-- Two-column layout -->
+                        <div class="flex flex-col gap-6 md:flex-row">
+                            <!-- Calendar View -->
+                            <div class="mb-6 w-full md:w-3/5 md:mb-0">
+                                <FullCalendar :options="calendarOptions" />
+                            </div>
 
-                        <!-- Schedule List -->
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Title
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Date & Time
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Location
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Status
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody
-                                    class="bg-white divide-y divide-gray-200"
-                                >
-                                    <tr
-                                        v-for="schedule in schedules"
-                                        :key="schedule.schedule_id"
+                            <!-- Spacer Line -->
+                            <div class="w-1/5 border border-gray-400 md:w-0" />
+
+                            <!-- Schedule List -->
+                            <div class="overflow-x-auto w-full md:w-2/5">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Title
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Date & Time
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Location
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Status
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        class="bg-white divide-y divide-gray-200"
                                     >
-                                        <td class="px-6 py-4">
-                                            {{ schedule.title }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{
-                                                formatDate(
-                                                    schedule.schedule_date,
-                                                )
-                                            }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{ schedule.location }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                                :class="
-                                                    getStatusClass(
-                                                        schedule.status,
-                                                    )
-                                                "
-                                            >
-                                                {{ schedule.status }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <button
-                                                @click="showDetails(schedule)"
-                                                class="text-blue-600 hover:text-blue-900 mr-2"
-                                            >
-                                                <i class="fas fa-eye"></i> View
-                                                Details
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr v-if="schedules.length === 0">
-                                        <td
-                                            colspan="6"
-                                            class="px-6 py-4 text-center text-gray-500"
+                                        <tr
+                                            v-for="schedule in schedules"
+                                            :key="schedule.schedule_id"
                                         >
-                                            No schedules found
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                            <td class="px-6 py-4">
+                                                {{ schedule.title }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{
+                                                    formatDate(
+                                                        schedule.schedule_date,
+                                                    )
+                                                }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ schedule.location }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span
+                                                    class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full"
+                                                    :class="
+                                                        getStatusClass(
+                                                            schedule.status,
+                                                        )
+                                                    "
+                                                >
+                                                    {{ schedule.status }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <button
+                                                    @click="showDetails(schedule)"
+                                                    class="mr-2 text-blue-600 hover:text-blue-900"
+                                                >
+                                                    <i class="fas fa-eye"></i> View
+                                                    Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="schedules.length === 0">
+                                            <td
+                                                colspan="6"
+                                                class="px-6 py-4 text-center text-gray-500"
+                                            >
+                                                No schedules found
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,15 +145,15 @@
             maxWidth="6xl"
         >
             <div v-if="selectedSchedule" class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <!-- Left column: Basic details -->
                     <div class="md:col-span-2">
-                        <div class="prose max-w-none">
-                            <h3 class="text-lg font-semibold mb-3">
+                        <div class="max-w-none prose">
+                            <h3 class="mb-3 text-lg font-semibold">
                                 Interview Details
                             </h3>
 
-                            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <div class="p-4 mb-6 bg-gray-50 rounded-lg">
                                 <div class="mb-4">
                                     <h4
                                         class="text-sm font-medium text-gray-500"
@@ -200,10 +206,10 @@
                                 </div>
                             </div>
 
-                            <h3 class="text-lg font-semibold mb-3">
+                            <h3 class="mb-3 text-lg font-semibold">
                                 Job Application
                             </h3>
-                            <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="p-4 bg-gray-50 rounded-lg">
                                 <div
                                     v-if="
                                         selectedSchedule.participants[0]
@@ -251,10 +257,10 @@
 
                     <!-- Right column: Status and actions -->
                     <div>
-                        <div class="border rounded-lg p-4 mb-6">
+                        <div class="p-4 mb-6 rounded-lg border">
                             <div class="mb-4">
                                 <div
-                                    class="text-center px-3 py-2 rounded-lg font-semibold text-sm mb-4"
+                                    class="px-3 py-2 mb-4 text-sm font-semibold text-center rounded-lg"
                                     :class="
                                         getParticipantStatusClass(
                                             selectedSchedule.status,
@@ -264,7 +270,7 @@
                                     {{ selectedSchedule.status }}
                                 </div>
 
-                                <p class="text-gray-600 text-sm mb-4">
+                                <p class="mb-4 text-sm text-gray-600">
                                     Your attendance at this interview is
                                     required. Please make sure to attend at the
                                     scheduled date and time.
@@ -276,7 +282,7 @@
                                     "
                                 >
                                     <p
-                                        class="text-gray-600 text-sm font-medium"
+                                        class="text-sm font-medium text-gray-600"
                                     >
                                         This interview has been cancelled.
                                     </p>
@@ -288,7 +294,7 @@
                                     "
                                 >
                                     <p
-                                        class="text-gray-600 text-sm font-medium"
+                                        class="text-sm font-medium text-gray-600"
                                     >
                                         This interview has been completed.
                                     </p>
@@ -296,8 +302,8 @@
                             </div>
                         </div>
 
-                        <div class="border rounded-lg p-4">
-                            <h3 class="text-lg font-semibold mb-4">
+                        <div class="p-4 rounded-lg border">
+                            <h3 class="mb-4 text-lg font-semibold">
                                 Schedule Created By
                             </h3>
 
@@ -456,3 +462,37 @@ const getParticipantStatusClass = (status) => {
     }
 };
 </script>
+
+<style scoped>
+
+/* Calendar View Styling */
+:deep(.fc-toolbar-title) {
+    font-size: 1.25rem !important;
+    font-weight: 600;
+}
+
+:deep(.fc-button) {
+    text-transform: capitalize !important;
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 500 !important;
+    @media (max-width: 768px) {
+        padding: 0.1rem 0.25rem !important;
+    }
+}
+
+:deep(.fc-event) {
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+:deep(.fc-daygrid-day-top) {
+    padding: 0.25rem;
+}
+
+:deep(.fc-day-today) {
+    background: var(--fc-today-bg-color) !important;
+}
+</style>

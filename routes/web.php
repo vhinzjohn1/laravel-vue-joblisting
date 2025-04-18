@@ -1,69 +1,57 @@
 <?php
+// =======================
+// IMPORTS
+// =======================
+// Core Framework Imports
+use Illuminate\Support\Facades\Route;
 
+// Controllers
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Applicant\ApplicantDashboardController;
 use App\Http\Controllers\Applicant\JobApplicationController;
 use App\Http\Controllers\Applicant\MyApplicationsController;
+use App\Http\Controllers\Applicant\ScheduleController as ApplicantScheduleController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\HR\ApplicationGroupController;
 use App\Http\Controllers\HR\HRController;
-use App\Http\Controllers\HR\ManageJobListingController;
-use App\Http\Controllers\HR\ManageApplicationController;
-use App\Http\Controllers\PositionController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\TestController;
-use App\Http\Controllers\ProfileDetailsController;
-use App\Http\Controllers\HR\ScheduleController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HR\JobPositionController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use App\Mail\SendEmail;
-use Illuminate\Support\Facades\Mail;
-use App\Models\User;
-use App\Http\Controllers\Applicant\ScheduleController as ApplicantScheduleController;
+use App\Http\Controllers\HR\ManageApplicationController;
+use App\Http\Controllers\HR\ManageJobListingController;
+use App\Http\Controllers\HR\ScheduleController;
 use App\Http\Controllers\HR\SelectionLineupController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileCompletionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileDetailsController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
+// =======================
+// WELCOME & LANDING ROUTES
+// =======================
 // Server Side Welcome Page (Blade)
-Route::get('/', function () {
-    // If the user is authenticated, redirect based on role
-    if (auth()->check()) {
-        return redirect()->route(auth()->user()->role_name . '.index');
-    }
-    else {  
-        $jobListings = (new WelcomeController)->index();
-        // Otherwise, show the welcome page for guests as a Blade template (server-side rendered) with welcome controller index
-        return view('welcome', [
-            'canLogin'       => Route::has('login'),
-            'canRegister'    => Route::has('register'),
-            'jobListings'    => $jobListings
-        ]);
-    }
-})->name('/');
-
+Route::get('/', [WelcomeController::class, 'showBlade'])->name('/');
+// Client Side Welcome Page (Inertia)
+Route::get('welcome', [WelcomeController::class, 'showInertia'])->name('welcome');
 // Fallback to root if route is not found
 Route::fallback(function () {
     return redirect('/');
 });
 
+// =======================
+// VALIDATE CREDENTIALS ROUTES
+// =======================
+Route::post('login/validate', [AuthenticatedSessionController::class, 'validateCredentials'])
+    ->name('login.validate');
+Route::post('register/validate', [RegisteredUserController::class, 'validateRegistration'])
+    ->name('register.validate');
 
-// Client Side Welcome Page (Inertia)
-Route::get('welcome', function () {
-    // with canLoign and canRegister
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-    ]);
-})->name('welcome');
-
-
-// Authentication route group
+// =======================
+// PROFILE & PROFILE DETAILS ROUTES
+// =======================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -75,22 +63,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('profile-details/{type}/{id}', [ProfileDetailsController::class, 'destroy'])->name('profile-details.destroy');
 });
 
-Route::post('login/validate', [AuthenticatedSessionController::class, 'validateCredentials'])
-    ->middleware('guest')
-    ->name('login.validate');
-
-Route::post('register/validate', [RegisteredUserController::class, 'validateRegistration'])
-    ->middleware('guest')
-    ->name('register.validate');
-
-// Admin Route Group
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::resource('admin', AdminController::class);
-    Route::resource('test', TestController::class);
-});
-
-
-// HR Personnel Route Group
+// =======================
+// HR ROUTES
+// =======================
 Route::middleware(['auth', 'role:hr'])->group(function () {
     Route::resource('hr', HRController::class);
     Route::resource('job-listing', ManageJobListingController::class);
@@ -100,47 +75,63 @@ Route::middleware(['auth', 'role:hr'])->group(function () {
     Route::resource('selection-lineup', SelectionLineupController::class);
 });
 
-// Applicant Route Group
+// =======================
+// APPLICANT ROUTES
+// =======================
 Route::middleware(['auth', 'role:applicant'])->group(function () {
     Route::resource('applicant', ApplicantDashboardController::class)->except(['show']);
     Route::resource('job-application', JobApplicationController::class);
     Route::resource('my-applications', MyApplicationsController::class);
-
-    // Applicant schedules
     Route::resource('my-schedules', ApplicantScheduleController::class);
-    // Add a custom route for updating status that doesn't fit the resource pattern
     Route::post('my-schedules/{schedule}/status', [ApplicantScheduleController::class, 'updateStatus'])->name('my-schedules.update-status');
 });
 
+// =======================
+// NOTIFICATION ROUTES
+// =======================
+Route::middleware(['auth'])->group(function () {
+    // Notification routes
+    Route::resource('notifications', NotificationController::class)->only(['index']);
+    Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+    Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+});
 
+// =======================
+// PROFILE & POSITION ROUTES
+// =======================
+Route::middleware(['auth'])->group(function () {
+    Route::resource('position', PositionController::class);
+    Route::resource('complete-profile', ProfileCompletionController::class);
+});
+
+// =======================
+// ADMIN ROUTES
+// =======================
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('admin', AdminController::class);
+    Route::resource('test', TestController::class);
+});
+
+// =======================
+// EMAIL ROUTES
+// =======================
 Route::middleware(['auth'])->group(function () {
     Route::resource('send-email', EmailController::class);
     Route::get('test-notification-email', [EmailController::class, 'sendTestNotification'])->name('email.test-notification');
     Route::post('notify-applicant', [EmailController::class, 'notifyApplicant'])->name('email.notify-applicant');
-    Route::resource('schedules', ScheduleController::class);
-
-     // Notification routes
-     Route::resource('notifications', NotificationController::class)->only(['index']);
-     Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
-     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
-     Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
- 
-     // Position routes
-     Route::resource('position', PositionController::class);
- 
-     // Profile completion routes
-     Route::resource('complete-profile', ProfileCompletionController::class);
 });
 
+// =======================
+// SCHEDULE ROUTES
+// =======================
+Route::middleware(['auth'])->group(function () {
+    Route::resource('schedules', ScheduleController::class);
+});
 
-Route::resource('server-side-home', WelcomeController::class);
-
-// Route::get('/php-info', function () {
-//     return [
-//         'upload_max_filesize' => ini_get('upload_max_filesize'),
-//         'post_max_size'      => ini_get('post_max_size'),
-//     ];
-// });
+// =======================
+// TEST & UTILITY ROUTES
+// =======================
 Route::get('/php-info', function () {
     return phpinfo();
 });

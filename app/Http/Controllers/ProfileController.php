@@ -47,6 +47,13 @@ class ProfileController extends Controller
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
+
+        // Validate the request
+        $request->validate([
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
         $user->save();
 
         // Update or create user details (all other fields)
@@ -55,7 +62,7 @@ class ProfileController extends Controller
             [
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
-                'middle_initial' => $request->middle_initial,
+                'middle_name' => $request->middle_name,
                 'phone_number' => $request->phone_number,
                 'eligibility' => $request->eligibility,
             ]
@@ -128,16 +135,15 @@ class ProfileController extends Controller
         $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'middle_initial' => 'nullable|string|max:1',
-            'phone_number' => 'nullable|string|max:20',
+            'middle_name' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|max:25',
             'eligibility' => 'nullable|string|max:255',
-            'email' => 'required|string|email|max:255',
         ]);
 
         $user = auth()->user();
 
         // Update email in the users table if it has changed
-        if ($request->email !== $user->email) {
+        if ($request->filled('email') && $request->email !== $user->email) {
             $user->email = $request->email;
             $user->email_verified_at = null; // Reset email verification if email changed
             $user->save();
@@ -149,7 +155,7 @@ class ProfileController extends Controller
         // Update details
         $userDetails->firstname = $request->firstname;
         $userDetails->lastname = $request->lastname;
-        $userDetails->middle_initial = $request->middle_initial;
+        $userDetails->middle_name = $request->middle_name;
         $userDetails->phone_number = $request->phone_number;
         $userDetails->eligibility = $request->eligibility;
 

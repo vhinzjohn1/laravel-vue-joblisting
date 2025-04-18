@@ -14,10 +14,10 @@
               </h3>
 
               <div class="mt-4 w-full">
-                <div v-if="!isChecked" class="flex items-center space-x-2 mb-4">
+                <div v-if="!isChecked" class="flex items-center justify-center space-x-2 mb-4">
                   <div
-                    class="w-6 h-6 border rounded cursor-pointer flex items-center justify-center hover:border-gray-400"
-                    :class="{ 'border-gray-300': !isChecked }"
+                    class="w-8 h-8 border-2 rounded border-black cursor-pointer flex items-center justify-center hover:border-green-500"
+                    :class="{ 'border-green-500': isChecked }"
                     @click="handleCheckboxClick"
                   >
                     <svg
@@ -34,7 +34,7 @@
                       />
                     </svg>
                   </div>
-                  <span class="text-sm text-gray-600">I'm not a robot</span>
+                  <span class="text-md text-black">I'm not a robot</span>
                 </div>
 
                 <div v-if="showCaptcha" class="mt-4">
@@ -80,7 +80,7 @@
                     {{ validationError }}
                   </div>
 
-                  <div class="mt-4 flex justify-end space-x-3">
+                  <div class="mt-4 flex justify-center space-x-3">
                     <button
                       type="button"
                       class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500"

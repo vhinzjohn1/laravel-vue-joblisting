@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobListing;
-use App\Models\Position;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 class WelcomeController extends Controller
 {
@@ -15,11 +15,33 @@ class WelcomeController extends Controller
     {
         $jobListings = JobListing::with([
             'position'
-        ])->latest()->paginate(3);
+        ])->latest()->limit(3)->get();
 
         return $jobListings;
     }
 
+    public function showBlade()
+    {
+        if (auth()->check()) {
+            return redirect()->route(auth()->user()->role_name . '.index');
+        }
+        $jobListings = $this->index();
+        return view('welcome', [
+            'canLogin'    => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'jobListings' => $jobListings
+        ]);
+    }
+
+    public function showInertia()
+    {
+        $jobListings = $this->index();
+        return \Inertia\Inertia::render('Welcome', [
+            'canLogin'    => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'jobListings' => $jobListings
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */

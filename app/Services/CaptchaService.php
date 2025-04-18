@@ -23,8 +23,13 @@ class CaptchaService
      */
     public function generate(): array
     {
-        // Generate random code with mix of numbers and uppercase letters
-        $code = Str::upper(Str::random(self::LENGTH));
+        $characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ123456789';
+        $max = strlen($characters) - 1;
+        $codeArr = [];
+        for ($i = 0; $i < self::LENGTH; $i++) {
+            $codeArr[] = $characters[random_int(0, $max)];
+        }
+        $code = implode('', $codeArr);
 
         // Create unique token
         $token = Str::random(32);

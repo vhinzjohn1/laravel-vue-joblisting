@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -21,24 +21,24 @@ const form = useForm({
     email: ""
 });
 
-
-// Computed property to check if required fields are filled
-const areRequiredFieldsFilled = computed(() => {
-    return form.firstname.trim() !== "" && form.lastname.trim() !== "";
-});
-
-// Watch for changes in required fields to update validity and emit event
-watch(areRequiredFieldsFilled, (newValue) => {
-    isFormValid.value = newValue;
-    if (newValue) {
-        emit("step-completed");
-    }
-});
+// Function to check if required fields in userDetails are filled
+function areFetchedFieldsFilled(details) {
+    const requireEmail = currentRoute !== '/complete-profile';
+    return (
+        details &&
+        details.firstname && details.firstname.trim() !== "" &&
+        details.lastname && details.lastname.trim() !== "" &&
+        details.middle_name && details.middle_name.trim() !== "" &&
+        details.phone_number && details.phone_number !== "" &&
+        details.eligibility && details.eligibility.trim() !== "" &&
+        (!requireEmail || (details.email && details.email.trim() !== ""))
+    );
+}
 
 const fetchUserDetails = async () => {
     try {
         const response = await axios.get(route("profile.user-details"));
-        console.log(response.data);
+        console.log('This is the props user', response.data.userDetails);
         if (response.data) {
             userDetails.value = response.data.userDetails; // Correctly assign userDetails
             userCredentials.value = response.data.userCredentials; // Assign userCredentials
@@ -49,10 +49,10 @@ const fetchUserDetails = async () => {
             form.middle_name = userDetails.value.middle_name || "";
             form.phone_number = userDetails.value.phone_number || "";
             form.eligibility = userDetails.value.eligibility || "";
-            form.email = userCredentials.value.email || ""; // Use userCredentials for email
+            form.email = userCredentials.value.email || "";
 
-            // Check if required fields are filled and emit "step-completed" if they are
-            if (form.firstname && form.lastname) {
+            // Check if required fields in fetched data are filled and emit "step-completed" if they are
+            if (areFetchedFieldsFilled(userDetails.value)) {
                 isFormValid.value = true;
                 emit("step-completed");
             }
@@ -64,7 +64,14 @@ const fetchUserDetails = async () => {
 
 const saveProfileDetails = async () => {
     // Don't submit if required fields are not filled
-    if (!areRequiredFieldsFilled.value) {
+    if (
+        !form.firstname ||
+        !form.lastname ||
+        !form.middle_name ||
+        !form.phone_number ||
+        !form.eligibility ||
+        (currentRoute !== '/complete-profile' && !form.email)
+    ) {
         return;
     }
 
@@ -102,19 +109,19 @@ onMounted(() => {
     <section>
         <form @submit.prevent="saveProfileDetails" class="space-y-6">
             <div
-                class="bg-white rounded-lg shadow-sm p-6 border border-gray-100"
+                class="p-6 bg-white rounded-lg border border-gray-100 shadow-sm"
             >
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
                         <InputLabel
                             for="firstname"
                             value="First Name"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <TextInput
                             id="firstname"
                             type="text"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.firstname"
                             required
                             placeholder="Enter your first name"
@@ -129,12 +136,12 @@ onMounted(() => {
                         <InputLabel
                             for="lastname"
                             value="Last Name"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <TextInput
                             id="lastname"
                             type="text"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.lastname"
                             required
                             placeholder="Enter your last name"
@@ -149,19 +156,14 @@ onMounted(() => {
                         <InputLabel
                             for="middle_name"
                             value="Middle Name"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <TextInput
                             id="middle_name"
                             type="text"
-                            class="mt-1 block w-full"
+                            class="block mt-1 w-full"
                             v-model="form.middle_name"
-                            maxlength="1"
                             placeholder="Enter Middle Name"
-                            @input="
-                                form.middle_name =
-                                    $event.target.value.toUpperCase()
-                            "
                         />
                         <InputError
                             class="mt-2"
@@ -173,14 +175,9 @@ onMounted(() => {
                         <InputLabel
                             for="phone_number"
                             value="Phone Number"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
-                        <div class="relative mt-1 flex">
-                            <div
-                                class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
-                            >
-                                +63
-                            </div>
+                        <div class="flex relative mt-1">
                             <TextInput
                                 id="phone_number"
                                 type="number"
@@ -188,6 +185,7 @@ onMounted(() => {
                                 v-model="form.phone_number"
                                 maxlength="10"
                                 placeholder="9123456789"
+                                required
                             />
                         </div>
                         <InputError
@@ -201,9 +199,9 @@ onMounted(() => {
                         <InputLabel
                             for="email"
                             value="Email"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
-                        <div class="relative mt-1 flex">
+                        <div class="flex relative mt-1">
 
                             <TextInput
                                 id="email"
@@ -211,6 +209,7 @@ onMounted(() => {
                                 class="block w-full rounded-none rounded-r-md"
                                 v-model="form.email"
                                 placeholder="example@gmail.com"
+                                required
                             />
                         </div>
                         <InputError
@@ -223,15 +222,28 @@ onMounted(() => {
                         <InputLabel
                             for="eligibility"
                             value="Eligibility (Optional)"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
-                        <TextInput
+                        <select
                             id="eligibility"
-                            type="text"
-                            class="mt-1 block w-full"
                             v-model="form.eligibility"
                             placeholder="e.g., Professional License, Civil Service Eligibility"
-                        />
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        >
+                            <option value="" selected disabled hidden>
+                            </option>
+                            <option value="None">None</option>
+                            <option value="Career Service (Professional)">
+                                Career Service (Professional)
+                            </option>
+                            <option value="Career Service (Sub-Professional)">
+                                Career Service (Sub-Professional)
+                            </option>
+                            <option value="RA 1080 (Board/Bar/Court)">
+                                RA 1080 (Board/Bar/Court)
+                            </option>
+                            <option value="PD 907">PD 907</option>
+                        </select>
                         <InputError
                             class="mt-2"
                             :message="form.errors.eligibility"
@@ -242,10 +254,11 @@ onMounted(() => {
 
             <div class="flex justify-end">
                 <PrimaryButton
-                    :disabled="form.processing || !areRequiredFieldsFilled"
+                    type="submit"
+                    :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || !form.eligibility || (currentRoute !== '/complete-profile' && !form.email)"
                     :class="[
                         'px-6 py-2',
-                        areRequiredFieldsFilled
+                        form.firstname && form.lastname && form.middle_name && form.phone_number && form.eligibility && (currentRoute === '/complete-profile' || form.email)
                             ? 'bg-green-700 hover:bg-green-800'
                             : 'bg-green-300 cursor-not-allowed',
                     ]"

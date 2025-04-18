@@ -141,13 +141,13 @@ onMounted(() => {
             </h3>
             <PrimaryButton
                 @click="showModal = true"
-                class="bg-green-700 hover:bg-green-800 flex items-center gap-2"
+                class="flex gap-2 items-center bg-green-700 hover:bg-green-800"
             >
                 <span class="hidden sm:inline">Add Training</span>
                 <span class="sm:hidden">Add</span>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
+                    class="w-5 h-5"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                 >
@@ -163,17 +163,17 @@ onMounted(() => {
         <!-- Loading State -->
         <div v-if="isLoading" class="flex justify-center my-8">
             <div
-                class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-700"
+                class="w-10 h-10 rounded-full border-t-2 border-b-2 border-green-700 animate-spin"
             ></div>
         </div>
 
         <!-- No Records State -->
         <div
             v-else-if="trainings.length === 0"
-            class="bg-white rounded-lg shadow-sm p-8 border border-gray-100 text-center"
+            class="p-8 text-center bg-white rounded-lg border border-gray-100 shadow-sm"
         >
             <div class="flex justify-center">
-                <AcademicCapIcon class="h-16 w-16 text-gray-400" />
+                <AcademicCapIcon class="w-16 h-16 text-gray-400" />
             </div>
             <h3 class="mt-4 text-lg font-medium text-gray-900">
                 No Trainings or Certifications Added Yet
@@ -183,7 +183,7 @@ onMounted(() => {
             </p>
             <button
                 @click="showModal = true"
-                class="mt-4 inline-flex items-center px-4 py-2 bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25 transition"
+                class="inline-flex items-center px-4 py-2 mt-4 text-xs font-semibold tracking-widest text-white uppercase bg-green-700 rounded-md border border-transparent transition hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25"
             >
                 Add Training
             </button>
@@ -194,15 +194,15 @@ onMounted(() => {
             <div
                 v-for="training in trainings"
                 :key="training.training_id"
-                class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all"
+                class="p-5 bg-white rounded-lg border border-gray-100 shadow-sm transition-all hover:shadow-md"
             >
                 <div class="flex justify-between">
                     <div class="flex-grow">
-                        <div class="flex items-start gap-3">
+                        <div class="flex gap-3 items-start">
                             <div class="mt-1">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    class="h-6 w-6 text-green-700"
+                                    class="w-6 h-6 text-green-700"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -216,7 +216,7 @@ onMounted(() => {
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-lg text-gray-800">
+                                <h4 class="text-lg font-semibold text-gray-800">
                                     {{ training.title }}
                                 </h4>
                                 <div
@@ -224,7 +224,7 @@ onMounted(() => {
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        class="h-4 w-4 mr-1"
+                                        class="mr-1 w-4 h-4"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -241,7 +241,7 @@ onMounted(() => {
                                 <div
                                     class="flex items-center mt-1 text-gray-500"
                                 >
-                                    <span class="font-medium mr-2"
+                                    <span class="mr-2 font-medium"
                                         >Duration:</span
                                     >
                                     <span
@@ -266,7 +266,7 @@ onMounted(() => {
                             class="text-red-500 hover:text-red-700 focus:outline-none"
                             title="Delete"
                         >
-                            <TrashIcon class="h-5 w-5" />
+                            <TrashIcon class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
@@ -286,14 +286,14 @@ onMounted(() => {
                         <InputLabel
                             for="title"
                             value="Title"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <input
                             id="title"
                             type="text"
                             v-model="form.title"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
-                            placeholder="Enter training or certification title"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            placeholder="e.g. Seminars, Workshops, etc."
                             required
                         />
                         <InputError :message="form.errors.title" />
@@ -303,14 +303,14 @@ onMounted(() => {
                         <InputLabel
                             for="institution"
                             value="Institution"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <input
                             id="institution"
                             type="text"
                             v-model="form.institution"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
-                            placeholder="Enter institution name"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            placeholder="e.g. Central Mindanao University"
                             required
                         />
                         <InputError :message="form.errors.institution" />
@@ -320,23 +320,25 @@ onMounted(() => {
                         <InputLabel
                             for="duration_hours"
                             value="Duration (hours)"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
+
                         />
                         <input
                             id="duration_hours"
                             type="number"
                             v-model="form.duration_hours"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             required
+                            placeholder="e.g 3 (hours)"
                         />
                         <InputError :message="form.errors.duration_hours" />
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 mt-6">
+                    <div class="flex gap-3 justify-end items-center mt-6">
                         <button
                             type="button"
                             @click="showModal = false"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25 transition"
+                            class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase rounded-md border border-gray-300 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25"
                         >
                             Cancel
                         </button>

@@ -116,7 +116,7 @@ const desktopTourSteps = [
     },
     {
         target: "#job-details-link",
-        title: "Job Details",
+        title: "Job Position Details",
         content: "Manage Job details here",
         popover: {
             position: "right",
@@ -311,7 +311,7 @@ onMounted(async () => {
         <div
             v-if="showMobileMenu"
             @click="toggleMobileMenu"
-            class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden transition-opacity duration-300"
+            class="fixed inset-0 z-30 bg-black bg-opacity-50 transition-opacity duration-300 lg:hidden"
         ></div>
 
         <!-- Vue Guided Tour Component -->
@@ -331,7 +331,7 @@ onMounted(async () => {
             class="fixed bottom-4 right-4 z-20 bg-[#012f12] text-white px-4 py-2 rounded-full shadow-lg hover:bg-[#034b1c] transition-colors duration-200"
             title="Start Tour"
         >
-            <i class="fas fa-question-circle mr-2"></i>
+            <i class="mr-2 fas fa-question-circle"></i>
             <span>Help</span>
         </button>
 
@@ -358,8 +358,8 @@ onMounted(async () => {
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 py-5 overflow-y-auto">
-                <ul class="space-y-2 px-2">
+            <nav class="overflow-y-auto flex-1 py-5">
+                <ul class="px-2 space-y-2">
                     <!-- Dashboard -->
                     <li>
                         <Link
@@ -367,7 +367,7 @@ onMounted(async () => {
                             as="button"
                             :disabled="isTourActive"
                             :href="route('hr.index')"
-                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
                             :class="{
                                 'bg-[#ffc001] text-black': isActive('hr.index'),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
@@ -376,7 +376,7 @@ onMounted(async () => {
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
                                         'text-black': isActive('hr.index'),
                                     }"
@@ -402,7 +402,7 @@ onMounted(async () => {
                             as="button"
                             :disabled="isTourActive"
                             :href="route('job-position.index')"
-                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('job-position.index'),
@@ -412,7 +412,7 @@ onMounted(async () => {
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
                                         'text-black':
                                             isActive('job-position.index'),
@@ -427,7 +427,7 @@ onMounted(async () => {
                                         'font-semibold':
                                             isActive('job-position.index'),
                                     }"
-                                    >Job Details</span
+                                    >Position Details</span
                                 >
                             </div>
                         </Link>
@@ -440,7 +440,7 @@ onMounted(async () => {
                             :disabled="isTourActive"
                             id="job-listings-link"
                             :href="route('job-listing.index')"
-                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('job-listing.index'),
@@ -450,7 +450,7 @@ onMounted(async () => {
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
                                         'text-black':
                                             isActive('job-listing.index'),
@@ -478,7 +478,7 @@ onMounted(async () => {
                             :disabled="isTourActive"
                             id="applications-link"
                             :href="route('applications.index')"
-                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
                             :class="{
                                 'bg-[#ffc001] text-black': isActiveGroup([
                                     'applications.index',
@@ -493,7 +493,7 @@ onMounted(async () => {
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
                                         'text-black': isActiveGroup([
                                             'applications.index',
@@ -523,7 +523,7 @@ onMounted(async () => {
                         <div
                             id="reports-link"
                             @click="toggleDropdown('reports')"
-                            class="sidebar-link flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
+                            class="flex overflow-hidden relative justify-between items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer sidebar-link group"
                             :class="{
                                 'text-white': isActiveGroup([
                                     'selection-lineup.index',
@@ -538,7 +538,7 @@ onMounted(async () => {
                         >
                             <div class="flex items-center">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
                                         'text-white': isActiveGroup([
                                             'selection-lineup.index',
@@ -568,7 +568,7 @@ onMounted(async () => {
                                 }"
                             >
                                 <i
-                                    class="fas fa-chevron-down text-xs"
+                                    class="text-xs fas fa-chevron-down"
                                     :class="{
                                         'text-white': isActiveGroup([
                                         'selection-lineup.index',
@@ -582,20 +582,20 @@ onMounted(async () => {
                         <!-- Dropdown menu -->
                         <transition
                             enter-active-class="transition duration-200 ease-out"
-                            enter-from-class="transform scale-95 opacity-0"
-                            enter-to-class="transform scale-100 opacity-100"
+                            enter-from-class="opacity-0 transform scale-95"
+                            enter-to-class="opacity-100 transform scale-100"
                             leave-active-class="transition duration-100 ease-in"
-                            leave-from-class="transform scale-100 opacity-100"
-                            leave-to-class="transform scale-95 opacity-0"
+                            leave-from-class="opacity-100 transform scale-100"
+                            leave-to-class="opacity-0 transform scale-95"
                         >
                             <ul
                                 v-show="activeDropdown === 'reports'"
-                                class="mt-1 space-y-1 ml-4 pl-4 pr-2"
+                                class="pr-2 pl-4 mt-1 ml-4 space-y-1"
                             >
                                 <li>
                                     <Link
                                         :href="route('selection-lineup.index')"
-                                        class="dropdown-link flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
                                         :class="{
                                             'bg-[#ffc001] text-black font-medium':
                                                 isActiveGroup([
@@ -610,7 +610,7 @@ onMounted(async () => {
                                         }"
                                     >
                                         <i
-                                            class="fas fa-calendar-check mr-2"
+                                            class="mr-2 fas fa-calendar-check"
                                             :class="{
                                                 'text-black': isActiveGroup([
                                                     'selection-lineup.index',
@@ -630,7 +630,7 @@ onMounted(async () => {
                         <div
                             id="schedule-management-link"
                             @click="toggleDropdown('schedule')"
-                            class="sidebar-link flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer group transition-all duration-200 relative overflow-hidden"
+                            class="flex overflow-hidden relative justify-between items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer sidebar-link group"
                             :class="{
                                 'text-white bg-[#034b1c]':
                                     activeDropdown === 'schedule' ||
@@ -650,7 +650,7 @@ onMounted(async () => {
                         >
                             <div class="flex items-center">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
                                         'text-white':
                                             isActiveGroup([
@@ -684,7 +684,7 @@ onMounted(async () => {
                                 }"
                             >
                                 <i
-                                    class="fas fa-chevron-down text-xs"
+                                    class="text-xs fas fa-chevron-down"
                                     :class="{
                                         'text-white':
                                             activeDropdown === 'schedule' ||
@@ -701,20 +701,20 @@ onMounted(async () => {
                         <!-- Dropdown menu -->
                         <transition
                             enter-active-class="transition duration-200 ease-out"
-                            enter-from-class="transform scale-95 opacity-0"
-                            enter-to-class="transform scale-100 opacity-100"
+                            enter-from-class="opacity-0 transform scale-95"
+                            enter-to-class="opacity-100 transform scale-100"
                             leave-active-class="transition duration-100 ease-in"
-                            leave-from-class="transform scale-100 opacity-100"
-                            leave-to-class="transform scale-95 opacity-0"
+                            leave-from-class="opacity-100 transform scale-100"
+                            leave-to-class="opacity-0 transform scale-95"
                         >
                             <ul
                                 v-show="activeDropdown === 'schedule'"
-                                class="mt-1 space-y-1 ml-4 pl-4 pr-2"
+                                class="pr-2 pl-4 mt-1 ml-4 space-y-1"
                             >
                                 <li>
                                     <Link
                                         :href="route('schedules.index')"
-                                        class="dropdown-link flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
                                         :class="{
                                             'bg-[#ffc001] text-black font-medium':
                                                 isActive('schedules.index'),
@@ -723,7 +723,7 @@ onMounted(async () => {
                                         }"
                                     >
                                         <i
-                                            class="fas fa-calendar-check mr-2"
+                                            class="mr-2 fas fa-calendar-check"
                                             :class="{
                                                 'text-black':
                                                     isActive('schedules.index'),
@@ -735,7 +735,7 @@ onMounted(async () => {
                                 <li>
                                     <Link
                                         :href="route('groups.index')"
-                                        class="dropdown-link flex items-center px-3 py-2 rounded-md text-sm transition-all duration-200"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
                                         :class="{
                                             'bg-[#ffc001] text-black font-medium':
                                                 isActive('groups.index'),
@@ -744,7 +744,7 @@ onMounted(async () => {
                                         }"
                                     >
                                         <i
-                                            class="fas fa-users-cog mr-2"
+                                            class="mr-2 fas fa-users-cog"
                                             :class="{
                                                 'text-black':
                                                     isActive('groups.index'),
@@ -764,7 +764,7 @@ onMounted(async () => {
                             :disabled="isTourActive"
                             id="profile-link"
                             :href="route('profile.edit')"
-                            class="sidebar-link flex items-center w-full px-4 py-2.5 rounded-lg group transition-all duration-200 relative overflow-hidden"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
                             :class="{
                                 'bg-[#ffc001] text-black':
                                     isActive('profile.edit'),
@@ -774,7 +774,7 @@ onMounted(async () => {
                         >
                             <div class="flex items-center w-full">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 transition-all duration-300"
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
                                         'text-black': isActive('profile.edit'),
                                     }"
@@ -806,8 +806,8 @@ onMounted(async () => {
             class="transition-all duration-300 ease-in-out"
         >
         <!-- Page Header -->
-            <header class="bg-white shadow-sm sticky top-0 z-10" v-if="$slots.header">
-                <div class="mx-auto py-2.5 sm:px-10 md:px-12 lg:px-8 flex items-center gap-5">
+            <header class="sticky top-0 z-10 bg-white shadow-sm" v-if="$slots.header">
+                <div class="flex gap-5 items-center py-2.5 mx-auto sm:px-10 md:px-12 lg:px-8">
 
                     <!-- One Toggle Button for Both Views -->
                     <button
@@ -832,19 +832,19 @@ onMounted(async () => {
                         <div class="relative ml-3">
                             <button
                                 @click="toggleProfileDropdown"
-                                class="flex items-center gap-2 hover:bg-gray-100 rounded-full p-1.5 transition-colors"
+                                class="flex gap-2 items-center p-1.5 rounded-full transition-colors hover:bg-gray-100"
                             >
-                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <div class="flex justify-center items-center w-8 h-8 bg-gray-200 rounded-full">
                                     <span class="text-sm font-medium text-gray-600">
                                         {{ $page.props.auth.user.username.charAt(0) }}
                                     </span>
                                 </div>
-                                <i class="fas fa-angle-down text-gray-600 text-sm"></i>
+                                <i class="text-sm text-gray-600 fas fa-angle-down"></i>
                             </button>
 
                             <!-- Dropdown Menu -->
-                            <div v-if="showProfileDropdown" 
-                                class="absolute right-0 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                            <div v-if="showProfileDropdown"
+                                class="absolute right-0 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg">
                                 <Link
                                     :href="route('profile.edit')"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -853,7 +853,7 @@ onMounted(async () => {
                                 </Link>
                                 <button
                                     @click="showLogoutModal = true"
-                                    class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                                    class="block px-4 py-2 w-full text-sm text-left text-gray-700 hover:bg-gray-100"
                                 >
                                     Logout
                                 </button>
@@ -865,7 +865,7 @@ onMounted(async () => {
 
             <!-- Page Content -->
             <main class="py-3">
-                <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="px-4 mx-auto max-w-full sm:px-6 lg:px-8">
                     <slot />
                 </div>
             </main>
@@ -874,10 +874,10 @@ onMounted(async () => {
         <!-- Logout Modal -->
         <div
             v-if="showLogoutModal"
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 transition-opacity"
+            class="flex fixed inset-0 z-50 justify-center items-center p-4 bg-black bg-opacity-75 transition-opacity"
         >
             <div
-                class="relative w-full max-w-sm rounded-lg bg-white p-6 text-center"
+                class="relative p-6 w-full max-w-sm text-center bg-white rounded-lg"
             >
                 <h3 class="mb-1 text-lg font-semibold text-black">
                     Are you sure you want to log out?
@@ -891,13 +891,13 @@ onMounted(async () => {
                 <div class="flex flex-col space-y-2">
                     <button
                         @click="handleLogout"
-                        class="w-full rounded-lg logout px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        class="px-4 py-2 w-full text-sm font-semibold text-white rounded-lg logout focus:outline-none focus:ring-2 focus:ring-gray-300"
                     >
                         Log out
                     </button>
                     <button
                         @click="showLogoutModal = false"
-                        class="w-full rounded-lg border border-gray-600 px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        class="px-4 py-2 w-full text-sm font-semibold text-black rounded-lg border border-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
                     >
                         Cancel
                     </button>
@@ -955,10 +955,6 @@ nav::-webkit-scrollbar-thumb {
     transition: transform 0.2s ease;
 }
 
-.sidebar-link:not(.bg-[#ffc001]):hover::before {
-    transform: scaleY(1);
-}
-
 /* Dropdown link hover effect */
 .dropdown-link {
     position: relative;
@@ -974,10 +970,6 @@ nav::-webkit-scrollbar-thumb {
     background-color: #ffc001;
     transform: scaleY(0);
     transition: transform 0.2s ease;
-}
-
-.dropdown-link:not(.bg-[#ffc001]):hover::before {
-    transform: scaleY(1);
 }
 
 /* Transition improvements */

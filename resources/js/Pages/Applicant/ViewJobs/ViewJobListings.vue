@@ -7,7 +7,7 @@
         </template>
 
         <div class="py-5">
-            <div class="container-fluid px-4">
+            <div class="px-4 container-fluid">
                 <Breadcrumbs
                     :items="[
                         { name: 'Home', href: route('job-application.index') },
@@ -20,22 +20,22 @@
                 />
 
                 <div
-                    class="card shadow-sm rounded-lg overflow-hidden bg-white mb-6"
+                    class="overflow-hidden mb-6 bg-white rounded-lg shadow-sm card"
                 >
-                    <div class="card-header bg-white py-4 px-4 border-b">
+                    <div class="px-4 py-4 bg-white border-b card-header">
                         <div
-                            class="flex flex-col md:flex-row justify-center items-center gap-3"
+                            class="flex flex-col gap-3 justify-center items-center md:flex-row"
                         >
-                            <div class="relative w-full md:w-1/2 max-w-xl">
+                            <div class="relative w-full max-w-xl md:w-1/2">
                                 <div class="flex">
                                     <input
                                         type="text"
-                                        class="form-control block w-full px-4 py-2.5 text-sm border border-gray-300 rounded-l-lg focus:ring-blue-500 focus:border-blue-500"
+                                        class="block px-4 py-2.5 w-full text-sm rounded-l-lg border border-gray-300 form-control focus:ring-blue-500 focus:border-blue-500"
                                         placeholder="Search job listings..."
                                         v-model="searchQuery"
                                     />
                                     <button
-                                        class="px-4 bg-gray-100 text-gray-700 border border-l-0 border-gray-300 rounded-r-lg hover:bg-gray-200 transition-colors"
+                                        class="px-4 text-gray-700 bg-gray-100 rounded-r-lg border border-l-0 border-gray-300 transition-colors hover:bg-gray-200"
                                     >
                                         <i class="fas fa-search"></i>
                                     </button>
@@ -43,15 +43,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="p-4 card-body">
                         <div
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+                            class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
                         >
                             <!-- Job Listing Preview Cards -->
                             <div
                                 v-for="(job, index) in filteredJobs"
                                 :key="index"
-                                class="bg-white rounded-xl border hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full cursor-pointer relative"
+                                class="flex overflow-hidden relative flex-col h-full bg-white rounded-xl border border-gray-300 transition-all duration-300 cursor-pointer hover:shadow-lg group"
                                 :class="[
                                     hasAppliedToJob(job)
                                         ? 'border-green-200 bg-green-50/30'
@@ -59,7 +59,7 @@
                                 ]"
                                 @click="showJobDetails(job)"
                             >
-                                <div class="p-6 flex flex-col h-full">
+                                <div class="flex flex-col p-6 h-full">
                                     <!-- Applied Badge (Top-Right Corner) -->
                                     <div
                                         v-if="hasAppliedToJob(job)"
@@ -69,14 +69,14 @@
                                     </div>
 
                                     <!-- Header Section -->
-                                    <div class="flex items-start gap-4 mb-3">
+                                    <div class="flex gap-4 items-start mb-3">
                                         <!-- Position Icon -->
                                         <div
-                                            class="flex-shrink-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
+                                            class="flex flex-shrink-0 justify-center items-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl transition-transform duration-300 group-hover:scale-105"
                                             style="width: 56px; height: 56px"
                                         >
                                             <span
-                                                class="text-green-600 font-semibold text-lg"
+                                                class="text-lg font-semibold text-green-600"
                                             >
                                                 {{
                                                     job.position.position_name.substring(
@@ -90,12 +90,12 @@
                                         <!-- Title and Position -->
                                         <div class="flex-1">
                                             <h5
-                                                class="font-bold text-gray-900 text-lg mb-2 group-hover:text-green-600 transition-colors"
+                                                class="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-green-600"
                                             >
                                                 {{ job.title }}
                                             </h5>
                                             <div
-                                                class="flex items-center gap-2 text-sm"
+                                                class="flex gap-2 items-center text-sm"
                                             >
                                                 <span class="text-gray-600">{{
                                                     job.position.position_name
@@ -104,7 +104,7 @@
                                                     >•</span
                                                 >
                                                 <span
-                                                    class="inline-flex items-center gap-1.5"
+                                                    class="inline-flex gap-1.5 items-center"
                                                 >
                                                     <span
                                                         class="inline-block w-2.5 h-2.5 rounded-full"
@@ -149,12 +149,12 @@
                                             class="mb-4"
                                         >
                                             <h6
-                                                class="text-sm font-medium text-gray-700 mb-2"
+                                                class="mb-2 text-sm font-medium text-gray-700"
                                             >
                                                 Minimum Requirements:
                                             </h6>
                                             <ul
-                                                class="list-disc list-inside text-sm text-gray-600 space-y-1"
+                                                class="space-y-1 text-sm list-disc list-inside text-gray-600"
                                             >
                                                 <li
                                                     v-if="
@@ -164,7 +164,7 @@
                                                     "
                                                 >
                                                     <i
-                                                        class="fas fa-graduation-cap mr-1 text-gray-500"
+                                                        class="mr-1 text-gray-500 fas fa-graduation-cap"
                                                     ></i>
                                                     {{
                                                         job.position
@@ -180,7 +180,7 @@
                                                     "
                                                 >
                                                     <i
-                                                        class="fas fa-certificate mr-1 text-gray-500"
+                                                        class="mr-1 text-gray-500 fas fa-certificate"
                                                     ></i>
                                                     {{
                                                         job.position
@@ -196,7 +196,7 @@
                                                     "
                                                 >
                                                     <i
-                                                        class="fas fa-chalkboard-teacher mr-1 text-gray-500"
+                                                        class="mr-1 text-gray-500 fas fa-chalkboard-teacher"
                                                     ></i>
                                                     {{
                                                         job.position
@@ -213,7 +213,7 @@
                                                     "
                                                 >
                                                     <i
-                                                        class="fas fa-briefcase mr-1 text-gray-500"
+                                                        class="mr-1 text-gray-500 fas fa-briefcase"
                                                     ></i>
                                                     {{
                                                         job.position
@@ -227,7 +227,7 @@
 
                                         <!-- Description -->
                                         <p
-                                            class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4"
+                                            class="mb-4 text-sm leading-relaxed text-gray-600 line-clamp-3"
                                         >
                                             {{ job.description }}
                                         </p>
@@ -235,13 +235,13 @@
 
                                     <!-- Footer Section -->
                                     <div
-                                        class="mt-6 pt-4 border-t border-gray-50"
+                                        class="pt-4 mt-6 border-t border-gray-50"
                                     >
                                         <div
-                                            class="flex items-center justify-between"
+                                            class="flex justify-between items-center"
                                         >
                                             <div
-                                                class="flex items-center gap-2"
+                                                class="flex gap-2 items-center"
                                             >
                                                 <span
                                                     class="text-sm text-gray-500"
@@ -255,13 +255,13 @@
                                                 </span>
                                             </div>
                                             <div
-                                                class="flex items-center gap-2"
+                                                class="flex gap-2 items-center"
                                             >
                                                 <button
-                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-lg hover:bg-green-700 transition-all duration-200"
+                                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-lg transition-all duration-200 hover:bg-green-700"
                                                 >
                                                     <i
-                                                        class="fas fa-arrow-right mr-2"
+                                                        class="mr-2 fas fa-arrow-right"
                                                     ></i>
                                                     View Details
                                                 </button>

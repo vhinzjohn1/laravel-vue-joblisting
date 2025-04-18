@@ -27,6 +27,7 @@ return new class extends Migration
 
             // Adding Index for Performance
             $table->index('email');
+            $table->index('username');
             $table->index('role_name');
             $table->index('profile_completed');
             $table->index('tour_completed');

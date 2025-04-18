@@ -77,13 +77,13 @@ const maxWidthClass = computed(() => {
         <Transition leave-active-class="duration-150">
             <div
                 v-show="show"
-                class="fixed inset-0 px-4 py-6 sm:px-0 z-50 flex items-center justify-center"
+                class="flex fixed inset-0 z-50 justify-center items-center px-4 py-6 sm:px-0"
             >
                 <Transition
-                    enter-active-class="ease-out duration-150"
+                    enter-active-class="duration-150 ease-out"
                     enter-from-class="opacity-0"
                     enter-to-class="opacity-100"
-                    leave-active-class="ease-in duration-150"
+                    leave-active-class="duration-150 ease-in"
                     leave-from-class="opacity-100"
                     leave-to-class="opacity-0"
                 >
@@ -95,16 +95,16 @@ const maxWidthClass = computed(() => {
                 </Transition>
 
                 <Transition
-                    enter-active-class="ease-out duration-150"
+                    enter-active-class="duration-150 ease-out"
                     enter-from-class="opacity-0 translate-y-2"
                     enter-to-class="opacity-100 translate-y-0"
-                    leave-active-class="ease-in duration-150"
+                    leave-active-class="duration-150 ease-in"
                     leave-from-class="opacity-100 translate-y-0"
                     leave-to-class="opacity-0 translate-y-2"
                 >
                     <div
                         v-show="show"
-                        class="bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
+                        class="bg-white rounded-lg shadow-xl transition-all transform sm:w-full sm:mx-auto"
                         :class="[
                             maxWidthClass,
                             'min-w-[370px] max-w-[90vw] max-h-[90vh] overflow-y-auto',
@@ -114,20 +114,20 @@ const maxWidthClass = computed(() => {
                             <!-- Modal Header -->
                             <div
                                 v-if="showHeader"
-                                class="modal-header bg-gray-50 px-5 py-4 border-b"
+                                class="sticky top-0 z-10 px-5 py-4 bg-gray-50 border-b modal-header"
                             >
                                 <div
                                     class="flex justify-between items-center w-full"
                                 >
                                     <h5
-                                        class="modal-title font-semibold text-gray-900 text-lg"
+                                        class="text-lg font-semibold text-gray-900 modal-title"
                                     >
                                         {{ title }}
                                     </h5>
                                     <button
                                         v-if="closeable"
                                         type="button"
-                                        class="btn-close text-gray-500 hover:text-gray-700"
+                                        class="text-gray-500 btn-close hover:text-gray-700"
                                         @click="close"
                                         aria-label="Close"
                                     >

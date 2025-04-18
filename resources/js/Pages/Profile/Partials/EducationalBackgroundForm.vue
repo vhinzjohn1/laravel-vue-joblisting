@@ -22,7 +22,7 @@ const form = useForm({
     school_name: "",
     degree_course: "",
     year_graduated: "",
-    honors_received: "",
+    honors_received: "None",
 });
 
 const emit = defineEmits(["step-completed"]);
@@ -135,13 +135,13 @@ onMounted(() => {
             </h3>
             <PrimaryButton
                 @click="showModal = true"
-                class="bg-green-700 hover:bg-green-800 flex items-center gap-2"
+                class="flex gap-2 items-center bg-green-700 hover:bg-green-800"
             >
                 <span class="hidden sm:inline">Add Education</span>
                 <span class="sm:hidden">Add</span>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
+                    class="w-5 h-5"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                 >
@@ -157,17 +157,17 @@ onMounted(() => {
         <!-- Loading State -->
         <div v-if="isLoading" class="flex justify-center my-8">
             <div
-                class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-700"
+                class="w-10 h-10 rounded-full border-t-2 border-b-2 border-green-700 animate-spin"
             ></div>
         </div>
 
         <!-- No Records State -->
         <div
             v-else-if="educations.length === 0"
-            class="bg-white rounded-lg shadow-sm p-8 border border-gray-100 text-center"
+            class="p-8 text-center bg-white rounded-lg border border-gray-100 shadow-sm"
         >
             <div class="flex justify-center">
-                <AcademicCapIcon class="h-16 w-16 text-gray-400" />
+                <AcademicCapIcon class="w-16 h-16 text-gray-400" />
             </div>
             <h3 class="mt-4 text-lg font-medium text-gray-900">
                 No Educational Background Added Yet
@@ -177,7 +177,7 @@ onMounted(() => {
             </p>
             <button
                 @click="showModal = true"
-                class="mt-4 inline-flex items-center px-4 py-2 bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25 transition"
+                class="inline-flex items-center px-4 py-2 mt-4 text-xs font-semibold tracking-widest text-white uppercase bg-green-700 rounded-md border border-transparent transition hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25"
             >
                 Add Education
             </button>
@@ -188,30 +188,30 @@ onMounted(() => {
             <div
                 v-for="education in educations"
                 :key="education.education_id"
-                class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all"
+                class="p-5 bg-white rounded-lg border border-gray-100 shadow-sm transition-all hover:shadow-md"
             >
                 <div class="flex justify-between">
                     <div class="flex-grow">
-                        <div class="flex items-start gap-3">
+                        <div class="flex gap-3 items-start">
                             <div class="mt-1">
                                 <AcademicCapIcon
-                                    class="h-6 w-6 text-green-700"
+                                    class="w-6 h-6 text-green-700"
                                 />
                             </div>
                             <div>
-                                <h4 class="font-semibold text-lg text-gray-800">
+                                <h4 class="text-lg font-semibold text-gray-800">
                                     {{ education.degree_course }}
                                 </h4>
                                 <div
                                     class="flex items-center mt-1 text-gray-600"
                                 >
-                                    <BuildingLibraryIcon class="h-4 w-4 mr-1" />
+                                    <BuildingLibraryIcon class="mr-1 w-4 h-4" />
                                     <span>{{ education.school_name }}</span>
                                 </div>
                                 <div
                                     class="flex items-center mt-1 text-gray-500"
                                 >
-                                    <CalendarIcon class="h-4 w-4 mr-1" />
+                                    <CalendarIcon class="mr-1 w-4 h-4" />
                                     <span
                                         >Graduated:
                                         {{ education.year_graduated }}</span
@@ -219,13 +219,13 @@ onMounted(() => {
                                 </div>
                                 <div class="mt-1">
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                        class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium text-green-800 bg-green-100 rounded-full"
                                     >
                                         {{ education.level }}
                                     </span>
                                     <span
                                         v-if="education.honors_received"
-                                        class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                        class="inline-flex items-center px-2.5 py-0.5 ml-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-full"
                                     >
                                         {{ education.honors_received }}
                                     </span>
@@ -239,7 +239,7 @@ onMounted(() => {
                             class="text-red-500 hover:text-red-700 focus:outline-none"
                             title="Delete"
                         >
-                            <TrashIcon class="h-5 w-5" />
+                            <TrashIcon class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
@@ -259,15 +259,16 @@ onMounted(() => {
                         <InputLabel
                             for="level"
                             value="Level"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <select
                             id="level"
                             v-model="form.level"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             required
                         >
-                            <option value="">Select Level</option>
+                            <option value="" disabled>Select Level</option>
+                            <option value="High School Diploma">High School Diploma</option>
                             <option value="Bachelor's degree">Bachelor's degree</option>
                             <option value="Master's degree">Master's degree</option>
                             <option value="Doctorate degree">Doctorate degree</option>
@@ -279,13 +280,13 @@ onMounted(() => {
                         <InputLabel
                             for="school_name"
                             value="School Name"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <input
                             id="school_name"
                             type="text"
                             v-model="form.school_name"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             placeholder="Enter school name"
                             required
                         />
@@ -296,13 +297,13 @@ onMounted(() => {
                         <InputLabel
                             for="degree_course"
                             value="Degree/Course"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <input
                             id="degree_course"
                             type="text"
                             v-model="form.degree_course"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             placeholder="e.g. BS Information Technology"
                             required
                         />
@@ -313,7 +314,7 @@ onMounted(() => {
                         <InputLabel
                             for="year_graduated"
                             value="Year Graduated"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
                         <input
                             id="year_graduated"
@@ -321,7 +322,7 @@ onMounted(() => {
                             v-model="form.year_graduated"
                             min="1900"
                             :max="new Date().getFullYear()"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             placeholder="2025"
                             required
                         />
@@ -332,23 +333,27 @@ onMounted(() => {
                         <InputLabel
                             for="honors_received"
                             value="Honors Received (Optional)"
-                            class="text-gray-700 font-medium"
+                            class="font-medium text-gray-700"
                         />
-                        <input
+                        <select
                             id="honors_received"
-                            type="text"
                             v-model="form.honors_received"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             placeholder="e.g., Cum Laude, Magna Cum Laude"
-                        />
+                        >
+                            <option value="" disabled>Select Honors</option>
+                            <option value="None">None</option>
+                            <option value="Cum Laude">Cum Laude</option>
+                            <option value="Magna Cum Laude">Magna Cum Laude</option>
+                            <option value="Summa Cum Laude">Summa Cum Laude</option>
+                        </select>
                         <InputError :message="form.errors.honors_received" />
                     </div>
-
-                    <div class="flex items-center justify-end gap-3 mt-6">
+                    <div class="flex gap-3 justify-end items-center mt-6">
                         <button
                             type="button"
                             @click="showModal = false"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25 transition"
+                            class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase rounded-md border border-gray-300 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25"
                         >
                             Cancel
                         </button>

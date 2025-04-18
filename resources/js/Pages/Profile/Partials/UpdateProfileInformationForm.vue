@@ -17,11 +17,10 @@ const form = useForm({
     email: user.email,
     firstname: props.userDetails?.firstname || "",
     lastname: props.userDetails?.lastname || "",
-    middle_initial: props.userDetails?.middle_initial || "",
+    middle_name: props.userDetails?.middle_name || "",
     phone_number: props.userDetails?.phone_number || "",
     eligibility: props.userDetails?.eligibility || "",
 });
-
 // Show success alert
 const showToast = () => {
     let title;
@@ -70,7 +69,7 @@ const showToast = () => {
                 <TextInput
                     id="username"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="block mt-1 w-full"
                     v-model="form.username"
                     required
                     autofocus
@@ -86,7 +85,7 @@ const showToast = () => {
                 <TextInput
                     id="email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="block mt-1 w-full"
                     v-model="form.email"
                     required
                     autocomplete="email"
@@ -95,13 +94,13 @@ const showToast = () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <InputLabel for="firstname" value="First Name" />
                     <TextInput
                         id="firstname"
                         type="text"
-                        class="mt-1 block w-full"
+                        class="block mt-1 w-full"
                         v-model="form.firstname"
                         required
                     />
@@ -113,7 +112,7 @@ const showToast = () => {
                     <TextInput
                         id="lastname"
                         type="text"
-                        class="mt-1 block w-full"
+                        class="block mt-1 w-full"
                         v-model="form.lastname"
                         required
                     />
@@ -121,15 +120,15 @@ const showToast = () => {
                 </div>
 
                 <div>
-                    <InputLabel for="middle_initial" value="Middle Initial" />
+                    <InputLabel for="middle_name" value="Middle Name" />
                     <TextInput
-                        id="middle_initial"
+                        id="middle_name"
                         type="text"
-                        class="mt-1 block w-full"
-                        v-model="form.middle_initial"
+                        class="block mt-1 w-full"
+                        v-model="form.middle_name"
                         maxlength="1"
                         @input="
-                            form.middle_initial =
+                            form.middle_name =
                                 $event.target.value.toUpperCase()
                         "
                     />
@@ -141,9 +140,9 @@ const showToast = () => {
 
                 <div>
                     <InputLabel for="phone_number" value="Phone Number" />
-                    <div class="relative mt-1 flex">
+                    <div class="flex relative mt-1">
                         <div
-                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
+                            class="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-50 rounded-l-md border border-r-0 border-gray-300"
                         >
                             +63
                         </div>
@@ -167,7 +166,7 @@ const showToast = () => {
                     <TextInput
                         id="eligibility"
                         type="text"
-                        class="mt-1 block w-full"
+                        class="block mt-1 w-full"
                         v-model="form.eligibility"
                     />
                     <InputError
@@ -178,13 +177,13 @@ const showToast = () => {
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <p class="text-sm mt-2 text-gray-800">
+                <p class="mt-2 text-sm text-gray-800">
                     Your email address is unverified.
                     <Link
                         :href="route('verification.send')"
                         method="post"
                         as="button"
-                        class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        class="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                         Click here to re-send the verification email.
                     </Link>
@@ -192,13 +191,13 @@ const showToast = () => {
 
                 <div
                     v-show="status === 'verification-link-sent'"
-                    class="mt-2 font-medium text-sm text-green-600"
+                    class="mt-2 text-sm font-medium text-green-600"
                 >
                     A new verification link has been sent to your email address.
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
+            <div class="flex gap-4 items-center">
                 <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
             </div>
         </form>

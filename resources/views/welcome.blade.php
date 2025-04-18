@@ -53,12 +53,11 @@
             @include('components.hero-section')
 
             <!-- How to Apply Section -->
+            @include('components.how-to-apply')
 
-           @include('components.how-to-apply')
-
-            {{-- Job Listing Section and display jobListings --}}
-
+            <!-- Job Listings Section -->
             @include('components.job-listings-section')
+
             <!-- About Section -->
             @include('components.about-section')
 
@@ -150,5 +149,4 @@
         });
     </script>
 </body>
-
 </html>

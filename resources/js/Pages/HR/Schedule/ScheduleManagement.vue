@@ -7,124 +7,131 @@
         </template>
 
         <div class="py-5">
-            <div class="container-fluid px-4">
+            <div class="px-4 container-fluid">
                 <div
-                    class="card shadow-sm rounded-lg overflow-hidden bg-white mb-6"
+                    class="overflow-hidden mb-6 bg-white rounded-lg shadow-sm card"
                 >
-                    <div class="card-header bg-white py-4 px-4 border-b">
+                    <div class="px-4 py-4 bg-white border-b card-header">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-semibold">Schedules</h2>
                             <PrimaryButton
                                 @click="showCreateModal = true"
                             >
-                                <i class="fas fa-plus mr-2"></i>
+                                <i class="mr-2 fas fa-plus"></i>
                                 Create Schedule
                             </PrimaryButton>
                         </div>
                     </div>
 
                     <div class="p-4">
-                        <!-- Calendar View -->
-                        <div class="mb-6">
-                            <FullCalendar :options="calendarOptions" />
-                        </div>
+                        <!-- Two-column layout -->
+                        <div class="flex flex-col gap-6 md:flex-row">
 
-                        <!-- Schedule List -->
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Title
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Date
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Location
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Status
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody
-                                    class="bg-white divide-y divide-gray-200"
-                                >
-                                    <tr
-                                        v-for="schedule in schedules"
-                                        :key="schedule.schedule_id"
+                            <!-- Calendar View -->
+                            <div class="mb-6 w-full md:w-3/5 md:mb-0">
+                                <FullCalendar :options="calendarOptions" />
+                            </div>
+
+                            <!-- Spacer Line -->
+                            <div class="w-1/5 border border-gray-400 md:w-0" />
+
+                            <!-- Schedule List -->
+                            <div class="overflow-x-auto w-full md:w-2/5">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Title
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Date
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Location
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Status
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase"
+                                            >
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        class="bg-white divide-y divide-gray-200"
                                     >
-                                        <td class="px-6 py-4">
-                                            {{ schedule.title }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{
-                                                formatDate(
-                                                    schedule.schedule_date,
-                                                )
-                                            }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{ schedule.location }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                                :class="
-                                                    getStatusClass(
-                                                        schedule.status,
+                                        <tr
+                                            v-for="schedule in schedules"
+                                            :key="schedule.schedule_id"
+                                        >
+                                            <td class="px-6 py-4">
+                                                {{ schedule.title }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{
+                                                    formatDate(
+                                                        schedule.schedule_date,
                                                     )
-                                                "
-                                            >
-                                                {{ schedule.status }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <button
-                                                @click="
-                                                    viewParticipants(schedule)
-                                                "
-                                                class="text-blue-600 hover:text-blue-900 mr-2"
-                                            >
-                                                <i class="fas fa-users"></i>
-                                            </button>
-                                            <button
-                                                @click="editSchedule(schedule)"
-                                                class="text-blue-600 hover:text-blue-900 mr-2"
-                                            >
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button
-                                                @click="
-                                                    deleteSchedule(schedule)
-                                                "
-                                                class="text-red-600 hover:text-red-900"
-                                            >
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                                }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ schedule.location }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span
+                                                    class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full"
+                                                    :class="
+                                                        getStatusClass(
+                                                            schedule.status,
+                                                        )
+                                                    "
+                                                >
+                                                    {{ schedule.status }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <button
+                                                    @click="
+                                                        viewParticipants(schedule)
+                                                    "
+                                                    class="mr-2 text-blue-600 hover:text-blue-900"
+                                                >
+                                                    <i class="fas fa-users"></i>
+                                                </button>
+                                                <button
+                                                    @click="editSchedule(schedule)"
+                                                    class="mr-2 text-blue-600 hover:text-blue-900"
+                                                >
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button
+                                                    @click="
+                                                        deleteSchedule(schedule)
+                                                    "
+                                                    class="text-red-600 hover:text-red-900"
+                                                >
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,7 +147,7 @@
         >
             <div class="p-6">
                 <form @submit.prevent="handleSubmit" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
                             <label
                                 class="block text-sm font-medium text-gray-700"
@@ -149,7 +156,7 @@
                             <input
                                 type="text"
                                 v-model="form.title"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 required
                             />
                         </div>
@@ -161,7 +168,7 @@
                             <input
                                 type="text"
                                 v-model="form.location"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 required
                             />
                         </div>
@@ -173,7 +180,7 @@
                             <input
                                 type="datetime-local"
                                 v-model="form.schedule_date"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 required
                             />
                             <p class="mt-1 text-xs text-gray-500">
@@ -188,7 +195,7 @@
                             >
                             <select
                                 v-model="form.status"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             >
                                 <option value="Scheduled">Scheduled</option>
                                 <option value="Completed">Completed</option>
@@ -204,7 +211,7 @@
                         <textarea
                             v-model="form.description"
                             rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             required
                         ></textarea>
                     </div>
@@ -216,13 +223,13 @@
                         <textarea
                             v-model="form.notes"
                             rows="2"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         ></textarea>
                     </div>
 
                     <div v-if="!editingSchedule">
                         <label
-                            class="block text-sm font-medium text-gray-700 mb-2"
+                            class="block mb-2 text-sm font-medium text-gray-700"
                             >Participants</label
                         >
 
@@ -252,7 +259,7 @@
                                     participant, index
                                 ) in form.participants"
                                 :key="index"
-                                class="flex items-center gap-2"
+                                class="flex gap-2 items-center"
                             >
                                 <div class="flex-1">
                                     <CustomSelect
@@ -282,15 +289,15 @@
                             @click="addParticipant"
                             class="mt-2 text-sm text-blue-600 hover:text-blue-800"
                         >
-                            <i class="fas fa-plus mr-1"></i> Add Participant
+                            <i class="mr-1 fas fa-plus"></i> Add Participant
                         </button>
                     </div>
 
-                    <div class="flex justify-end space-x-3 mt-6">
+                    <div class="flex justify-end mt-6 space-x-3">
                         <button
                             type="button"
                             @click="closeModal"
-                            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                            class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50"
                         >
                             Cancel
                         </button>
@@ -317,15 +324,15 @@
             maxWidth="6xl"
         >
             <div v-if="selectedSchedule" class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <!-- Left column: Basic details -->
                     <div class="md:col-span-2">
-                        <div class="prose max-w-none">
-                            <h3 class="text-lg font-semibold mb-3">
+                        <div class="max-w-none prose">
+                            <h3 class="mb-3 text-lg font-semibold">
                                 Interview Details
                             </h3>
 
-                            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <div class="p-4 mb-6 bg-gray-50 rounded-lg">
                                 <div class="mb-4">
                                     <h4
                                         class="text-sm font-medium text-gray-500"
@@ -382,23 +389,23 @@
 
                     <!-- Right column: Admin actions -->
                     <div class="md:col-span-1">
-                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                            <h3 class="text-lg font-semibold mb-3">
+                        <div class="p-4 mb-6 bg-gray-50 rounded-lg">
+                            <h3 class="mb-3 text-lg font-semibold">
                                 Admin Actions
                             </h3>
                             <div class="space-y-2">
                                 <button
                                     @click="editSchedule(selectedSchedule)"
-                                    class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                                    class="flex justify-center items-center py-2 w-full text-white bg-blue-600 rounded-lg transition-colors hover:bg-blue-700"
                                 >
-                                    <i class="fas fa-edit mr-2"></i> Edit
+                                    <i class="mr-2 fas fa-edit"></i> Edit
                                     Schedule
                                 </button>
                                 <button
                                     @click="deleteSchedule(selectedSchedule)"
-                                    class="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                                    class="flex justify-center items-center py-2 w-full text-white bg-red-600 rounded-lg transition-colors hover:bg-red-700"
                                 >
-                                    <i class="fas fa-trash mr-2"></i> Delete
+                                    <i class="mr-2 fas fa-trash"></i> Delete
                                     Schedule
                                 </button>
                             </div>
@@ -406,14 +413,14 @@
                     </div>
                 </div>
 
-                <h3 class="text-lg font-semibold mb-4 mt-6">
+                <h3 class="mt-6 mb-4 text-lg font-semibold">
                     Schedule Participants
                 </h3>
                 <div class="space-y-4">
                     <div
                         v-for="participant in selectedSchedule.participants"
                         :key="participant.participant_id"
-                        class="border rounded-lg p-4"
+                        class="p-4 rounded-lg border"
                     >
                         <div class="flex justify-between items-start">
                             <div>
@@ -447,7 +454,7 @@
                             </div>
                             <span
                                 :class="getStatusClass(participant.status)"
-                                class="px-2 py-1 rounded-full text-xs"
+                                class="px-2 py-1 text-xs rounded-full"
                             >
                                 {{ participant.status }}
                             </span>
@@ -795,6 +802,9 @@ const deleteSchedule = (schedule) => {
     border-radius: 0.375rem !important;
     padding: 0.5rem 0.75rem !important;
     font-weight: 500 !important;
+    @media (max-width: 768px) {
+        padding: 0.1rem 0.25rem !important;
+    }
 }
 
 :deep(.fc-event) {
