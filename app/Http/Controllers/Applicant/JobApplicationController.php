@@ -12,6 +12,7 @@ use App\Models\EducationalBackground;
 use App\Models\Training;
 use App\Models\WorkExperience;
 use App\Traits\NotificationTrait;
+use App\Models\TemporaryFile;
 
 class JobApplicationController extends Controller
 {
@@ -230,7 +231,7 @@ class JobApplicationController extends Controller
         // Increase memory limit and execution time for this request
         ini_set('memory_limit', '256M');
         ini_set('max_execution_time', 300);
-        
+
         try {
             // First validate non-file inputs
             $request->validate([
@@ -240,7 +241,7 @@ class JobApplicationController extends Controller
                 'experiences' => 'required|array|min:1',
             ]);
 
-            // Validate each document separately to identify which one fails
+            // Validate document references (IDs or hashes)
             $documentTypes = [
                 'application_letter' => 'Application Letter',
                 'personal_data_sheet' => 'Personal Data Sheet',
@@ -252,40 +253,50 @@ class JobApplicationController extends Controller
                 'employment_certificate' => 'Employment Certificate'
             ];
 
+            $documentRefs = $request->input('documents', []);
+            $documentsToAttach = [];
+
             foreach ($documentTypes as $key => $label) {
-                try {
-                    $request->validate([
-                        "documents.$key" => 'required|file|mimes:pdf|max:51200'
-                    ], [
-                        "documents.$key.required" => "$label is required",
-                        "documents.$key.file" => "$label must be a valid file",
-                        "documents.$key.mimes" => "$label must be a PDF file",
-                        "documents.$key.max" => "$label size must not exceed 50MB"
-                    ]);
-                } catch (\Illuminate\Validation\ValidationException $e) {
+                if (empty($documentRefs[$key])) {
                     return response()->json([
                         'message' => 'File Upload Error',
                         'errors' => [
                             'document_name' => $label,
-                            'error' => $e->validator->errors()->first()
+                            'error' => $label . ' is required'
                         ]
                     ], 422);
                 }
+                // Accept either a numeric ID or a hash string
+                $ref = $documentRefs[$key];
+                $tempFile = null;
+                if (is_numeric($ref)) {
+                    $tempFile = TemporaryFile::find($ref);
+                } else {
+                    $tempFile = TemporaryFile::where('hash', $ref)->first();
+                }
+                if (!$tempFile) {
+                    return response()->json([
+                        'message' => 'File Reference Error',
+                        'errors' => [
+                            'document_name' => $label,
+                            'error' => $label . ' file reference is invalid or expired'
+                        ]
+                    ], 422);
+                }
+                $documentsToAttach[$key] = $tempFile;
             }
 
-            // Validate remaining fields
+            // Validate remaining fields (education, trainings, experiences)
             $request->validate([
                 'education.*.education_id' => 'nullable|exists:educational_backgrounds,education_id',
                 'education.*.level' => 'required_without:education.*.education_id|string',
                 'education.*.school_name' => 'required_without:education.*.education_id|string',
                 'education.*.degree_course' => 'required_without:education.*.education_id|string',
                 'education.*.year_graduated' => 'nullable|numeric',
-                
                 'trainings.*.training_id' => 'nullable|exists:trainings,training_id',
                 'trainings.*.title' => 'required_without:trainings.*.training_id|string',
                 'trainings.*.institution' => 'required_without:trainings.*.training_id|string',
                 'trainings.*.duration_hours' => 'required_without:trainings.*.training_id|integer|min:1',
-                
                 'experiences.*.experience_id' => 'nullable|exists:work_experiences,experience_id',
                 'experiences.*.position' => 'required_without:experiences.*.experience_id|string',
                 'experiences.*.company_name' => 'required_without:experiences.*.experience_id|string',
@@ -330,96 +341,56 @@ class JobApplicationController extends Controller
                         'user_id' => auth()->id(),
                         'title' => $training['title'],
                         'institution' => $training['institution'],
-                        'duration_hours' => $training['duration_hours'] ?? null,
+                        'duration_hours' => $training['duration_hours'],
                     ]);
                 }
             }
 
-            // Store work experiences
+            // Store experiences
             foreach ($request->experiences as $experience) {
                 if (isset($experience['experience_id'])) {
-                    // If experience_id exists, just associate it
                     WorkExperience::where('experience_id', $experience['experience_id'])
                         ->update(['user_id' => auth()->id()]);
                 } else {
-                    // Create new work experience
                     WorkExperience::create([
                         'user_id' => auth()->id(),
                         'position' => $experience['position'],
                         'company_name' => $experience['company_name'],
                         'start_date' => $experience['start_date'],
                         'end_date' => $experience['end_date'] ?? null,
-                        'is_current_job' => $experience['is_current_job'] ?? false,
-                        'responsibilities' => $experience['responsibilities'] ?? null,
                     ]);
                 }
             }
 
-            // Handle multiple document uploads
-            $documentTypes = [
-                'application_letter' => 'Application Letter',
-                'personal_data_sheet' => 'Personal Data Sheet',
-                'work_experience_sheet' => 'Work Experience Sheet',
-                'transcript_and_diploma' => 'Transcript and Diploma',
-                'eligibility_proof' => 'Eligibility Proof',
-                'performance_rating' => 'Performance Rating',
-                'training_certificates' => 'Training Certificates',
-                'employment_certificate' => 'Employment Certificate'
-            ];
-
-            foreach ($documentTypes as $key => $label) {
-                if ($request->hasFile("documents.$key")) {
-                    $file = $request->file("documents.$key");
-                    $documentName = $label . ' - ' . $file->getClientOriginalName();
-                    $documentPath = $file->store('application_documents', 'public');
-
-                    ApplicantDocument::create([
-                        'user_id' => auth()->id(),
-                        'application_id' => $application->application_id,
-                        'document_name' => $documentName,
-                        'document_type' => $key,
-                        'file_path' => $documentPath,
-                        'is_verified' => false,
-                    ]);
-                }
+            // Attach documents to application
+            foreach ($documentsToAttach as $docType => $tempFile) {
+                // Store file_path as relative to public storage
+                $filePathForDb = $tempFile->path;
+                ApplicantDocument::create([
+                    'user_id' => auth()->id(),
+                    'application_id' => $application->application_id,
+                    'document_name' => $tempFile->filename,
+                    'document_type' => $docType,
+                    'file_path' => $filePathForDb,
+                    'is_verified' => false,
+                ]);
             }
+
+            // Optionally: Clean up temporary files (if needed)
 
             // Notify HR about new application
             $this->notifyHRNewApplication($application);
 
-            $job = JobListing::with([
-                'position' => function ($query) {
-                    $query->with(['salaryGrade', 'minimumRequirement']);
-                },
-                'creator',
-                'applications' => function ($query) {
-                    $query->where('user_id', auth()->id());
-                }
-            ])->findOrFail($request->job_listing_id);
-
-            // Get user's existing data
-            $userData = [
-                'education' => EducationalBackground::where('user_id', auth()->id())->get(),
-                'trainings' => Training::where('user_id', auth()->id())->get(),
-                'experiences' => WorkExperience::where('user_id', auth()->id())->get(),
-            ];
-
-            // Check if user meets minimum requirements
-            $meetsRequirements = $this->checkRequirementsMet($job, $userData);
-
-            // Return JSON response with application and job data
             return response()->json([
-                'success' => true,
                 'message' => 'Application submitted successfully',
-                'job' => $job,
-                'meetsRequirements' => $meetsRequirements,
-                'redirect_url' => route('my-applications.index')
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+                'application_id' => $application->application_id,
+            ], 201);
+
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Validation Error',
-                'errors' => $e->validator->errors()
-            ], 422);
+                'message' => 'There was an error submitting your application. Please try again.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 

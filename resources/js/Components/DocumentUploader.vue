@@ -66,10 +66,10 @@
                 </svg>
                 <div class="flex flex-col">
                     <span class="text-sm font-medium text-gray-800">
-                        {{ document.name }}
+                        {{ document?.name || 'No file selected' }}
                     </span>
                     <span class="text-xs text-gray-600">
-                        {{ formatFileSize(document.size) }}
+                        {{ formatFileSize(document?.size || 0) }}
                     </span>
                 </div>
             </div>
@@ -104,38 +104,88 @@ const props = defineProps({
         type: Object,
         default: null,
     },
-    isLoading: {
-        type: Boolean,
-        default: false,
-    },
     documentType: {
         type: String,
         default: "",
     },
 });
 
-const emit = defineEmits(["update:document", "remove"]);
+const emit = defineEmits(["update:document", "remove", "upload-complete"]);
 
 // Generate a unique ID for this uploader to prevent input conflicts
 const uniqueId = ref(
     `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 );
 
-const handleFileSelect = (event) => {
+const isLoading = ref(false);
+
+const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     if (file) {
         // Reset the input field to ensure the change event fires even if the same file is selected again
         event.target.value = "";
-        emit("update:document", file);
+        isLoading.value = true;
+        // Hash the file using SparkMD5
+        const hash = await hashFile(file);
+        // Prepare form data
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('hash', hash);
+        try {
+            const response = await fetch('/api/temporary-files', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            emit("update:document", {
+                name: file.name,
+                size: file.size,
+                hash: data.file.hash,
+                serverFile: data.file,
+                duplicate: data.duplicate || false,
+                rawFile: file,
+            });
+            emit("upload-complete", data.file);
+        } catch (e) {
+            alert('Upload failed. Please try again.');
+        } finally {
+            isLoading.value = false;
+        }
     }
 };
+
+function hashFile(file) {
+    return new Promise((resolve, reject) => {
+        const chunkSize = 2097152; // 2MB per chunk
+        const spark = new window.SparkMD5.ArrayBuffer();
+        const fileReader = new FileReader();
+        let cursor = 0;
+
+        fileReader.onload = function (e) {
+            spark.append(e.target.result);
+            cursor += chunkSize;
+            if (cursor < file.size) {
+                readNextChunk();
+            } else {
+                resolve(spark.end());
+            }
+        };
+        fileReader.onerror = reject;
+
+        function readNextChunk() {
+            const next = file.slice(cursor, cursor + chunkSize);
+            fileReader.readAsArrayBuffer(next);
+        }
+        readNextChunk();
+    });
+}
 
 const removeFile = () => {
     emit("remove");
 };
 
 const formatFileSize = (size) => {
-    if (size === 0) return "0 Bytes";
+    if (!size || size === 0) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(size) / Math.log(k));

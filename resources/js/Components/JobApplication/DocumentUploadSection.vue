@@ -42,6 +42,7 @@
                 (file) => $emit('update:document', 'application_letter', file)
             "
             @remove="() => $emit('remove:document', 'application_letter')"
+            @upload-complete="$emit('upload-complete', 'application_letter', $event)"
         />
 
         <!-- Personal Data Sheet -->
@@ -57,6 +58,7 @@
                 (file) => $emit('update:document', 'personal_data_sheet', file)
             "
             @remove="() => $emit('remove:document', 'personal_data_sheet')"
+            @upload-complete="$emit('upload-complete', 'personal_data_sheet', $event)"
         />
 
         <!-- Work Experience Sheet -->
@@ -70,10 +72,10 @@
             :document="documents.work_experience_sheet"
             :is-loading="documentUploadLoading.work_experience_sheet"
             @update:document="
-                (file) =>
-                    $emit('update:document', 'work_experience_sheet', file)
+                (file) => $emit('update:document', 'work_experience_sheet', file)
             "
             @remove="() => $emit('remove:document', 'work_experience_sheet')"
+            @upload-complete="$emit('upload-complete', 'work_experience_sheet', $event)"
         />
 
         <!-- Transcript & Diploma -->
@@ -85,10 +87,10 @@
             :document="documents.transcript_and_diploma"
             :is-loading="documentUploadLoading.transcript_and_diploma"
             @update:document="
-                (file) =>
-                    $emit('update:document', 'transcript_and_diploma', file)
+                (file) => $emit('update:document', 'transcript_and_diploma', file)
             "
             @remove="() => $emit('remove:document', 'transcript_and_diploma')"
+            @upload-complete="$emit('upload-complete', 'transcript_and_diploma', $event)"
         />
 
         <!-- Eligibility -->
@@ -105,6 +107,7 @@
                 (file) => $emit('update:document', 'eligibility_proof', file)
             "
             @remove="() => $emit('remove:document', 'eligibility_proof')"
+            @upload-complete="$emit('upload-complete', 'eligibility_proof', $event)"
         />
 
         <!-- Performance Rating -->
@@ -122,6 +125,7 @@
                 (file) => $emit('update:document', 'performance_rating', file)
             "
             @remove="() => $emit('remove:document', 'performance_rating')"
+            @upload-complete="$emit('upload-complete', 'performance_rating', $event)"
         />
 
         <!-- Training Certificates -->
@@ -135,10 +139,10 @@
             :document="documents.training_certificates"
             :is-loading="documentUploadLoading.training_certificates"
             @update:document="
-                (file) =>
-                    $emit('update:document', 'training_certificates', file)
+                (file) => $emit('update:document', 'training_certificates', file)
             "
             @remove="() => $emit('remove:document', 'training_certificates')"
+            @upload-complete="$emit('upload-complete', 'training_certificates', $event)"
         />
 
         <!-- Employment Certificate -->
@@ -150,10 +154,10 @@
             :document="documents.employment_certificate"
             :is-loading="documentUploadLoading.employment_certificate"
             @update:document="
-                (file) =>
-                    $emit('update:document', 'employment_certificate', file)
+                (file) => $emit('update:document', 'employment_certificate', file)
             "
             @remove="() => $emit('remove:document', 'employment_certificate')"
+            @upload-complete="$emit('upload-complete', 'employment_certificate', $event)"
         />
     </div>
 </template>
@@ -173,5 +177,5 @@ const props = defineProps({
     },
 });
 
-defineEmits(["update:document", "remove:document"]);
+defineEmits(["update:document", "remove:document", "upload-complete"]);
 </script>

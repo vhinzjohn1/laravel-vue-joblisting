@@ -6,8 +6,6 @@ use App\Models\Test;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Google_Client;
-use Google_Service_Drive;
 
 class TestController extends Controller
 {
@@ -16,39 +14,10 @@ class TestController extends Controller
      */
     public function index()
     {
-        // return json response
-        return response()->json([
-            'message' => 'Test controller index'
-        ]);
+        // Render the new Inertia page
+        return Inertia::render('Admin/TestUpload/Test');
     }
 
-    /**
-     * Format bytes to human readable format
-     */
-    private function formatBytes($bytes, $precision = 2)
-    {
-        if ($bytes === null) {
-            return 'Unknown';
-        }
-
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        $bytes /= pow(1024, $pow);
-
-        return round($bytes, $precision) . ' ' . $units[$pow];
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.

@@ -9,7 +9,7 @@
     <title inertia>{{ config('app.name') }}</title>
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/x-icon" href="{{ asset('/cmu-favicon.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('cmu-favicon.png') }}">
 
     <!-- Fonts -->
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
@@ -44,6 +44,9 @@
     @routes
     @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
     @inertiaHead
+
+    <!-- JS Hashing Library for File Deduplication -->
+    <script src="https://cdn.jsdelivr.net/npm/spark-md5@3.0.2/spark-md5.min.js"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">

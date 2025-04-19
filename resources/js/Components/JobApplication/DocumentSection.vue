@@ -16,6 +16,7 @@
             :document-type="documentType"
             @update:document="(file) => $emit('update:document', file)"
             @remove="$emit('remove')"
+            @upload-complete="$emit('upload-complete', documentType, $event)"
         />
     </div>
 </template>
@@ -46,5 +47,5 @@ defineProps({
     },
 });
 
-defineEmits(["update:document", "remove"]);
+defineEmits(["update:document", "remove", "upload-complete"]);
 </script>

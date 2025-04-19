@@ -83,7 +83,7 @@ return new class extends Migration
             'lastname'       => 'Balinas',
             'middle_name'    => 'Hinoay',
             'phone_number'   => '0912345678',
-            'eligibility'    => null,
+            'eligibility'    => "None",
             'created_at'     => now(),
             'updated_at'     => now(),
         ]);

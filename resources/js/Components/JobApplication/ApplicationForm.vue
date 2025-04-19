@@ -8,7 +8,7 @@
         <div class="p-8 bg-gradient-to-br from-green-50 to-white">
             <form @submit.prevent="submitApplication">
                 <!-- Header Information -->
-                <div class="mb-8 border-l-4 border-green-800 pl-4">
+                <div class="pl-4 mb-8 border-l-4 border-green-800">
                     <h3 class="text-xl font-semibold text-gray-800">
                         {{ job.title }} - {{ job.position.position_name }}
                     </h3>
@@ -27,7 +27,7 @@
                 />
                 <p
                     v-if="showValidation && validationErrors.education"
-                    class="text-red-500 text-sm mt-1"
+                    class="mt-1 text-sm text-red-500"
                 >
                     Please select at least one education record
                 </p>
@@ -41,7 +41,7 @@
                 />
                 <p
                     v-if="showValidation && validationErrors.trainings"
-                    class="text-red-500 text-sm mt-1"
+                    class="mt-1 text-sm text-red-500"
                 >
                     Please select at least one training record
                 </p>
@@ -55,7 +55,7 @@
                 />
                 <p
                     v-if="showValidation && validationErrors.experiences"
-                    class="text-red-500 text-md mt-1"
+                    class="mt-1 text-red-500 text-md"
                 >
                     Please select at least one experience record
                 </p>
@@ -66,15 +66,16 @@
                     :document-upload-loading="documentUploadLoading"
                     @update:document="handleDocumentUpdate"
                     @remove:document="handleDocumentRemove"
+                    @upload-complete="handleDocumentUploadComplete"
                 />
 
-                <div class="flex justify-end gap-2">
+                <div class="flex gap-2 justify-end">
                     <!-- Document Validation Error -->
                     <div
                         v-if="showValidation && validationErrors.documents"
                         class="flex-1 text-right"
                     >
-                        <p class="text-red-500 text-md font-bold">
+                        <p class="font-bold text-red-500 text-md">
                             Please upload all required documents
                         </p>
                     </div>
@@ -83,7 +84,7 @@
                         type="button"
                         @click="closeModal"
                         :disabled="formSubmitting"
-                        class="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="px-6 py-2.5 font-medium text-gray-700 rounded-lg border border-gray-300 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
                     </button>
@@ -94,7 +95,7 @@
                     >
                         <span v-if="formSubmitting" class="mr-2">
                             <svg
-                                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                                class="mr-2 -ml-1 w-5 h-5 text-white animate-spin"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -128,7 +129,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router } from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
 
 // Import our new components
@@ -244,8 +245,6 @@ const handleDocumentUpdate = (docType, file) => {
         delete validationErrors.value[`documents.${docType}`];
     }
 
-    console.log(`Starting upload for document type: ${docType}`);
-
     // Set loading state for this specific document type
     documentUploadLoading.value[docType] = true;
 
@@ -256,22 +255,14 @@ const handleDocumentUpdate = (docType, file) => {
         return;
     }
 
-    // Create a clean copy of the current documents
-    const updatedDocuments = { ...form.documents };
-
     // Update only the specific document type
-    updatedDocuments[docType] = file;
-
-    // Update the entire documents object to ensure reactivity
-    form.documents = updatedDocuments;
+    form.documents[docType] = file;
 
     // Log for debugging to confirm which document is being updated
     console.log(`Document updated: ${docType}`, file.name);
 
-    // Simulate slight delay to show loading (remove in production)
-    setTimeout(() => {
-        documentUploadLoading.value[docType] = false;
-    }, 500);
+    // Set loading to false after upload (upload is now handled in DocumentUploader)
+    documentUploadLoading.value[docType] = false;
 };
 
 const handleDocumentRemove = (docType) => {
@@ -288,6 +279,12 @@ const handleDocumentRemove = (docType) => {
 
     // Log for debugging
     console.log(`Document removed: ${docType}`);
+};
+
+const handleDocumentUploadComplete = (docType, fileInfo) => {
+    // Optionally, you can show a toast or mark the document as uploaded
+    console.log(`Upload complete for ${docType}`, fileInfo);
+    // You could update state here if needed for further UX improvement
 };
 
 // Validation functions
@@ -351,14 +348,12 @@ const submitApplication = () => {
         });
     });
 
-    // Add document files
+    // Add document references (send serverFile.id or serverFile.hash, not the file itself)
     Object.keys(form.documents).forEach((docType) => {
-        if (form.documents[docType]) {
-            console.log(
-                `Adding document to FormData: documents[${docType}]`,
-                form.documents[docType].name,
-            );
-            formData.append(`documents[${docType}]`, form.documents[docType]);
+        const doc = form.documents[docType];
+        if (doc && doc.serverFile) {
+            // Prefer using serverFile.id, fallback to hash if needed
+            formData.append(`documents[${docType}]`, doc.serverFile.id || doc.serverFile.hash);
         }
     });
 
@@ -371,11 +366,9 @@ const submitApplication = () => {
         })
         .then((response) => {
             formSubmitting.value = false;
-            // Include the job data from the current component state
-            const submissionData = response.data;
-            emit("submitted", submissionData);
-            showToast("Application Submitted Successfully");
             closeModal();
+            router.visit(route("job-application.show", props.job.job_listing_id));
+            showToast("Application Submitted Successfully");
         })
         .catch((error) => {
             formSubmitting.value = false;
