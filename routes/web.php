@@ -110,7 +110,6 @@ Route::middleware(['auth'])->group(function () {
 // =======================
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('admin', AdminController::class);
-    Route::resource('test', TestController::class);
 });
 
 // =======================
@@ -135,5 +134,4 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/php-info', function () {
     return phpinfo();
 });
-
 require __DIR__ . '/auth.php';

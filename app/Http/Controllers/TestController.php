@@ -16,62 +16,10 @@ class TestController extends Controller
      */
     public function index()
     {
-        try {
-            // Get the Google Drive client correctly
-            $client = new Google_Client();
-            $client->setClientId(config('filesystems.disks.google.clientId'));
-            $client->setClientSecret(config('filesystems.disks.google.clientSecret'));
-            $client->refreshToken(config('filesystems.disks.google.refreshToken'));
-
-            // Create Google Drive service
-            $service = new Google_Service_Drive($client);
-
-            // Get About information which includes storage quota
-            $about = $service->about->get(['fields' => 'storageQuota']);
-            $quota = $about->getStorageQuota();
-
-            // Calculate available storage
-            $total = $quota->getLimit();
-            $used = $quota->getUsage();
-            $available = $total - $used;
-
-            // Get storage quota details with raw bytes and formatted values
-            $storageQuota = [
-                'total' => [
-                    'bytes' => $total,
-                    'formatted' => $this->formatBytes($total)
-                ],
-                'used' => [
-                    'bytes' => $used,
-                    'formatted' => $this->formatBytes($used)
-                ],
-                'available' => [
-                    'bytes' => $available,
-                    'formatted' => $this->formatBytes($available)
-                ],
-                'usageInDrive' => [
-                    'bytes' => $quota->getUsageInDrive(),
-                    'formatted' => $this->formatBytes($quota->getUsageInDrive())
-                ],
-                'percentage' => round(($used / $total) * 100, 2)
-            ];
-
-            return Inertia::render('Admin/TestUpload/Test', [
-                'storageQuota' => $storageQuota
-            ]);
-        } catch (\Exception $e) {
-            // If we can't get storage info, return default values
-            return Inertia::render('Admin/TestUpload/Test', [
-                'storageQuota' => [
-                    'total' => ['bytes' => 0, 'formatted' => 'Unknown'],
-                    'used' => ['bytes' => 0, 'formatted' => 'Unknown'],
-                    'available' => ['bytes' => 0, 'formatted' => 'Unknown'],
-                    'usageInDrive' => ['bytes' => 0, 'formatted' => 'Unknown'],
-                    'percentage' => 0
-                ],
-                'error' => 'Could not fetch storage information: ' . $e->getMessage()
-            ]);
-        }
+        // return json response
+        return response()->json([
+            'message' => 'Test controller index'
+        ]);
     }
 
     /**
@@ -116,22 +64,17 @@ class TestController extends Controller
             // Get the file from the request
             $file = $request->file('file');
 
-            // Create a unique filename
-            $filename = 'JobListingUpload/' . time() . '_' . $file->getClientOriginalName();
+            // Create a unique filename in the public storage
+            $filename = time() . '_' . $file->getClientOriginalName();
 
-            // Stream the file directly to Google Drive using a resource handle
-            // This is more memory efficient than loading the entire file into memory
-            $stream = fopen($file->getRealPath(), 'r');
-            Storage::disk('google')->put($filename, $stream);
-            if (is_resource($stream)) {
-                fclose($stream);
-            }
+            // Store the file in the public disk (storage/app/public/JobListingUpload)
+            $path = $file->storeAs('JobListingUpload', $filename, 'public');
 
-            // Get the file's URL
-            $url = Storage::disk('google')->url($filename);
+            // Get the public file URL
+            $url = Storage::disk('public')->url($path);
 
             return response()->json([
-                'message' => 'File uploaded successfully to Google Drive.',
+                'message' => 'File uploaded successfully to public storage.',
                 'file_url' => $url,
             ], 201);
         } catch (\Exception $e) {
