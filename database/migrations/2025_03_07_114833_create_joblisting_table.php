@@ -347,7 +347,7 @@ return new class extends Migration
             $table->foreign('updated_by')->references('user_id')->on('users')->onDelete('set null');
         });
 
-        Schema::create('application_groups', function (Blueprint $table) {
+        Schema::create('group_schedules', function (Blueprint $table) {
             $table->id('group_id');
             $table->string('name');
             $table->text('notes')->nullable();
@@ -373,7 +373,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('created_by')->references('user_id')->on('users')->onDelete('set null');
-            $table->foreign('group_id')->references('group_id')->on('application_groups')->onDelete('set null');
+            $table->foreign('group_id')->references('group_id')->on('group_schedules')->onDelete('set null');
         });
 
         Schema::create('schedule_participants', function (Blueprint $table) {
@@ -401,13 +401,13 @@ return new class extends Migration
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
 
-        Schema::create('application_group_members', function (Blueprint $table) {
+        Schema::create('group_schedule_members', function (Blueprint $table) {
             $table->id('member_id');
             $table->unsignedBigInteger('group_id');
             $table->unsignedBigInteger('application_id');
             $table->timestamps();
 
-            $table->foreign('group_id')->references('group_id')->on('application_groups')->onDelete('cascade');
+            $table->foreign('group_id')->references('group_id')->on('group_schedules')->onDelete('cascade');
             $table->foreign('application_id')->references('application_id')->on('applications')->onDelete('cascade');
         });
 
@@ -443,7 +443,7 @@ return new class extends Migration
         Schema::dropIfExists('work_experiences');
         Schema::dropIfExists('trainings');
         Schema::dropIfExists('educational_backgrounds');
-        Schema::dropIfExists('application_group_members');
-        Schema::dropIfExists('application_groups');
+        Schema::dropIfExists('group_schedule_members');
+        Schema::dropIfExists('group_schedules');
     }
 };

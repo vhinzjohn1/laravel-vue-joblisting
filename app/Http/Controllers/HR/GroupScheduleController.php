@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\ApplicationGroup;
-use App\Models\Application;
+use App\Models\GroupSchedule;
 use App\Models\JobListing;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ApplicationGroupController extends Controller
+class GroupScheduleController extends Controller
 {
     public function index()
     {
-        $groups = ApplicationGroup::with([
+        $groups = GroupSchedule::with([
             'jobListing.position',
-            'applications.user',
+            'members.user.userDetail',
             'schedule',
             'creator'
         ])->get();
@@ -24,7 +23,7 @@ class ApplicationGroupController extends Controller
         $jobListings = JobListing::with([
             'position',
             'applications' => function ($query) {
-                $query->with('user');
+                $query->with('user.userDetail');
             }
         ])->get();
 
@@ -44,7 +43,7 @@ class ApplicationGroupController extends Controller
             'job_listing_id' => 'required|exists:job_listings,job_listing_id',
         ]);
 
-        $group = ApplicationGroup::create([
+        $group = GroupSchedule::create([
             'name' => $validated['name'],
             'notes' => $validated['notes'],
             'job_listing_id' => $validated['job_listing_id'],
@@ -55,7 +54,7 @@ class ApplicationGroupController extends Controller
     }
 
     // Function for updating an existing group
-    public function update(Request $request, ApplicationGroup $group)
+    public function update(Request $request, GroupSchedule $group)
     {
         // Check the action type from the request
         $action = $request->input('action');
@@ -67,12 +66,14 @@ class ApplicationGroupController extends Controller
                 return $this->handleRemoveMembers($request, $group);
             case 'updateDetails':
                 return $this->handleUpdateDetails($request, $group);
+            case 'createSchedule':
+                return $this->handleCreateSchedule($request, $group);
             default:
                 return $this->handleUpdateDetails($request, $group);
         }
     }
 
-    private function handleAddMembers(Request $request, ApplicationGroup $group)
+    private function handleAddMembers(Request $request, GroupSchedule $group)
     {
         $validated = $request->validate([
             'application_ids' => 'required|array',
@@ -88,7 +89,7 @@ class ApplicationGroupController extends Controller
         return redirect()->back()->with('success', 'Members added successfully');
     }
 
-    private function handleRemoveMembers(Request $request, ApplicationGroup $group)
+    private function handleRemoveMembers(Request $request, GroupSchedule $group)
     {
         $validated = $request->validate([
             'application_ids' => 'required|array',
@@ -102,7 +103,7 @@ class ApplicationGroupController extends Controller
         return redirect()->back()->with('success', 'Members removed successfully');
     }
 
-    private function handleUpdateDetails(Request $request, ApplicationGroup $group)
+    private function handleUpdateDetails(Request $request, GroupSchedule $group)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -114,7 +115,15 @@ class ApplicationGroupController extends Controller
         return redirect()->back()->with('success', 'Group updated successfully');
     }
 
-    public function destroy(ApplicationGroup $group)
+    /**
+     * Handle creating a schedule for the group by redirecting to schedule creation
+     */
+    private function handleCreateSchedule(Request $request, GroupSchedule $group)
+    {
+        return redirect()->route('schedules.create', ['group' => $group->group_id]);
+    }
+
+    public function destroy(GroupSchedule $group)
     {
         $group->delete();
         return redirect()->back()->with('success', 'Group deleted successfully');

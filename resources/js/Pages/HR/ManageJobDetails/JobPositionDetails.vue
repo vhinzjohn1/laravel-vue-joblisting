@@ -151,6 +151,7 @@
                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     >
                         <option value="" disabled>Select Education</option>
+                        <option value="High School Diploma">High School Diploma</option>
                         <option value="Bachelor's degree">Bachelor's degree</option>
                         <option value="Master's degree">Master's degree</option>
                         <option value="Doctorate degree">Doctorate degree</option>
@@ -298,6 +299,7 @@
                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     >
                         <option value="" disabled>Select Education</option>
+                        <option value="High School Diploma">High School Diploma</option>
                         <option value="Bachelor's degree">Bachelor's degree</option>
                         <option value="Master's degree">Master's degree</option>
                         <option value="Doctorate degree">Doctorate degree</option>

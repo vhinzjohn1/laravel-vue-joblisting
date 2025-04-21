@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Application;
 use App\Models\JobListing;
 use App\Models\ApplicationGroup;
+use App\Models\GroupSchedule;
 use App\Models\ScheduleParticipant;
 use App\Traits\NotificationTrait;
 use Illuminate\Http\Request;
@@ -155,7 +156,7 @@ class ScheduleController extends Controller
 
     public function createFromGroup($groupId)
     {
-        $group = ApplicationGroup::with([
+        $group = GroupSchedule::with([
             'applications.user',
             'jobListing.position'
         ])->findOrFail($groupId);
@@ -175,7 +176,7 @@ class ScheduleController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        $group = ApplicationGroup::with('applications')->findOrFail($groupId);
+        $group = GroupSchedule::with('applications')->findOrFail($groupId);
 
         $schedule = Schedule::create([
             'title' => $validated['title'],

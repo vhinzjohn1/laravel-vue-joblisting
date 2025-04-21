@@ -572,13 +572,13 @@ const getStatusColor = (status) => {
 const formatDate = (date) => {
     if (!date) return "N/A";
 
-    const formattedDate = new Date(date).toLocaleDateString("en-US", {
+    const formattedDate = new Date(date).toLocaleString("en-US", {
         year: "numeric",
-        month: "long",
-        day: "numeric",
+        month: "2-digit",
+        day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
-        timeZoneName: "short", // Add timezone information
+        hour12: true,
     });
 
     return formattedDate;

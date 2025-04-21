@@ -38,14 +38,9 @@ function submitFile() {
     const formData = new FormData();
     formData.append("file", file.value);
 
-    // Use fetch for direct comparison (or use axios if you prefer)
-    fetch(route("test.store"), {
-        method: "POST",
-        body: formData
-    })
-        .then((res) => res.json())
-        .then((data) => {
-            result.value = data;
+    axios.post(route("test.store"), formData)
+        .then((res) => {
+            result.value = res.data;
         })
         .catch((error) => {
             console.error('Error uploading file:', error);

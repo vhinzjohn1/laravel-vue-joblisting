@@ -7,18 +7,17 @@
         </template>
 
         <div class="py-5">
-            <div class="container-fluid px-4">
-                <div class="card shadow-sm rounded-lg overflow-hidden bg-white">
-                    <div class="card-header bg-white py-4 px-4 border-b">
+            <div class="px-4 container-fluid">
+                <div class="overflow-hidden bg-white rounded-lg shadow-sm card">
+                    <div class="px-4 py-4 bg-white border-b card-header">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-semibold">Application Groups</h2>
-                            <button
+                            <PrimaryButton
                                 @click="showModal = true"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                             >
-                                <i class="fas fa-plus mr-2"></i>
+                                <i class="mr-2 fas fa-plus"></i>
                                 Create Group
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </div>
 
@@ -28,19 +27,19 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">
                                             Group Name
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">
                                             Job Position
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">
                                             Members Count
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">
                                             Schedule Status
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">
                                             Actions
                                         </th>
                                     </tr>
@@ -57,37 +56,29 @@
                                             {{ group.applications?.length || 0 }} members
                                         </td>
                                         <td class="px-6 py-4">
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                                :class="getScheduleStatusClass(group)"
+                                            <button
+                                                @click="createSchedule(group)"
+                                                :disabled="!!group.schedule"
                                             >
-                                                {{ getScheduleStatus(group) }}
+                                                <span
+                                                class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full"
+                                            >
+                                                {{ group.schedule ? 'Scheduled' : 'Not Scheduled' }}
                                             </span>
+                                            </button>
+
                                         </td>
                                         <td class="px-6 py-4">
                                             <button
                                                 @click="addMembers(group)"
-                                                class="text-indigo-600 hover:text-indigo-900 mr-2"
+                                                class="mr-2 text-indigo-600 hover:text-indigo-900"
                                                 title="Add Members"
                                             >
                                                 <i class="fas fa-user-plus"></i>
                                             </button>
                                             <button
-                                                @click="viewGroup(group)"
-                                                class="text-blue-600 hover:text-blue-900 mr-2"
-                                            >
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button
-                                                @click="createSchedule(group)"
-                                                class="text-green-600 hover:text-green-900 mr-2"
-                                                :disabled="!!group.schedule"
-                                            >
-                                                <i class="fas fa-calendar-plus"></i>
-                                            </button>
-                                            <button
                                                 @click="editGroup(group)"
-                                                class="text-blue-600 hover:text-blue-900 mr-2"
+                                                class="mr-2 text-blue-600 hover:text-blue-900"
                                             >
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -113,7 +104,7 @@
          @close="closeModal"
          :title="editingGroup ? 'Edit Group' : 'Create New Group'"
             >
-            <div class="py-4 px-10">
+            <div class="px-10 py-4">
                 <form @submit.prevent="createGroup" class="space-y-4">
                     <div class="space-y-4">
                         <div>
@@ -123,7 +114,7 @@
                             <input
                                 type="text"
                                 v-model="form.name"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 required
                             />
                         </div>
@@ -134,7 +125,7 @@
                             </label>
                             <select
                                 v-model="form.job_listing_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 required
                             >
                                 <option value="">Select Job Listing</option>
@@ -155,53 +146,103 @@
                             <textarea
                                 v-model="form.notes"
                                 rows="3"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             ></textarea>
                         </div>
                     </div>
 
-                    <div class="mt-6 flex justify-end space-x-3">
+                    <div class="flex justify-end mt-6 space-x-3">
                         <button
                             type="button"
                             @click="closeModal"
-                            class="px-4 py-2 border rounded-md hover:bg-gray-50"
+                            class="px-4 py-2 rounded-md border hover:bg-gray-50"
                         >
                             Cancel
                         </button>
-                        <button
+                        <PrimaryButton
                             type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                             :disabled="processing"
                         >
                             {{ editingGroup ? 'Update Group' : 'Create Group' }}
-                        </button>
+                        </PrimaryButton>
                     </div>
                 </form>
+            </div>
+        </Modal>
+
+        <!-- Add Members Modal -->
+        <Modal
+            :show="showAddMembersModal"
+            @close="closeAddMembersModal"
+            :title="`Add Members to ${selectedGroup?.name}`"
+        >
+            <div class="px-10 py-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Select Applicants</label>
+                    <div class="overflow-y-auto mt-2 max-h-64">
+                        <div v-for="app in selectedGroupApplications" :key="app.application_id" class="flex items-center py-2">
+                            <input
+                                type="checkbox"
+                                :value="app.application_id"
+                                v-model="selectedApplications"
+                                class="mr-2 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                            />
+                            <span>{{ app.user.name }} ({{ app.application_id }})</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4 space-x-3">
+                    <button
+                        type="button"
+                        @click="closeAddMembersModal"
+                        class="px-4 py-2 rounded-md border hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <PrimaryButton
+                        type="button"
+                        :disabled="processingAddMembers"
+                        @click="submitAddMembers"
+                    >
+                        Add Members
+                    </PrimaryButton>
+                </div>
             </div>
         </Modal>
     </HRLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import HRLayout from '@/Layouts/HR/HRLayout.vue';
 import Header from '@/Components/Header/Header.vue';
 import Modal from '@/Components/Modal.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     groups: Array,
     jobListings: Array
 });
 
+console.log(props);
+
 const showModal = ref(false);
 const editingGroup = ref(null);
 const processing = ref(false);
+const showAddMembersModal = ref(false);
+const selectedGroup = ref(null);
+const selectedApplications = ref([]);
+const processingAddMembers = ref(false);
 
-const form = useForm({
-    name: '',
-    job_listing_id: '',
-    notes: ''
+const applications = ref(props.jobListings);
+
+console.log('this is the applications: ', applications.value);
+
+const selectedGroupApplications = computed(() => {
+    if (!selectedGroup.value) return [];
+    const job = props.jobListings.find(j => j.job_listing_id === selectedGroup.value.job_listing_id);
+    return job ? job.applications : [];
 });
 
 const closeModal = () => {
@@ -238,19 +279,18 @@ const showSuccessAlert = (action) => {
     switch (action) {
         case "add":
             title = "Added Successfully!";
-            text = "Information has been updated.";
             break;
         case "update":
             title = "Updated Successfully!";
-            text = "Information has been updated.";
+            break;
+        case "addMembers":
+            title = "Members Added!";
             break;
         case "delete":
             title = "Deleted Successfully!";
-            text = "Information has been updated.";
             break;
         default:
             title = "Action Completed!";
-            text = "The operation was successful.";
     }
 
     // Using SweetAlert2 toast with custom styling
@@ -258,7 +298,6 @@ const showSuccessAlert = (action) => {
         position: "top-end",
         icon: "success",
         title: title,
-        text: text,
         iconColor: '#ffffffff',
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds
@@ -268,10 +307,34 @@ const showSuccessAlert = (action) => {
     });
 };
 
-const addMembers = (group, applicationIds) => {
-    router.put(route('groups.update', group.group_id), {
+const addMembers = (group) => {
+    selectedGroup.value = group;
+    selectedApplications.value = [];
+    showAddMembersModal.value = true;
+};
+
+const closeAddMembersModal = () => {
+    showAddMembersModal.value = false;
+    selectedGroup.value = null;
+    selectedApplications.value = [];
+};
+
+const submitAddMembers = () => {
+    if (!selectedGroup.value) return;
+    processingAddMembers.value = true;
+    router.put(route('groups.update', selectedGroup.value.group_id), {
         action: 'addMembers',
-        application_ids: applicationIds
+        application_ids: selectedApplications.value
+    }, {
+        onSuccess: () => {
+            processingAddMembers.value = false;
+            showSuccessAlert('addMembers');
+            closeAddMembersModal();
+        },
+        onError: () => {
+            processingAddMembers.value = false;
+            console.error('Error adding members:', form.errors);
+        }
     });
 };
 
@@ -290,7 +353,8 @@ const getScheduleStatusClass = (group) => {
 };
 
 const createSchedule = (group) => {
-    router.visit(route('schedules.create', { group: group.group_id }));
+    // router.visit(route('schedules.create', { group: group.group_id }));
+    console.log(group);
 };
 
 const viewGroup = (group) => {
@@ -324,4 +388,10 @@ const deleteGroup = (group) => {
         }
     });
 };
+
+const form = useForm({
+    name: '',
+    job_listing_id: '',
+    notes: ''
+});
 </script>

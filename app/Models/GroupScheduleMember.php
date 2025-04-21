@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ApplicationGroupMember extends Model
+class GroupScheduleMember extends Model
 {
     protected $primaryKey = 'member_id';
-    
+
     protected $fillable = [
         'group_id',
         'application_id'
@@ -15,7 +15,7 @@ class ApplicationGroupMember extends Model
 
     public function group()
     {
-        return $this->belongsTo(ApplicationGroup::class, 'group_id');
+        return $this->belongsTo(GroupSchedule::class, 'group_id');
     }
 
     public function application()

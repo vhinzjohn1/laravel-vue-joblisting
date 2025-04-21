@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ApplicationGroup extends Model
+class GroupSchedule extends Model
 {
     protected $primaryKey = 'group_id';
 
@@ -28,19 +28,7 @@ class ApplicationGroup extends Model
 
     public function members()
     {
-        return $this->hasMany(ApplicationGroupMember::class, 'group_id');
-    }
-
-    public function applications()
-    {
-        return $this->hasManyThrough(
-            Application::class,
-            ApplicationGroupMember::class,
-            'group_id',
-            'application_id',
-            'group_id',
-            'application_id'
-        );
+        return $this->hasMany(GroupScheduleMember::class, 'group_id');
     }
 
     public function schedule()

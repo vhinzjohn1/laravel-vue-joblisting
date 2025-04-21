@@ -28,6 +28,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\HR\GroupScheduleController;
 
 // =======================
 // WELCOME & LANDING ROUTES
@@ -71,7 +72,7 @@ Route::middleware(['auth', 'role:hr'])->group(function () {
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
     Route::resource('job-position', JobPositionController::class);
-    Route::resource('groups', ApplicationGroupController::class);
+    Route::resource('groups', GroupScheduleController::class);
     Route::resource('selection-lineup', SelectionLineupController::class);
 });
 
