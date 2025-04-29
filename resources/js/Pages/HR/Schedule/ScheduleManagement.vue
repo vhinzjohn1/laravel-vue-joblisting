@@ -14,9 +14,7 @@
                     <div class="px-4 py-4 bg-white border-b card-header">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-semibold">Schedules</h2>
-                            <PrimaryButton
-                                @click="showCreateModal = true"
-                            >
+                            <PrimaryButton @click="showCreateModal = true">
                                 <i class="mr-2 fas fa-plus"></i>
                                 Create Schedule
                             </PrimaryButton>
@@ -26,7 +24,6 @@
                     <div class="p-4">
                         <!-- Two-column layout -->
                         <div class="flex flex-col gap-6 md:flex-row">
-
                             <!-- Calendar View -->
                             <div class="mb-6 w-full md:w-3/5 md:mb-0">
                                 <FullCalendar :options="calendarOptions" />
@@ -37,7 +34,9 @@
 
                             <!-- Schedule List -->
                             <div class="overflow-x-auto w-full md:w-2/5">
-                                <table class="min-w-full divide-y divide-gray-200">
+                                <table
+                                    class="min-w-full divide-y divide-gray-200"
+                                >
                                     <thead class="bg-gray-50">
                                         <tr>
                                             <th
@@ -107,14 +106,18 @@
                                             <td class="px-6 py-4">
                                                 <button
                                                     @click="
-                                                        viewParticipants(schedule)
+                                                        viewParticipants(
+                                                            schedule,
+                                                        )
                                                     "
                                                     class="mr-2 text-blue-600 hover:text-blue-900"
                                                 >
                                                     <i class="fas fa-users"></i>
                                                 </button>
                                                 <button
-                                                    @click="editSchedule(schedule)"
+                                                    @click="
+                                                        editSchedule(schedule)
+                                                    "
                                                     class="mr-2 text-blue-600 hover:text-blue-900"
                                                 >
                                                     <i class="fas fa-edit"></i>
@@ -216,17 +219,6 @@
                         ></textarea>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Notes</label
-                        >
-                        <textarea
-                            v-model="form.notes"
-                            rows="2"
-                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        ></textarea>
-                    </div>
-
                     <div v-if="!editingSchedule">
                         <label
                             class="block mb-2 text-sm font-medium text-gray-700"
@@ -252,12 +244,53 @@
                             />
                         </div>
 
-                        <!-- Participants Selection -->
-                        <div class="space-y-2">
+                        <!-- Group Status Toggle -->
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    v-model="useGroupStatus"
+                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                                <span class="ml-2 text-sm text-gray-700">Apply group status to all participants</span>
+                            </label>
+                        </div>
+
+                        <!-- Group Status Selection (only show if checkbox is checked) -->
+                        <div v-if="useGroupStatus" class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Group Status</label>
+                            <select
+                                v-model="groupStatus"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            >
+                                <option value="">Select Status</option>
+                                <option v-for="status in availableGroupStatuses" :key="status" :value="status">
+                                    {{ status }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Application Status Selection -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Application Status</label>
+                            <select
+                                v-model="applicationStatus"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            >
+                                <option value="">Select Status</option>
+                                <option v-for="(color, status) in statusColors" :key="status" :value="status">
+                                    {{ status }}
+                                </option>
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">
+                                This status will be applied to all applications added to this schedule.
+                            </p>
+                        </div>
+
+                        <!-- Participants Selection (only show if group status is not checked) -->
+                        <div v-if="!useGroupStatus" class="space-y-2">
                             <div
-                                v-for="(
-                                    participant, index
-                                ) in form.participants"
+                                v-for="(participant, index) in form.participants"
                                 :key="index"
                                 class="flex gap-2 items-center"
                             >
@@ -283,14 +316,14 @@
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
+                            <button
+                                type="button"
+                                @click="addParticipant"
+                                class="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                            >
+                                <i class="mr-1 fas fa-plus"></i> Add Participant
+                            </button>
                         </div>
-                        <button
-                            type="button"
-                            @click="addParticipant"
-                            class="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                        >
-                            <i class="mr-1 fas fa-plus"></i> Add Participant
-                        </button>
                     </div>
 
                     <div class="flex justify-end mt-6 space-x-3">
@@ -301,10 +334,7 @@
                         >
                             Cancel
                         </button>
-                        <PrimaryButton
-                            type="submit"
-                            :disabled="processing"
-                        >
+                        <PrimaryButton type="submit" :disabled="processing">
                             {{
                                 editingSchedule
                                     ? "Update Schedule"
@@ -369,45 +399,6 @@
                                         {{ selectedSchedule.description }}
                                     </p>
                                 </div>
-
-                                <div>
-                                    <h4
-                                        class="text-sm font-medium text-gray-500"
-                                    >
-                                        Additional Notes
-                                    </h4>
-                                    <p class="text-gray-800">
-                                        {{
-                                            selectedSchedule.notes ||
-                                            "No additional notes"
-                                        }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right column: Admin actions -->
-                    <div class="md:col-span-1">
-                        <div class="p-4 mb-6 bg-gray-50 rounded-lg">
-                            <h3 class="mb-3 text-lg font-semibold">
-                                Admin Actions
-                            </h3>
-                            <div class="space-y-2">
-                                <button
-                                    @click="editSchedule(selectedSchedule)"
-                                    class="flex justify-center items-center py-2 w-full text-white bg-blue-600 rounded-lg transition-colors hover:bg-blue-700"
-                                >
-                                    <i class="mr-2 fas fa-edit"></i> Edit
-                                    Schedule
-                                </button>
-                                <button
-                                    @click="deleteSchedule(selectedSchedule)"
-                                    class="flex justify-center items-center py-2 w-full text-white bg-red-600 rounded-lg transition-colors hover:bg-red-700"
-                                >
-                                    <i class="mr-2 fas fa-trash"></i> Delete
-                                    Schedule
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -422,43 +413,96 @@
                         :key="participant.participant_id"
                         class="p-4 rounded-lg border"
                     >
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="font-medium">
-                                    {{ participant.user.name }}
-                                </h3>
-                                <p class="text-sm text-gray-600">
-                                    {{
-                                        participant.application.jobListing
-                                            .position.position_name
-                                    }}
-                                    -
-                                    {{
-                                        participant.application.jobListing.title
-                                    }}
-                                </p>
-                                <div class="mt-2 text-sm text-gray-500">
-                                    <p>Email: {{ participant.user.email }}</p>
-                                    <p>
-                                        Contact:
-                                        {{
-                                            participant.user.userDetail
-                                                ?.contact_number || "N/A"
-                                        }}
-                                    </p>
-                                    <p>
-                                        Application Status:
-                                        {{ participant.application.status }}
+                        <div
+                            class="flex items-center gap-6 p-3 rounded-md shadow-sm hover:bg-gray-50 transition-colors"
+                        >
+                            <div class="flex-1 flex items-center gap-4">
+                                <div>
+                                    <h3
+                                        class="text-lg font-semibold text-gray-800"
+                                    >
+                                        {{ participant.user.user_detail?.firstname || 'N/A' }} {{ participant.user.user_detail?.lastname || 'N/A' }}
+                                    </h3>
+                                    <p class="text-sm text-gray-600">
+                                        {{ getPositionName(participant) }}
                                     </p>
                                 </div>
+                                <div class="text-sm text-gray-600 space-x-4">
+                                    <span
+                                        ><strong class="font-medium"
+                                            >Email:</strong
+                                        >
+                                        {{ participant.user.email }}</span
+                                    >
+                                    <span>
+                                        <strong class="font-medium"
+                                            >Application Status:</strong
+                                        >
+                                        <span
+                                            class="font-semibold text-indigo-600"
+                                            >{{
+                                                participant.application.status
+                                            }}</span
+                                        >
+                                    </span>
+                                </div>
                             </div>
-                            <span
-                                :class="getStatusClass(participant.status)"
-                                class="px-2 py-1 text-xs rounded-full"
-                            >
-                                {{ participant.status }}
-                            </span>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    @click="removeParticipantFromSchedule(participant)"
+                                    class="text-red-600 hover:text-red-800"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Add Participant Form -->
+                <div class="mt-6 p-4 border rounded-lg bg-gray-50">
+                    <h3 class="text-lg font-semibold mb-4">Add New Participant</h3>
+
+                    <!-- Job Listing Selection (only show if no participants or explicitly adding from different job listing) -->
+                    <div v-if="!hasParticipants || showJobListingSelection" class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Select Job Listing</label>
+                        <CustomSelect
+                            v-model="newParticipant.jobListingId"
+                            :options="jobListings"
+                            :displayFormat="(option) => `${option.position.position_name} - ${option.title}`"
+                            valueKey="job_listing_id"
+                            placeholder="Select Job Listing"
+                            @select="handleJobListingChangeForNewParticipant"
+                        />
+                        <button
+                            v-if="hasParticipants && !showJobListingSelection"
+                            @click="showJobListingSelection = true"
+                            class="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                        >
+                            <i class="mr-1 fas fa-plus"></i> Add from different job listing
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Select Applicant</label>
+                        <CustomSelect
+                            v-model="newParticipant.applicationId"
+                            :options="availableApplications"
+                            :displayFormat="(option) => {
+                                return `${option.user.user_detail.firstname} ${option.user.user_detail.lastname} - ${option.user.email} (${option.status})`;
+                            }"
+                            valueKey="application_id"
+                            placeholder="Select Applicant"
+                        />
+                    </div>
+
+                    <div class="mt-4 flex justify-end">
+                        <PrimaryButton
+                            @click="addParticipantToSchedule"
+                            :disabled="!newParticipant.applicationId"
+                        >
+                            Add Participant
+                        </PrimaryButton>
                     </div>
                 </div>
             </div>
@@ -486,13 +530,16 @@ const props = defineProps({
     },
     applications: {
         type: Array,
-        required: true,
+        required: false,
+        default: () => []
     },
     jobListings: {
         type: Array,
         required: true,
     },
 });
+
+console.log('This is the props: ', props)
 const showCreateModal = ref(false);
 const showParticipantsModal = ref(false);
 const editingSchedule = ref(null);
@@ -501,17 +548,101 @@ const processing = ref(false);
 const selectedJobListing = ref("");
 const schedules = ref(props.schedules);
 
-console.log(schedules);
-
 const form = ref({
     title: "",
     description: "",
     schedule_date: "",
     location: "",
     status: "Scheduled",
-    notes: "",
     participants: [{ application_id: "" }],
 });
+
+// New participant form
+const newParticipant = ref({
+    jobListingId: "",
+    applicationId: "",
+    groupStatus: ""
+});
+
+// Show job listing selection when adding from different job listing
+const showJobListingSelection = ref(false);
+
+// Computed property to check if schedule has participants
+const hasParticipants = computed(() => {
+    return selectedSchedule.value?.participants?.length > 0;
+});
+
+// Get available applications (filtered by job listing and excluding existing participants)
+const availableApplications = computed(() => {
+    // If no job listing is selected and there are participants, use the first participant's job listing
+    let jobListingId = newParticipant.value.jobListingId;
+
+    if (!jobListingId && hasParticipants.value) {
+        jobListingId = selectedSchedule.value.participants[0].application.job_listing_id;
+    }
+
+    if (!jobListingId) return [];
+
+    // Find the job listing with matching ID
+    const jobListing = props.jobListings.find(
+        (job) => job.job_listing_id === jobListingId
+    );
+
+    if (!jobListing) return [];
+
+    // Get existing participant application IDs
+    const existingApplicationIds = selectedSchedule.value.participants.map(
+        p => p.application_id
+    );
+
+    // Filter out applications that are already participants
+    return jobListing.applications.filter(
+        app => !existingApplicationIds.includes(app.application_id)
+    );
+});
+
+const handleJobListingChangeForNewParticipant = () => {
+    newParticipant.value.applicationId = "";
+};
+
+const addParticipantToSchedule = () => {
+    if (!newParticipant.value.applicationId) {
+        return;
+    }
+
+    // Get the application to determine its current status
+    const application = availableApplications.value.find(
+        app => app.application_id === newParticipant.value.applicationId
+    );
+
+    // Use the application's current status or default to 'Pending'
+    const status = application ? application.status : 'Pending';
+
+    axios.post(route('schedules.add-participant', selectedSchedule.value.schedule_id), {
+        application_id: newParticipant.value.applicationId,
+        status: status
+    })
+    .then(response => {
+        if (response.data.success) {
+            selectedSchedule.value = response.data.schedule;
+            showToast("add");
+
+            // Reset form
+            newParticipant.value = {
+                jobListingId: "",
+                applicationId: "",
+                groupStatus: ""
+            };
+
+            // Hide job listing selection if it was shown
+            showJobListingSelection.value = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error adding participant:', error);
+        showToast("add", false);
+    });
+};
 
 const calendarOptions = computed(() => ({
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -642,13 +773,15 @@ const closeModal = () => {
     showCreateModal.value = false;
     editingSchedule.value = null;
     selectedJobListing.value = "";
+    useGroupStatus.value = false;
+    groupStatus.value = "";
+    applicationStatus.value = "";
     form.value = {
         title: "",
         description: "",
         schedule_date: "",
         location: "",
         status: "Scheduled",
-        notes: "",
         participants: [{ application_id: "" }],
     };
 };
@@ -663,6 +796,25 @@ const removeParticipant = (index) => {
 
 const handleSubmit = () => {
     processing.value = true;
+
+    // Prepare form data
+    const formData = prepareFormData();
+
+    // If group status is enabled, add group status and job listing ID
+    if (useGroupStatus.value && groupStatus.value && selectedJobListing.value) {
+        formData.use_group_status = true;
+        formData.group_status = groupStatus.value;
+        formData.job_listing_id = selectedJobListing.value;
+
+        // Clear participants array when using group status
+        formData.participants = [];
+    } else {
+        // Ensure use_group_status is false when not using group status
+        formData.use_group_status = false;
+    }
+
+    // Add application status
+    formData.application_status = applicationStatus.value;
 
     const options = {
         onSuccess: (response) => {
@@ -681,11 +833,11 @@ const handleSubmit = () => {
     if (editingSchedule.value) {
         router.put(
             route("schedules.update", editingSchedule.value.schedule_id),
-            prepareFormData(),
+            formData,
             options,
         );
     } else {
-        router.post(route("schedules.store"), prepareFormData(), options);
+        router.post(route("schedules.store"), formData, options);
     }
 };
 
@@ -701,7 +853,6 @@ const editSchedule = (schedule) => {
         schedule_date: formatDateForInput(schedule.schedule_date),
         location: schedule.location,
         status: schedule.status,
-        notes: schedule.notes,
         participants: schedule.participants.map((participant) => ({
             application_id: participant.application_id,
         })),
@@ -710,6 +861,7 @@ const editSchedule = (schedule) => {
 };
 
 const viewParticipants = (schedule) => {
+    console.log('Schedule participants:', schedule.participants);
     selectedSchedule.value = schedule;
     showParticipantsModal.value = true;
 };
@@ -776,6 +928,80 @@ const deleteSchedule = (schedule) => {
         }
     });
 };
+
+const removeParticipantFromSchedule = (participant) => {
+    Swal.fire({
+        title: "Are you sure?",
+        text: `You are about to remove this participant from the schedule`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, remove it!",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(route('schedules.remove-participant', [selectedSchedule.value.schedule_id, participant.participant_id]))
+                .then(response => {
+                    if (response.data.success) {
+                        selectedSchedule.value = response.data.schedule;
+                        showToast("delete");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing participant:', error);
+                    showToast("delete", false);
+                });
+        }
+    });
+};
+
+// Add this function to safely get the position name
+const getPositionName = (participant) => {
+    try {
+        return participant.application?.job_listing?.position?.position_name || 'Position not available';
+    } catch (error) {
+        console.error('Error getting position name:', error);
+        return 'Position not available';
+    }
+};
+
+// Add status colors from ApplicationDetails.vue
+const statusColors = {
+    Pending: "bg-yellow-100 text-yellow-800",
+    Qualified: "bg-green-100 text-green-800",
+    Disqualified: "bg-red-100 text-red-800",
+    "Competency Exam": "bg-blue-100 text-blue-800",
+    Rejected: "bg-red-100 text-red-800",
+    Interview: "bg-purple-100 text-purple-800",
+    Accepted: "bg-green-100 text-green-800",
+};
+
+// Add group status toggle
+const useGroupStatus = ref(false);
+const groupStatus = ref("");
+
+// Add applicationStatus to the form data
+const applicationStatus = ref("");
+
+// Computed property to get available group statuses based on selected job listing
+const availableGroupStatuses = computed(() => {
+    if (!selectedJobListing.value) return [];
+
+    // Find the job listing with matching ID
+    const jobListing = props.jobListings.find(
+        (job) => job.job_listing_id === selectedJobListing.value
+    );
+
+    if (!jobListing || !jobListing.applications) return [];
+
+    // Get unique statuses from applications
+    const statuses = new Set();
+    jobListing.applications.forEach(app => {
+        if (app.status) statuses.add(app.status);
+    });
+
+    return Array.from(statuses);
+});
 </script>
 
 <style scoped>

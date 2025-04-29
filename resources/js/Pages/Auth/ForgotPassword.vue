@@ -2,7 +2,7 @@
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import InputField from '@/Components/InputField.vue';
+import TextInput from '@/Components/TextInput.vue';
 
 
 defineProps({
@@ -45,7 +45,7 @@ const submit = () => {
                 <SessionMessages :status="status" />
                 <form @submit.prevent="submit">
                     <div class="input-group mb-4">
-                        <InputField
+                        <TextInput
                             name="Email"
                             type="email"
                             v-model="form.email"

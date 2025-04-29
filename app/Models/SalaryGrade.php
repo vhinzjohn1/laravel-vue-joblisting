@@ -12,6 +12,7 @@ class SalaryGrade extends Model
 
     protected $fillable = [
         'amount',
+        'salary_grade'
     ];
 
     /**

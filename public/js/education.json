@@ -1,0 +1,1795 @@
+[
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Civil Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Electrical Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Mechanical Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Computer Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Electronics Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Chemical Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Industrial Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Geodetic Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Mining Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Sanitary Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Petroleum Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Metallurgical Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Bachelor of Science in Environmental Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Master of Science in Civil Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Master of Science in Electrical Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Master of Science in Mechanical Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Master of Science in Computer Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Master of Science in Electronics Engineering"
+    },
+    {
+        "field": "Engineering",
+        "name": "Doctor of Philosophy in Engineering"
+    },
+    {
+        "field": "Education",
+        "name": "Bachelor of Elementary Education"
+    },
+    {
+        "field": "Education",
+        "name": "Bachelor of Secondary Education"
+    },
+    {
+        "field": "Education",
+        "name": "Bachelor of Early Childhood Education"
+    },
+    {
+        "field": "Education",
+        "name": "Bachelor of Special Needs Education"
+    },
+    {
+        "field": "Education",
+        "name": "Bachelor of Physical Education"
+    },
+    {
+        "field": "Education",
+        "name": "Bachelor of Technical-Vocational Teacher Education"
+    },
+    {
+        "field": "Education",
+        "name": "Master of Arts in Education"
+    },
+    {
+        "field": "Education",
+        "name": "Doctor of Education"
+    },
+    {
+        "field": "Business and Management",
+        "name": "Bachelor of Science in Accountancy"
+    },
+    {
+        "field": "Business and Management",
+        "name": "Bachelor of Science in Business Administration"
+    },
+    {
+        "field": "Business and Management",
+        "name": "Bachelor of Science in Management Accounting"
+    },
+    {
+        "field": "Business and Management",
+        "name": "Bachelor of Science in Entrepreneurship"
+    },
+    {
+        "field": "Business and Management",
+        "name": "Bachelor of Science in Marketing Management"
+    },
+    {
+        "field": "Business and Management",
+        "name": "Master in Business Administration"
+    },
+    {
+        "field": "Business and Management",
+        "name": "Doctor of Business Administration"
+    },
+    {
+        "field": "Information Technology",
+        "name": "Bachelor of Science in Information Technology"
+    },
+    {
+        "field": "Information Technology",
+        "name": "Bachelor of Science in Computer Science"
+    },
+    {
+        "field": "Information Technology",
+        "name": "Bachelor of Science in Information Systems"
+    },
+    {
+        "field": "Information Technology",
+        "name": "Master of Science in Information Technology"
+    },
+    {
+        "field": "Information Technology",
+        "name": "Doctor of Philosophy in Computer Science"
+    },
+    {
+        "field": "Agriculture and Fisheries",
+        "name": "Bachelor of Science in Agriculture"
+    },
+    {
+        "field": "Agriculture and Fisheries",
+        "name": "Bachelor of Science in Fisheries"
+    },
+    {
+        "field": "Agriculture and Fisheries",
+        "name": "Bachelor of Science in Agribusiness"
+    },
+    {
+        "field": "Agriculture and Fisheries",
+        "name": "Bachelor of Science in Agricultural Engineering"
+    },
+    {
+        "field": "Agriculture and Fisheries",
+        "name": "Master of Science in Agriculture"
+    },
+    {
+        "field": "Agriculture and Fisheries",
+        "name": "Doctor of Philosophy in Agriculture"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Bachelor of Science in Nursing"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Bachelor of Science in Pharmacy"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Bachelor of Science in Medical Technology"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Bachelor of Science in Physical Therapy"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Bachelor of Science in Occupational Therapy"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Bachelor of Science in Radiologic Technology"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Doctor of Medicine"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Master of Science in Nursing"
+    },
+    {
+        "field": "Medical and Health Sciences",
+        "name": "Doctor of Philosophy in Nursing"
+    },
+    {
+        "field": "Social Sciences",
+        "name": "Bachelor of Arts in Psychology"
+    },
+    {
+        "field": "Social Sciences",
+        "name": "Bachelor of Arts in Sociology"
+    },
+    {
+        "field": "Social Sciences",
+        "name": "Bachelor of Arts in Political Science"
+    },
+    {
+        "field": "Social Sciences",
+        "name": "Bachelor of Arts in Economics"
+    },
+    {
+        "field": "Social Sciences",
+        "name": "Master of Arts in Psychology"
+    },
+    {
+        "field": "Social Sciences",
+        "name": "Doctor of Philosophy in Psychology"
+    },
+    {
+        "field": "Natural Sciences",
+        "name": "Bachelor of Science in Biology"
+    },
+    {
+        "field": "Natural Sciences",
+        "name": "Bachelor of Science in Chemistry"
+    },
+    {
+        "field": "Natural Sciences",
+        "name": "Bachelor of Science in Physics"
+    },
+    {
+        "field": "Natural Sciences",
+        "name": "Bachelor of Science in Mathematics"
+    },
+    {
+        "field": "Natural Sciences",
+        "name": "Bachelor of Science in Environmental Science"
+    },
+    {
+        "field": "Natural Sciences",
+        "name": "Master of Science in Biology"
+    },
+    {
+        "field": "Natural Sciences",
+        "name": "Doctor of Philosophy in Biology"
+    },
+    {
+        "field": "Humanities and Liberal Arts",
+        "name": "Bachelor of Arts in English"
+    },
+    {
+        "field": "Humanities and Liberal Arts",
+        "name": "Bachelor of Arts in Filipino"
+    },
+    {
+        "field": "Humanities and Liberal Arts",
+        "name": "Bachelor of Arts in Communication"
+    },
+    {
+        "field": "Humanities and Liberal Arts",
+        "name": "Bachelor of Arts in Philosophy"
+    },
+    {
+        "field": "Humanities and Liberal Arts",
+        "name": "Master of Arts in Communication"
+    },
+    {
+        "field": "Humanities and Liberal Arts",
+        "name": "Doctor of Philosophy in Communication"
+    },
+    {
+        "field": "Law",
+        "name": "Bachelor of Laws (LLB)"
+    },
+    {
+        "field": "Law",
+        "name": "Juris Doctor (JD)"
+    },
+    {
+        "field": "Law",
+        "name": "Master of Laws (LLM)"
+    },
+    {
+        "field": "Law",
+        "name": "Doctor of Juridical Science (SJD)"
+    },
+    {
+        "field": "Accountancy",
+        "name": "Bachelor of Science in Accountancy"
+    },
+    {
+        "field": "Accountancy",
+        "name": "Master in Accountancy"
+    },
+    {
+        "field": "Accountancy",
+        "name": "Doctor of Philosophy in Accountancy"
+    },
+    {
+        "field": "Architecture",
+        "name": "Bachelor of Science in Architecture"
+    },
+    {
+        "field": "Architecture",
+        "name": "Master of Architecture"
+    },
+    {
+        "field": "Architecture",
+        "name": "Doctor of Philosophy in Architecture"
+    },
+    {
+        "field": "Fine Arts",
+        "name": "Bachelor of Fine Arts"
+    },
+    {
+        "field": "Fine Arts",
+        "name": "Master of Fine Arts"
+    },
+    {
+        "field": "Fine Arts",
+        "name": "Doctor of Philosophy in Fine Arts"
+    },
+    {
+        "field": "Criminology",
+        "name": "Bachelor of Science in Criminology"
+    },
+    {
+        "field": "Criminology",
+        "name": "Master of Science in Criminology"
+    },
+    {
+        "field": "Criminology",
+        "name": "Doctor of Philosophy in Criminology"
+    },
+    {
+        "field": "Hospitality and Tourism",
+        "name": "Bachelor of Science in Hospitality Management"
+    },
+    {
+        "field": "Hospitality and Tourism",
+        "name": "Bachelor of Science in Tourism Management"
+    },
+    {
+        "field": "Hospitality and Tourism",
+        "name": "Master in Hospitality Management"
+    },
+    {
+        "field": "Hospitality and Tourism",
+        "name": "Doctor of Philosophy in Hospitality Management"
+    },
+    {
+        "field": "Maritime",
+        "name": "Bachelor of Science in Marine Transportation"
+    },
+    {
+        "field": "Maritime",
+        "name": "Bachelor of Science in Marine Engineering"
+    },
+    {
+        "field": "Maritime",
+        "name": "Master of Science in Maritime Education"
+    },
+    {
+        "field": "Public Administration",
+        "name": "Bachelor of Public Administration"
+    },
+    {
+        "field": "Public Administration",
+        "name": "Master in Public Administration"
+    },
+    {
+        "field": "Public Administration",
+        "name": "Doctor of Public Administration"
+    },
+    {
+        "field": "Social Work",
+        "name": "Bachelor of Science in Social Work"
+    },
+    {
+        "field": "Social Work",
+        "name": "Master of Science in Social Work"
+    },
+    {
+        "field": "Social Work",
+        "name": "Doctor of Philosophy in Social Work"
+    },
+    {
+        "field": "Veterinary Medicine",
+        "name": "Doctor of Veterinary Medicine"
+    },
+    {
+        "field": "Dentistry",
+        "name": "Doctor of Dental Medicine"
+    },
+    {
+        "field": "Medicine",
+        "name": "Doctor of Medicine"
+    },
+    {
+        "field": "Library and Information Science",
+        "name": "Bachelor of Library and Information Science"
+    },
+    {
+        "field": "Library and Information Science",
+        "name": "Master of Library and Information Science"
+    },
+    {
+        "field": "Library and Information Science",
+        "name": "Doctor of Philosophy in Library and Information Science"
+    }
+]
+  {
+    "field": "Engineering",
+    "name": "Bachelor of Science in Industrial Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Geodetic Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Mining Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Sanitary Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Petroleum Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Metallurgical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Environmental Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Civil Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Electrical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Mechanical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Computer Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Electronics Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Doctor of Philosophy in Engineering"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Elementary Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Secondary Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Early Childhood Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Special Needs Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Physical Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Technical-Vocational Teacher Education"
+},
+{
+    "field": "Education",
+    "name": "Master of Arts in Education"
+},
+{
+    "field": "Education",
+    "name": "Doctor of Education"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Accountancy"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Business Administration"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Management Accounting"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Entrepreneurship"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Marketing Management"
+},
+{
+    "field": "Business and Management",
+    "name": "Master in Business Administration"
+},
+{
+    "field": "Business and Management",
+    "name": "Doctor of Business Administration"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Information Technology"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Computer Science"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Information Systems"
+},
+{
+    "field": "Information Technology",
+    "name": "Master of Science in Information Technology"
+},
+{
+    "field": "Information Technology",
+    "name": "Doctor of Philosophy in Computer Science"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agriculture"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Fisheries"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agribusiness"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agricultural Engineering"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Master of Science in Agriculture"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Doctor of Philosophy in Agriculture"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Nursing"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Pharmacy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Medical Technology"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Physical Therapy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Occupational Therapy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Radiologic Technology"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Doctor of Medicine"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Master of Science in Nursing"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Doctor of Philosophy in Nursing"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Psychology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Sociology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Political Science"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Economics"
+},
+{
+    "field": "Social Sciences",
+    "name": "Master of Arts in Psychology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Doctor of Philosophy in Psychology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Biology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Chemistry"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Physics"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Mathematics"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Environmental Science"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Master of Science in Biology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Doctor of Philosophy in Biology"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in English"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Filipino"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Communication"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Philosophy"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Master of Arts in Communication"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Doctor of Philosophy in Communication"
+},
+{
+    "field": "Law",
+    "name": "Bachelor of Laws (LLB)"
+},
+{
+    "field": "Law",
+    "name": "Juris Doctor (JD)"
+},
+{
+    "field": "Law",
+    "name": "Master of Laws (LLM)"
+},
+{
+    "field": "Law",
+    "name": "Doctor of Juridical Science (SJD)"
+},
+{
+    "field": "Accountancy",
+    "name": "Bachelor of Science in Accountancy"
+},
+{
+    "field": "Accountancy",
+    "name": "Master in Accountancy"
+},
+{
+    "field": "Accountancy",
+    "name": "Doctor of Philosophy in Accountancy"
+},
+{
+    "field": "Architecture",
+    "name": "Bachelor of Science in Architecture"
+},
+{
+    "field": "Architecture",
+    "name": "Master of Architecture"
+},
+{
+    "field": "Architecture",
+    "name": "Doctor of Philosophy in Architecture"
+},
+{
+    "field": "Fine Arts",
+    "name": "Bachelor of Fine Arts"
+},
+{
+    "field": "Fine Arts",
+    "name": "Master of Fine Arts"
+},
+{
+    "field": "Fine Arts",
+    "name": "Doctor of Philosophy in Fine Arts"
+},
+{
+    "field": "Criminology",
+    "name": "Bachelor of Science in Criminology"
+},
+{
+    "field": "Criminology",
+    "name": "Master of Science in Criminology"
+},
+{
+    "field": "Criminology",
+    "name": "Doctor of Philosophy in Criminology"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Bachelor of Science in Hospitality Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Bachelor of Science in Tourism Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Master in Hospitality Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Doctor of Philosophy in Hospitality Management"
+},
+{
+    "field": "Maritime",
+    "name": "Bachelor of Science in Marine Transportation"
+},
+{
+    "field": "Maritime",
+    "name": "Bachelor of Science in Marine Engineering"
+},
+{
+    "field": "Maritime",
+    "name": "Master of Science in Maritime Education"
+},
+{
+    "field": "Public Administration",
+    "name": "Bachelor of Public Administration"
+},
+{
+    "field": "Public Administration",
+    "name": "Master in Public Administration"
+},
+{
+    "field": "Public Administration",
+    "name": "Doctor of Public Administration"
+},
+{
+    "field": "Social Work",
+    "name": "Bachelor of Science in Social Work"
+},
+{
+    "field": "Social Work",
+    "name": "Master of Science in Social Work"
+},
+{
+    "field": "Social Work",
+    "name": "Doctor of Philosophy in Social Work"
+},
+{
+    "field": "Veterinary Medicine",
+    "name": "Doctor of Veterinary Medicine"
+},
+{
+    "field": "Dentistry",
+    "name": "Doctor of Dental Medicine"
+},
+{
+    "field": "Medicine",
+    "name": "Doctor of Medicine"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Bachelor of Library and Information Science"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Master of Library and Information Science"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Doctor of Philosophy in Library and Information Science"
+}
+
+      {
+    "name": "Bachelor of Science in Nursing",
+    "field": "Health Sciences",
+},
+{
+    "name": "Bachelor of Science in Information Technology",
+    "field": "Information Technology",
+},
+{
+    "name": "Bachelor of Science in Business Administration",
+    "field": "Business and Administration",
+},
+{
+    "name": "Bachelor of Science in Civil Engineering",
+    "field": "Engineering and Engineering Trades",
+},
+{
+    "name": "Bachelor of Science in Accountancy",
+    "field": "Accounting and Taxation",
+},
+{
+    "name": "Bachelor of Science in Psychology",
+    "field": "Psychology",
+},
+{
+    "name": "Bachelor of Science in Criminology",
+    "field": "Security Services",
+},
+{
+    "name": "Bachelor of Science in Hospitality Management",
+    "field": "Hospitality and Tourism",
+},
+{
+    "name": "Bachelor of Elementary Education",
+    "field": "Education",
+},
+{
+    "name": "Bachelor of Secondary Education",
+    "field": "Education",
+}
+],
+"master_degrees": [
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Civil Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Electrical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Mechanical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Computer Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Electronics Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Chemical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Industrial Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Geodetic Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Mining Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Sanitary Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Petroleum Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Metallurgical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Environmental Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Civil Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Electrical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Mechanical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Computer Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Electronics Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Doctor of Philosophy in Engineering"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Elementary Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Secondary Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Early Childhood Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Special Needs Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Physical Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Technical-Vocational Teacher Education"
+},
+{
+    "field": "Education",
+    "name": "Master of Arts in Education"
+},
+{
+    "field": "Education",
+    "name": "Doctor of Education"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Accountancy"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Business Administration"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Management Accounting"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Entrepreneurship"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Marketing Management"
+},
+{
+    "field": "Business and Management",
+    "name": "Master in Business Administration"
+},
+{
+    "field": "Business and Management",
+    "name": "Doctor of Business Administration"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Information Technology"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Computer Science"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Information Systems"
+},
+{
+    "field": "Information Technology",
+    "name": "Master of Science in Information Technology"
+},
+{
+    "field": "Information Technology",
+    "name": "Doctor of Philosophy in Computer Science"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agriculture"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Fisheries"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agribusiness"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agricultural Engineering"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Master of Science in Agriculture"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Doctor of Philosophy in Agriculture"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Nursing"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Pharmacy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Medical Technology"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Physical Therapy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Occupational Therapy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Radiologic Technology"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Doctor of Medicine"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Master of Science in Nursing"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Doctor of Philosophy in Nursing"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Psychology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Sociology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Political Science"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Economics"
+},
+{
+    "field": "Social Sciences",
+    "name": "Master of Arts in Psychology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Doctor of Philosophy in Psychology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Biology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Chemistry"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Physics"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Mathematics"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Environmental Science"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Master of Science in Biology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Doctor of Philosophy in Biology"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in English"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Filipino"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Communication"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Philosophy"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Master of Arts in Communication"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Doctor of Philosophy in Communication"
+},
+{
+    "field": "Law",
+    "name": "Bachelor of Laws (LLB)"
+},
+{
+    "field": "Law",
+    "name": "Juris Doctor (JD)"
+},
+{
+    "field": "Law",
+    "name": "Master of Laws (LLM)"
+},
+{
+    "field": "Law",
+    "name": "Doctor of Juridical Science (SJD)"
+},
+{
+    "field": "Accountancy",
+    "name": "Bachelor of Science in Accountancy"
+},
+{
+    "field": "Accountancy",
+    "name": "Master in Accountancy"
+},
+{
+    "field": "Accountancy",
+    "name": "Doctor of Philosophy in Accountancy"
+},
+{
+    "field": "Architecture",
+    "name": "Bachelor of Science in Architecture"
+},
+{
+    "field": "Architecture",
+    "name": "Master of Architecture"
+},
+{
+    "field": "Architecture",
+    "name": "Doctor of Philosophy in Architecture"
+},
+{
+    "field": "Fine Arts",
+    "name": "Bachelor of Fine Arts"
+},
+{
+    "field": "Fine Arts",
+    "name": "Master of Fine Arts"
+},
+{
+    "field": "Fine Arts",
+    "name": "Doctor of Philosophy in Fine Arts"
+},
+{
+    "field": "Criminology",
+    "name": "Bachelor of Science in Criminology"
+},
+{
+    "field": "Criminology",
+    "name": "Master of Science in Criminology"
+},
+{
+    "field": "Criminology",
+    "name": "Doctor of Philosophy in Criminology"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Bachelor of Science in Hospitality Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Bachelor of Science in Tourism Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Master in Hospitality Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Doctor of Philosophy in Hospitality Management"
+},
+{
+    "field": "Maritime",
+    "name": "Bachelor of Science in Marine Transportation"
+},
+{
+    "field": "Maritime",
+    "name": "Bachelor of Science in Marine Engineering"
+},
+{
+    "field": "Maritime",
+    "name": "Master of Science in Maritime Education"
+},
+{
+    "field": "Public Administration",
+    "name": "Bachelor of Public Administration"
+},
+{
+    "field": "Public Administration",
+    "name": "Master in Public Administration"
+},
+{
+    "field": "Public Administration",
+    "name": "Doctor of Public Administration"
+},
+{
+    "field": "Social Work",
+    "name": "Bachelor of Science in Social Work"
+},
+{
+    "field": "Social Work",
+    "name": "Master of Science in Social Work"
+},
+{
+    "field": "Social Work",
+    "name": "Doctor of Philosophy in Social Work"
+},
+{
+    "field": "Veterinary Medicine",
+    "name": "Doctor of Veterinary Medicine"
+},
+{
+    "field": "Dentistry",
+    "name": "Doctor of Dental Medicine"
+},
+{
+    "field": "Medicine",
+    "name": "Doctor of Medicine"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Bachelor of Library and Information Science"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Master of Library and Information Science"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Doctor of Philosophy in Library and Information Science"
+}
+
+      {
+    "name": "Master of Arts in Education",
+    "field": "Education",
+},
+{
+    "name": "Master of Science in Nursing",
+    "field": "Health Sciences",
+},
+{
+    "name": "Master in Business Administration",
+    "field": "Business and Administration",
+},
+{
+    "name": "Master of Science in Information Technology",
+    "field": "Information Technology",
+},
+{
+    "name": "Master of Science in Psychology",
+    "field": "Psychology",
+}
+],
+"doctorate_degrees": [
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Civil Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Electrical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Mechanical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Computer Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Electronics Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Chemical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Industrial Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Geodetic Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Mining Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Sanitary Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Petroleum Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Metallurgical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Bachelor of Science in Environmental Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Civil Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Electrical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Mechanical Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Computer Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Master of Science in Electronics Engineering"
+},
+{
+    "field": "Engineering",
+    "name": "Doctor of Philosophy in Engineering"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Elementary Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Secondary Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Early Childhood Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Special Needs Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Physical Education"
+},
+{
+    "field": "Education",
+    "name": "Bachelor of Technical-Vocational Teacher Education"
+},
+{
+    "field": "Education",
+    "name": "Master of Arts in Education"
+},
+{
+    "field": "Education",
+    "name": "Doctor of Education"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Accountancy"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Business Administration"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Management Accounting"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Entrepreneurship"
+},
+{
+    "field": "Business and Management",
+    "name": "Bachelor of Science in Marketing Management"
+},
+{
+    "field": "Business and Management",
+    "name": "Master in Business Administration"
+},
+{
+    "field": "Business and Management",
+    "name": "Doctor of Business Administration"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Information Technology"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Computer Science"
+},
+{
+    "field": "Information Technology",
+    "name": "Bachelor of Science in Information Systems"
+},
+{
+    "field": "Information Technology",
+    "name": "Master of Science in Information Technology"
+},
+{
+    "field": "Information Technology",
+    "name": "Doctor of Philosophy in Computer Science"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agriculture"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Fisheries"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agribusiness"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Bachelor of Science in Agricultural Engineering"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Master of Science in Agriculture"
+},
+{
+    "field": "Agriculture and Fisheries",
+    "name": "Doctor of Philosophy in Agriculture"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Nursing"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Pharmacy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Medical Technology"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Physical Therapy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Occupational Therapy"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Bachelor of Science in Radiologic Technology"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Doctor of Medicine"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Master of Science in Nursing"
+},
+{
+    "field": "Medical and Health Sciences",
+    "name": "Doctor of Philosophy in Nursing"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Psychology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Sociology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Political Science"
+},
+{
+    "field": "Social Sciences",
+    "name": "Bachelor of Arts in Economics"
+},
+{
+    "field": "Social Sciences",
+    "name": "Master of Arts in Psychology"
+},
+{
+    "field": "Social Sciences",
+    "name": "Doctor of Philosophy in Psychology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Biology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Chemistry"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Physics"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Mathematics"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Bachelor of Science in Environmental Science"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Master of Science in Biology"
+},
+{
+    "field": "Natural Sciences",
+    "name": "Doctor of Philosophy in Biology"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in English"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Filipino"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Communication"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Bachelor of Arts in Philosophy"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Master of Arts in Communication"
+},
+{
+    "field": "Humanities and Liberal Arts",
+    "name": "Doctor of Philosophy in Communication"
+},
+{
+    "field": "Law",
+    "name": "Bachelor of Laws (LLB)"
+},
+{
+    "field": "Law",
+    "name": "Juris Doctor (JD)"
+},
+{
+    "field": "Law",
+    "name": "Master of Laws (LLM)"
+},
+{
+    "field": "Law",
+    "name": "Doctor of Juridical Science (SJD)"
+},
+{
+    "field": "Accountancy",
+    "name": "Bachelor of Science in Accountancy"
+},
+{
+    "field": "Accountancy",
+    "name": "Master in Accountancy"
+},
+{
+    "field": "Accountancy",
+    "name": "Doctor of Philosophy in Accountancy"
+},
+{
+    "field": "Architecture",
+    "name": "Bachelor of Science in Architecture"
+},
+{
+    "field": "Architecture",
+    "name": "Master of Architecture"
+},
+{
+    "field": "Architecture",
+    "name": "Doctor of Philosophy in Architecture"
+},
+{
+    "field": "Fine Arts",
+    "name": "Bachelor of Fine Arts"
+},
+{
+    "field": "Fine Arts",
+    "name": "Master of Fine Arts"
+},
+{
+    "field": "Fine Arts",
+    "name": "Doctor of Philosophy in Fine Arts"
+},
+{
+    "field": "Criminology",
+    "name": "Bachelor of Science in Criminology"
+},
+{
+    "field": "Criminology",
+    "name": "Master of Science in Criminology"
+},
+{
+    "field": "Criminology",
+    "name": "Doctor of Philosophy in Criminology"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Bachelor of Science in Hospitality Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Bachelor of Science in Tourism Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Master in Hospitality Management"
+},
+{
+    "field": "Hospitality and Tourism",
+    "name": "Doctor of Philosophy in Hospitality Management"
+},
+{
+    "field": "Maritime",
+    "name": "Bachelor of Science in Marine Transportation"
+},
+{
+    "field": "Maritime",
+    "name": "Bachelor of Science in Marine Engineering"
+},
+{
+    "field": "Maritime",
+    "name": "Master of Science in Maritime Education"
+},
+{
+    "field": "Public Administration",
+    "name": "Bachelor of Public Administration"
+},
+{
+    "field": "Public Administration",
+    "name": "Master in Public Administration"
+},
+{
+    "field": "Public Administration",
+    "name": "Doctor of Public Administration"
+},
+{
+    "field": "Social Work",
+    "name": "Bachelor of Science in Social Work"
+},
+{
+    "field": "Social Work",
+    "name": "Master of Science in Social Work"
+},
+{
+    "field": "Social Work",
+    "name": "Doctor of Philosophy in Social Work"
+},
+{
+    "field": "Veterinary Medicine",
+    "name": "Doctor of Veterinary Medicine"
+},
+{
+    "field": "Dentistry",
+    "name": "Doctor of Dental Medicine"
+},
+{
+    "field": "Medicine",
+    "name": "Doctor of Medicine"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Bachelor of Library and Information Science"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Master of Library and Information Science"
+},
+{
+    "field": "Library and Information Science",
+    "name": "Doctor of Philosophy in Library and Information Science"
+}
+
+      {
+    "name": "Doctor of Philosophy in Education",
+    "field": "Education",
+},
+{
+    "name": "Doctor of Philosophy in Psychology",
+    "field": "Psychology",
+},
+{
+    "name": "Doctor of Business Administration",
+    "field": "Business and Administration",
+},
+{
+    "name": "Doctor of Philosophy in Information Technology",
+    "field": "Information Technology",
+},
+{
+    "name": "Doctor of Philosophy in Nursing",
+    "field": "Health Sciences",
+}
+]
+}

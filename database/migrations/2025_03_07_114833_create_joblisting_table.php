@@ -168,13 +168,14 @@ return new class extends Migration
         // Create salary_grades table and seed data
         Schema::create('salary_grades', function (Blueprint $table) {
             $table->id('salary_grade_id');
+            $table->string('salary_grade')->nullable();
             $table->float('amount', 53, 2)->nullable();
             $table->timestamps();
         });
 
         DB::table('salary_grades')->insert([
-            ['amount' => 50000],
-            ['amount' => 70000],
+            ['salary_grade' => 'SG-7'],
+            ['salary_grade' => 'SG-8'],
         ]);
 
         // Create minimum_requirements table
@@ -224,6 +225,8 @@ return new class extends Migration
             $table->id('position_id');
             $table->string('position_name')->nullable();
             $table->string('item_number')->nullable();
+            $table->string('category')->nullable();
+            $table->string('employment_type')->nullable();
             $table->unsignedBigInteger('salary_grade_id')->nullable();
             $table->unsignedBigInteger('minimum_requirement_id')->nullable();
             $table->timestamps();
@@ -237,6 +240,8 @@ return new class extends Migration
             [
                 'position_name' => 'Mathematics Teacher',
                 'item_number' => 'TCH-001',
+                'category' => 'Teaching',
+                'employment_type' => 'Plantilla',
                 'salary_grade_id' => 1,
                 'minimum_requirement_id' => 1, // Bachelor's degree with CSP eligibility
                 'created_at' => now(),
@@ -244,7 +249,9 @@ return new class extends Migration
             ],
             [
                 'position_name' => 'Administrative Assistant',
-                'item_number' => 'ADM-001',
+                'item_number' => '',
+                'category' => 'Non-Teaching',
+                'employment_type' => 'CoS',
                 'salary_grade_id' => 1,
                 'minimum_requirement_id' => 2, // Associate's or Bachelor's with Sub-Professional eligibility
                 'created_at' => now(),
@@ -253,6 +260,8 @@ return new class extends Migration
             [
                 'position_name' => 'Science Department Head',
                 'item_number' => 'TCH-002',
+                'category' => 'Teaching',
+                'employment_type' => 'Plantilla',
                 'salary_grade_id' => 2,
                 'minimum_requirement_id' => 3, // Associate's or Bachelor's with RA 1080 eligibility
                 'created_at' => now(),
@@ -264,7 +273,6 @@ return new class extends Migration
         Schema::create('job_listings', function (Blueprint $table) {
             $table->id('job_listing_id');
             $table->unsignedBigInteger('position_id')->nullable();
-            $table->string('category')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->date('closing_date')->nullable();
@@ -277,7 +285,6 @@ return new class extends Migration
 
             // Adding Index
             $table->index('status');
-            $table->index('category');
             $table->index('position_id');
             $table->index('created_at');
         });
@@ -286,7 +293,6 @@ return new class extends Migration
         DB::table('job_listings')->insert([
             [
                 'position_id'  => 1, // Mathematics Teacher
-                'category'     => 'Teaching',
                 'title'        => 'Mathematics Teacher Position',
                 'description'  => 'Join our academic team to teach mathematics subjects for high school students.',
                 'closing_date' => '2025-04-30',
@@ -297,7 +303,6 @@ return new class extends Migration
             ],
             [
                 'position_id'  => 2, // Administrative Assistant
-                'category'     => 'Non-Teaching',
                 'title'        => 'Administrative Assistant Position',
                 'description'  => 'Support administrative operations with document handling, correspondence and scheduling.',
                 'closing_date' => '2025-05-15',

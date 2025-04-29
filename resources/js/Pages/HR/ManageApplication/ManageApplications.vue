@@ -8,15 +8,14 @@
 
         <div class="py-5">
             <div class="container-fluid px-4">
-
-                <div
-                    class="card shadow-sm rounded-lg overflow-hidden bg-white"
-                >
+                <div class="card shadow-sm rounded-lg overflow-hidden bg-white">
                     <div class="card-header bg-white py-2 px-4 border-b">
                         <div
                             class="flex flex-col md:flex-row justify-center items-center gap-3"
                         >
-                            <div class="w-full flex flex-col md:flex-row items-center justify-between">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center justify-between"
+                            >
                                 <div class="px-2">
                                     <h1
                                         class="text-2xl font-bold uppercase tracking-wider sm:mb-0"
@@ -24,7 +23,15 @@
                                         Manage Applications
                                     </h1>
                                 </div>
-                                <div class="flex gap-3 items-center justify-center">
+                                <div
+                                    class="flex gap-3 items-center justify-center"
+                                >
+                                    <!-- Reset Icon -->
+                                    <i
+                                        @click="resetFilters"
+                                        class="fas fa-sync-alt text-gray-500 cursor-pointer hover:text-green-500"
+                                    ></i>
+
                                     <CustomSelect
                                         v-model="statusFilter"
                                         :options="statuses"
@@ -111,11 +118,13 @@
                                         {
                                             key: 'status',
                                             title: 'Status',
-                                        }
+                                        },
                                     ]"
                                     action="view"
                                     :row-click="'application_id'"
-                                    @row-click="({ value }) => viewDetails(value)"
+                                    @row-click="
+                                        ({ value }) => viewDetails(value)
+                                    "
                                 />
                             </div>
                         </div>
@@ -150,7 +159,21 @@ const searchQuery = ref("");
 const statusFilter = ref("");
 const jobTitleFilter = ref("");
 const statuses = ref(props.statuses);
-const jobListings = ref(props.applications.map((app) => app.job_listing));
+
+// Create a unique list of job listings
+const jobListings = ref(
+    [...new Map(
+        props.applications
+            .filter(app => app.job_listing) // Filter out any null job_listings
+            .map(app => [app.job_listing.job_listing_id, app.job_listing])
+    ).values()]
+);
+
+const resetFilters = () => {
+    statusFilter.value = "";
+    jobTitleFilter.value = "";
+    searchQuery.value = "";
+};
 
 const viewDetails = (applicationId) => {
     // Instead of showing modal, redirect to the application details page
@@ -200,7 +223,7 @@ const filteredApplications = computed(() => {
     return filtered;
 });
 
-console.log("Filtered Applications:",filteredApplications.value);
+console.log("Filtered Applications:", filteredApplications.value);
 
 const formatDate = (dateString) => {
     if (!dateString) return "N/A";

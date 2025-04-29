@@ -3,6 +3,10 @@ import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import Header from "@/Components/Header/Header.vue";
 import { computed, ref } from "vue";
+
+// Add reactive variables for input fields
+const preparedBy = ref('HR Staff');
+const certifiedBy = ref('ATHENA JAN I. DERAYUNAN');
 import DataTable from "@/Components/DataTable.vue";
 
 const props = defineProps({
@@ -19,6 +23,8 @@ const statusOptions = [
     { value: "Pending", label: "Pending Review" },
     { value: "Rejected", label: "Rejected" },
 ];
+
+console.log("this is the props", props)
 
 // Filtered applicants based on statusFilter
 const filteredApplicants = computed(() => {
@@ -105,7 +111,7 @@ const print = () => {
                                     title: 'Item No.',
                                 },
                                 {
-                                    key: 'category',
+                                    key: 'position.category',
                                     title: 'Category',
                                 },
                                 {
@@ -216,15 +222,16 @@ const print = () => {
                             </div>
                         </div>
 
-                        <div class="card-body p-4 overflow-x-auto">
+                        <div class="card-body p-0 overflow-x-visible w-full">
                             <div
                                 v-if="
                                     filteredApplicants &&
                                     filteredApplicants.length > 0
                                 "
+                                class="p-4 relative"
                             >
                                 <table
-                                    class="min-w-full border-collapse border border-gray-300"
+                                    class="w-full border-collapse border border-gray-300"
                                 >
                                     <thead>
                                         <tr class="bg-gray-50">
@@ -243,7 +250,7 @@ const print = () => {
                                                             .minimum_requirement
                                                             ?.education_level
                                                     "
-                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                    class="text-xs font-normal mt-1"
                                                 >
                                                     {{
                                                         jobListing.position
@@ -263,7 +270,7 @@ const print = () => {
                                                             .minimum_requirement
                                                             ?.training_hours
                                                     "
-                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                    class="text-xs font-normal mt-1"
                                                 >
                                                     {{
                                                         jobListing.position
@@ -283,7 +290,7 @@ const print = () => {
                                                             .minimum_requirement
                                                             ?.years_experience
                                                     "
-                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                    class="text-xs font-normal mt-1"
                                                 >
                                                     {{
                                                         jobListing.position
@@ -303,7 +310,7 @@ const print = () => {
                                                             .minimum_requirement
                                                             ?.eligibility
                                                     "
-                                                    class="text-xs font-normal mt-1 text-gray-600"
+                                                    class="text-xs font-normal mt-1"
                                                 >
                                                     {{
                                                         jobListing.position
@@ -338,10 +345,10 @@ const print = () => {
                                                          :key="index"
                                                          class="mb-2 pb-2"
                                                          :class="{'border-b border-gray-200': index < ensureArray(applicant.education).length - 1}">
-                                                        <p class="text-sm text-gray-600">
+                                                        <p class="text-sm">
                                                             {{ edu.course || "N/A" }}
                                                         </p>
-                                                        <p v-if="edu.school" class="text-xs text-gray-500">
+                                                        <p v-if="edu.school" class="text-xs">
                                                             {{ edu.school }}
                                                         </p>
                                                     </div>
@@ -364,7 +371,7 @@ const print = () => {
                                                         <p>
                                                             {{ train.hours || "N/A" }} hours
                                                         </p>
-                                                        <p class="text-sm text-gray-600">
+                                                        <p class="text-sm">
                                                             {{ train.details || "No details available" }}
                                                         </p>
                                                     </div>
@@ -385,16 +392,15 @@ const print = () => {
                                                          class="mb-2 pb-2"
                                                          :class="{'border-b border-gray-200': index < ensureArray(applicant.experience).length - 1}">
                                                         <p>
-                                                            {{ exp.years || "N/A" }} year(s)
+                                                            {{ exp.years || "N/A" }}
                                                         </p>
-                                                        <p class="text-sm text-gray-600">
+                                                        <p class="text-sm">
                                                             {{ exp.details || "No details available" }}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <span
                                                     v-else
-                                                    class="text-gray-400"
                                                     >N/A</span
                                                 >
                                             </td>
@@ -428,7 +434,7 @@ const print = () => {
                                                         'bg-red-100 text-red-800':
                                                             applicant.status ===
                                                             'Rejected',
-                                                        'bg-gray-100 text-gray-800':
+                                                        'bg-gray-100':
                                                             ![
                                                                 'Qualified',
                                                                 'Pending',
@@ -458,7 +464,7 @@ const print = () => {
                                     }}
                                     applicants found for this position.
                                 </p>
-                                <p class="text-gray-500 text-sm">
+                                <p class=" text-sm">
                                     {{
                                         statusFilter !== "All"
                                             ? "Try changing the filter above or "
@@ -478,23 +484,37 @@ const print = () => {
                                     class="grid grid-cols-1 md:grid-cols-2 gap-8"
                                 >
                                     <div class="flex flex-col items-center">
-                                        <div
-                                            class="w-48 border-b border-black mt-10"
-                                        ></div>
-                                        <p class="font-medium mt-2">
-                                            Prepared by:
-                                        </p>
-                                        <p class="text-sm">HR Staff</p>
+                                        <div class="flex flex-col items-center">
+                                            <p class="font-medium mb-2">
+                                                Prepared by:
+                                            </p>
+                                            <input
+                                              v-model="preparedBy"
+                                              type="text"
+                                              class="text-sm text-center w-48 bg-transparent border-0 border-b-2 border-black focus:border-blue-500 focus:outline-none placeholder:italic placeholder-gray-400 mb-1"
+                                              placeholder="Signature/Name"
+                                            />
+                                            <p class="font-medium mb-2 ">
+                                                HRM Clerk
+                                            </p>
+                                        </div>
                                     </div>
 
                                     <div class="flex flex-col items-center">
-                                        <div
-                                            class="w-48 border-b border-black mt-10"
-                                        ></div>
-                                        <p class="font-medium mt-2">
-                                            Certified Correct by:
-                                        </p>
-                                        <p class="text-sm">Director, OHRM</p>
+                                        <div class="flex flex-col items-center">
+                                            <p class="font-medium mb-2">
+                                                Certified Correct by:
+                                            </p>
+                                            <input
+                                              v-model="certifiedBy"
+                                              type="text"
+                                              class="text-sm text-center w-48 bg-transparent border-0 border-b-2 border-black focus:border-blue-500 focus:outline-none placeholder:italic placeholder-gray-400 mb-1"
+                                              placeholder="Signature/Name"
+                                            />
+                                            <p class="font-medium mb-2 ">
+                                                Director, OHRM
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -508,9 +528,15 @@ const print = () => {
 
 <style scoped>
 @media print {
+    .card-body, .card-body > div, .card-body > div > table, .card-body > table, table {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     @page {
         margin: 0mm;
-        size: auto;
     }
 
     html,
@@ -535,7 +561,7 @@ const print = () => {
     }
 
     :deep(main),
-    :deep(.max-w-7xl) {
+    :deep(.max-w-9xl) {
         padding: 0 !important;
         margin: 0 !important;
         max-width: 100% !important;
@@ -577,13 +603,6 @@ const print = () => {
     }
 
     /* Table formatting */
-    table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        margin: 0 auto !important;
-        table-layout: fixed !important;
-    }
-
     th,
     td {
         border: 1px solid #000 !important;
@@ -600,11 +619,11 @@ const print = () => {
     /* Adjust column widths */
     table th:nth-child(1),
     table td:nth-child(1) {
-        width: 20% !important;
+        width: 25% !important;
     } /* Name */
     table th:nth-child(2),
     table td:nth-child(2) {
-        width: 20% !important;
+        width: 25% !important;
     } /* Education */
     table th:nth-child(3),
     table td:nth-child(3) {
@@ -612,11 +631,11 @@ const print = () => {
     } /* Training */
     table th:nth-child(4),
     table td:nth-child(4) {
-        width: 20% !important;
+        width: 15% !important;
     } /* Experience */
     table th:nth-child(5),
     table td:nth-child(5) {
-        width: 20% !important;
+        width: 15% !important;
     } /* Eligibility */
 
     /* Signature section */

@@ -127,6 +127,9 @@ Route::middleware(['auth'])->group(function () {
 // =======================
 Route::middleware(['auth'])->group(function () {
     Route::resource('schedules', ScheduleController::class);
+    Route::post('schedules/{schedule}/participants', [ScheduleController::class, 'addParticipant'])->name('schedules.add-participant');
+    Route::put('schedules/{schedule}/participants/{participant}', [ScheduleController::class, 'updateParticipant'])->name('schedules.update-participant');
+    Route::delete('schedules/{schedule}/participants/{participant}', [ScheduleController::class, 'removeParticipant'])->name('schedules.remove-participant');
 });
 
 // =======================

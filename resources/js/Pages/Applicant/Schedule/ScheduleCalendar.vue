@@ -3,7 +3,7 @@
 
     <ApplicantLayout>
         <template #header>
-            <Header title="My Interview Schedules" />
+            <Header title="My Schedules" />
         </template>
 
         <div class="py-5">
@@ -25,7 +25,7 @@
                     <div class="px-4 py-4 bg-white border-b card-header">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl font-semibold">
-                                My Interview Schedules
+                                My Schedules
                             </h2>
                         </div>
                     </div>
@@ -150,7 +150,7 @@
                     <div class="md:col-span-2">
                         <div class="max-w-none prose">
                             <h3 class="mb-3 text-lg font-semibold">
-                                Interview Details
+                                Details
                             </h3>
 
                             <div class="p-4 mb-6 bg-gray-50 rounded-lg">
@@ -188,20 +188,6 @@
                                     </h4>
                                     <p class="text-gray-800">
                                         {{ selectedSchedule.description }}
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <h4
-                                        class="text-sm font-medium text-gray-500"
-                                    >
-                                        Additional Notes
-                                    </h4>
-                                    <p class="text-gray-800">
-                                        {{
-                                            selectedSchedule.notes ||
-                                            "No additional notes"
-                                        }}
                                     </p>
                                 </div>
                             </div>
@@ -271,7 +257,7 @@
                                 </div>
 
                                 <p class="mb-4 text-sm text-gray-600">
-                                    Your attendance at this interview is
+                                    Your attendance at this schedule is
                                     required. Please make sure to attend at the
                                     scheduled date and time.
                                 </p>
@@ -284,7 +270,7 @@
                                     <p
                                         class="text-sm font-medium text-gray-600"
                                     >
-                                        This interview has been cancelled.
+                                        This schedule has been cancelled.
                                     </p>
                                 </div>
 
@@ -296,7 +282,7 @@
                                     <p
                                         class="text-sm font-medium text-gray-600"
                                     >
-                                        This interview has been completed.
+                                        This schedule has been completed.
                                     </p>
                                 </div>
                             </div>

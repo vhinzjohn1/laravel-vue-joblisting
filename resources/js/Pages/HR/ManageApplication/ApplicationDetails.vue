@@ -1209,7 +1209,7 @@ const getStatusColor = (status) => {
         Qualified: "bg-green-100 text-green-800",
         Disqualified: "bg-red-100 text-red-800",
         "Competency Exam": "bg-blue-100 text-blue-800",
-        Rejected: "bg-red-100 text-red-800",
+        "Not Selected": "bg-red-100 text-red-800",
         Interview: "bg-purple-100 text-purple-800",
         Accepted: "bg-green-100 text-green-800",
     };

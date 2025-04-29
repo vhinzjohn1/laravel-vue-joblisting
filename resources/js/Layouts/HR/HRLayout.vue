@@ -729,10 +729,10 @@ onMounted(async () => {
                                                     isActive('schedules.index'),
                                             }"
                                         ></i>
-                                        <span>Individual Schedule</span>
+                                        <span>Manage Schedule</span>
                                     </Link>
                                 </li>
-                                <li>
+                                <!-- <li>
                                     <Link
                                         :href="route('groups.index')"
                                         class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
@@ -752,7 +752,7 @@ onMounted(async () => {
                                         ></i>
                                         <span>Group Schedule</span>
                                     </Link>
-                                </li>
+                                </li> -->
                             </ul>
                         </transition>
                     </li>

@@ -37,8 +37,7 @@ class ManageJobListingController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'closing_date' => 'required|date|after_or_equal:today',
-            'status' => 'required|string|in:Active,Draft,Closed',
-            'category' => 'required|string|in:Teaching,Non-Teaching',
+            'status' => 'required|string|in:Active,Draft,Closed'
         ]);
 
         if ($validator->fails()) {
@@ -52,7 +51,6 @@ class ManageJobListingController extends Controller
             'closing_date' => $request->closing_date,
             'status' => $request->status,
             'created_by' => Auth::id(),
-            'category' => $request->category,
         ]);
 
         $jobListings = JobListing::with([
@@ -85,7 +83,6 @@ class ManageJobListingController extends Controller
             'description' => 'required|string',
             'closing_date' => 'required|date|after_or_equal:today',
             'status' => 'required|string|in:Active,Draft,Closed',
-            'category' => 'required|string|in:Teaching,Non-Teaching',
         ]);
 
         if ($validator->fails()) {
@@ -100,7 +97,6 @@ class ManageJobListingController extends Controller
             'description' => $request->description,
             'closing_date' => $request->closing_date,
             'status' => $request->status,
-            'category' => $request->category,
         ]);
 
         $jobListings = JobListing::with([

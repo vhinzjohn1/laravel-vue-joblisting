@@ -49,7 +49,7 @@
                             <div class="md:col-span-2">
                                 <div class="prose max-w-none">
                                     <h3 class="text-lg font-semibold mb-3">
-                                        Interview Details
+                                        Details
                                     </h3>
 
                                     <div class="bg-gray-50 p-4 rounded-lg mb-6">
@@ -87,20 +87,6 @@
                                             </h4>
                                             <p class="text-gray-800">
                                                 {{ schedule.description }}
-                                            </p>
-                                        </div>
-
-                                        <div>
-                                            <h4
-                                                class="text-sm font-medium text-gray-500"
-                                            >
-                                                Additional Notes
-                                            </h4>
-                                            <p class="text-gray-800">
-                                                {{
-                                                    schedule.notes ||
-                                                    "No additional notes"
-                                                }}
                                             </p>
                                         </div>
                                     </div>

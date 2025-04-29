@@ -443,11 +443,11 @@
                                     <div class="space-y-4">
                                         <div>
                                             <label class="text-sm text-gray-500"
-                                                >Salary</label
+                                                >Salary Grade</label
                                             >
                                             <p class="font-medium text-lg">
-                                                ₱{{
-                                                    job.position.salary_grade.amount.toLocaleString()
+                                                {{
+                                                    job.position.salary_grade.salary_grade
                                                 }}
                                             </p>
                                         </div>

@@ -25,7 +25,6 @@ class HRController extends Controller
         // Get statistics
         $stats = [
             'total_jobs' => JobListing::count(),
-            'active_applications' => Application::where('status', 'pending')->count(),
             'total_applicants' => Application::distinct('user_id')->count(),
             'scheduled_interviews' => Schedule::where('schedule_date', '>=', now())->count(),
         ];
@@ -50,11 +49,42 @@ class HRController extends Controller
             ->take(5)
             ->get();
 
+        // Get application status distribution for chart
+        $applicationStats = Application::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->get()
+            ->pluck('count', 'status')
+            ->toArray();
+
+        // Get applications over time for chart
+        $applicationsOverTime = Application::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date,
+                    'count' => $item->count
+                ];
+            })
+            ->toArray();
+
+        // Get job listings by category for chart
+        $jobListingStats = JobListing::join('positions', 'job_listings.position_id', '=', 'positions.position_id')
+            ->select('positions.category', DB::raw('count(*) as count'))
+            ->groupBy('positions.category')
+            ->get()
+            ->pluck('count', 'category')
+            ->toArray();
+
         return Inertia::render('HR/HRDashboard', [
             'stats' => $stats,
             'recentJobs' => $recentJobs,
             'upcomingInterviews' => $upcomingInterviews,
             'recentApplications' => $recentApplications,
+            'applicationStats' => $applicationStats,
+            'applicationsOverTime' => $applicationsOverTime,
+            'jobListingStats' => $jobListingStats,
         ]);
     }
 

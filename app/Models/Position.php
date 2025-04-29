@@ -17,6 +17,8 @@ class Position extends Model
         'position_name',
         'item_number',
         'salary_grade_id',
+        'employment_type',
+        'category',
         'minimum_requirement_id',
     ];
 

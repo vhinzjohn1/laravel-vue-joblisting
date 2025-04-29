@@ -11,10 +11,10 @@ class CaptchaService
     private const CACHE_PREFIX = 'captcha_';
     private const VERIFIED_PREFIX = 'captcha_verified_';
     private const EXPIRY_MINUTES = 10;
-    private const WIDTH = 180;
-    private const HEIGHT = 50;
+    private const WIDTH = 360; // or 320
+private const HEIGHT = 120; // or 100
     private const LENGTH = 6;
-    private const FONT_SIZE = 24;
+    private const FONT_SIZE = 45;
 
     /**
      * Generate a new CAPTCHA
@@ -131,58 +131,66 @@ class CaptchaService
             }
             imagefill($image, 0, 0, $bg);
 
-            // Add noise (random dots)
-            for ($i = 0; $i < 500; $i++) {
-                $color = imagecolorallocate(
+            // Pre-allocate a small set of noise/line colors
+            $noiseColors = [];
+            for ($i = 0; $i < 3; $i++) {
+                $noiseColors[] = imagecolorallocate(
                     $image,
-                    mt_rand(0, 255),
-                    mt_rand(0, 255),
-                    mt_rand(0, 255)
+                    mt_rand(120, 220),
+                    mt_rand(120, 220),
+                    mt_rand(120, 220)
                 );
-                imagesetpixel($image, mt_rand(0, self::WIDTH), mt_rand(0, self::HEIGHT), $color);
             }
 
-            // Add random lines
-            for ($i = 0; $i < 5; $i++) {
-                $color = imagecolorallocate(
-                    $image,
-                    mt_rand(0, 255),
-                    mt_rand(0, 255),
-                    mt_rand(0, 255)
-                );
+            // Add less but still effective noise (random dots)
+            for ($i = 0; $i < 200; $i++) {
+                $color = $noiseColors[$i % count($noiseColors)];
+                imagesetpixel($image, mt_rand(0, self::WIDTH - 1), mt_rand(0, self::HEIGHT - 1), $color);
+            }
+
+            // Add fewer random lines
+            for ($i = 0; $i < 2; $i++) {
+                $color = $noiseColors[$i % count($noiseColors)];
                 imageline(
                     $image,
-                    mt_rand(0, self::WIDTH),
-                    mt_rand(0, self::HEIGHT),
-                    mt_rand(0, self::WIDTH),
-                    mt_rand(0, self::HEIGHT),
+                    mt_rand(0, self::WIDTH - 1),
+                    mt_rand(0, self::HEIGHT - 1),
+                    mt_rand(0, self::WIDTH - 1),
+                    mt_rand(0, self::HEIGHT - 1),
                     $color
                 );
             }
 
-            // Check if font file exists
-            $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
-            if (!file_exists($fontPath)) {
-                throw new \RuntimeException("Font file not found at: {$fontPath}");
+            // Cache font path statically for efficiency
+            static $fontPath = null;
+            if ($fontPath === null) {
+                $fontPath = public_path('font/DejaVuSans-Bold.ttf');
+                if (!file_exists($fontPath)) {
+                    throw new \RuntimeException("Font file not found at: {$fontPath}");
+                }
             }
 
-            // Add text
-            $length = strlen($code);
-            $spacing = self::WIDTH / ($length + 1);
-
-            for ($i = 0; $i < $length; $i++) {
-                $color = imagecolorallocate(
+            // Pre-allocate a small set of dark text colors
+            $textColors = [];
+            for ($i = 0; $i < 4; $i++) {
+                $textColors[] = imagecolorallocate(
                     $image,
                     mt_rand(0, 100),
                     mt_rand(0, 100),
                     mt_rand(0, 100)
                 );
+            }
 
+            $length = strlen($code);
+            $spacing = self::WIDTH / ($length + 1);
+
+            for ($i = 0; $i < $length; $i++) {
+                $color = $textColors[$i % count($textColors)];
                 $angle = mt_rand(-15, 15);
-                $x = ($i + 1) * $spacing - mt_rand(5, 10);
-                $y = self::HEIGHT / 2 + mt_rand(-5, 5);
+                $x = (int)(($i + 1) * $spacing) - mt_rand(5, 10);
+                $y = (int)(self::HEIGHT / 2) + mt_rand(-5, 5);
 
-                $result = imagettftext(
+                imagettftext(
                     $image,
                     self::FONT_SIZE,
                     $angle,
@@ -192,16 +200,14 @@ class CaptchaService
                     $fontPath,
                     $code[$i]
                 );
-
-                if ($result === false) {
-                    throw new \RuntimeException('Failed to add text to image');
-                }
             }
 
             // Convert to base64
             ob_start();
-            $success = imagepng($image);
+            // Use lower compression for faster encoding (level 3 is a good balance)
+            $success = imagepng($image, null, 3);
             if (!$success) {
+                imagedestroy($image);
                 throw new \RuntimeException('Failed to generate PNG image');
             }
             $imageData = ob_get_clean();

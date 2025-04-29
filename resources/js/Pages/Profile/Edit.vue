@@ -5,7 +5,6 @@ import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import DeleteUserForm from "./Partials/DeleteUserForm.vue";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm.vue";
-import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm.vue";
 import EducationalBackgroundForm from "./Partials/EducationalBackgroundForm.vue";
 import TrainingCertificationsForm from "./Partials/TrainingCertificationsForm.vue";
 import WorkExperienceForm from "./Partials/WorkExperienceForm.vue";
@@ -108,7 +107,7 @@ const showSuccessAlert = (action) => {
                                         Profile Information
                                     </button>
                                 </li>
-                                <li class="w-full sm:flex-1 md:w-full">
+                                <li v-if="user.role_name !== 'hr'" class="w-full sm:flex-1 md:w-full">
                                     <button
                                         @click="activeTab = 'education'"
                                         :class="[
@@ -121,7 +120,7 @@ const showSuccessAlert = (action) => {
                                         Educational Background
                                     </button>
                                 </li>
-                                <li class="w-full sm:flex-1 md:w-full">
+                                <li v-if="user.role_name !== 'hr'" class="w-full sm:flex-1 md:w-full">
                                     <button
                                         @click="activeTab = 'training'"
                                         :class="[
@@ -134,7 +133,7 @@ const showSuccessAlert = (action) => {
                                         Training & Certifications
                                     </button>
                                 </li>
-                                <li class="w-full sm:flex-1 md:w-full">
+                                <li v-if="user.role_name !== 'hr'" class="w-full sm:flex-1 md:w-full">
                                     <button
                                         @click="activeTab = 'experience'"
                                         :class="[
@@ -205,7 +204,7 @@ const showSuccessAlert = (action) => {
 
                         <!-- Educational Background -->
                         <div
-                            v-if="activeTab === 'education'"
+                            v-if="activeTab === 'education' && user.role_name !== 'hr'"
                             class="bg-white shadow sm:rounded-lg"
                         >
                             <div
@@ -219,7 +218,7 @@ const showSuccessAlert = (action) => {
 
                         <!-- Training & Certifications -->
                         <div
-                            v-if="activeTab === 'training'"
+                            v-if="activeTab === 'training' && user.role_name !== 'hr'"
                             class="bg-white shadow sm:rounded-lg"
                         >
                             <div
@@ -233,7 +232,7 @@ const showSuccessAlert = (action) => {
 
                         <!-- Work Experience -->
                         <div
-                            v-if="activeTab === 'experience'"
+                            v-if="activeTab === 'experience' && user.role_name !== 'hr'"
                             class="bg-white shadow sm:rounded-lg"
                         >
                             <div

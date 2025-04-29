@@ -1,7 +1,7 @@
 <template>
   <div class="captcha-container">
     <div class="captcha-image" v-if="imageData">
-      <img :src="imageData" alt="CAPTCHA" class="mb-2" />
+      <img :src="imageData" alt="CAPTCHA" class="mb-2 w-[320px] h-[100px] md:w-[360px] md:h-[120px] object-contain border border-gray-300 rounded bg-white shadow" />
       <button
         type="button"
         @click="refreshCaptcha"
@@ -30,7 +30,7 @@
         type="text"
         v-model="attempt"
         :placeholder="placeholder"
-        class="w-full p-2 text-sm rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-700"
+        class="w-full uppercase p-2 text-sm rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-700"
         :class="{ 'error': error }"
         maxlength="6"
         autofocus

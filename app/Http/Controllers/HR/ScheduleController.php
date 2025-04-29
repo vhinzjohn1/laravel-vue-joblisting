@@ -11,6 +11,7 @@ use App\Models\GroupSchedule;
 use App\Models\ScheduleParticipant;
 use App\Traits\NotificationTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ScheduleController extends Controller
@@ -21,7 +22,7 @@ class ScheduleController extends Controller
     {
         $schedules = Schedule::with([
             'creator',
-            'participants.user',
+            'participants.user.userDetail',
             'participants.application.jobListing.position'
         ])
             ->orderBy('schedule_date', 'desc')
@@ -43,15 +44,27 @@ class ScheduleController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Determine if we're using group status
+        $useGroupStatus = $request->has('use_group_status') && $request->use_group_status === true;
+
+        // Set up validation rules based on whether we're using group status
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'schedule_date' => 'required|date',
             'location' => 'required|string|max:255',
-            'participants' => 'required|array',
-            'participants.*.application_id' => 'required|exists:applications,application_id',
-            'notes' => 'nullable|string'
-        ]);
+            'application_status' => 'required|string',
+        ];
+
+        if ($useGroupStatus) {
+            $rules['group_status'] = 'required|string';
+            $rules['job_listing_id'] = 'required|exists:job_listings,job_listing_id';
+        } else {
+            $rules['participants'] = 'required|array';
+            $rules['participants.*.application_id'] = 'required|exists:applications,application_id';
+        }
+
+        $validated = $request->validate($rules);
 
         $schedule = Schedule::create([
             'title' => $validated['title'],
@@ -59,26 +72,63 @@ class ScheduleController extends Controller
             'schedule_date' => $validated['schedule_date'],
             'location' => $validated['location'],
             'status' => 'Scheduled',
-            'notes' => $validated['notes'],
             'created_by' => auth()->id()
         ]);
 
-        // Create participants and send notifications in a single loop
-        if ($request->has('participants')) {
-            foreach ($request->participants as $participant) {
-                // Get the application to retrieve the user_id
-                $application = Application::findOrFail($participant['application_id']);
+        // Handle group status selection
+        if ($useGroupStatus) {
+            // Get all applications for the selected job listing with the specified status
+            $applications = Application::where('job_listing_id', $validated['job_listing_id'])
+                ->where('status', $validated['group_status'])
+                ->get();
 
-                // Create the participant
-                $scheduleParticipant = ScheduleParticipant::create([
-                    'schedule_id' => $schedule->schedule_id,
-                    'user_id' => $application->user_id,
-                    'application_id' => $application->application_id,
-                    'status' => 'Pending'
-                ]);
+            // Log the number of applications found
+            Log::info("Found {$applications->count()} applications with status {$validated['group_status']} for job listing {$validated['job_listing_id']}");
 
-                // Notify the applicant
-                $this->notifyApplicantScheduled($schedule, $application);
+            // Create participants for all applications
+            foreach ($applications as $application) {
+                // Check if participant already exists
+                $existingParticipant = ScheduleParticipant::where('schedule_id', $schedule->schedule_id)
+                    ->where('application_id', $application->application_id)
+                    ->first();
+
+                if (!$existingParticipant) {
+                    // Create the participant
+                    $scheduleParticipant = ScheduleParticipant::create([
+                        'schedule_id' => $schedule->schedule_id,
+                        'user_id' => $application->user_id,
+                        'application_id' => $application->application_id,
+                        'status' => 'Pending'
+                    ]);
+
+                    // Update the application status to the provided status
+                    $application->update(['status' => $validated['application_status']]);
+
+                    // Notify the applicant
+                    $this->notifyApplicantScheduled($schedule, $application);
+                }
+            }
+        } else {
+            // Create participants and send notifications in a single loop
+            if ($request->has('participants')) {
+                foreach ($request->participants as $participant) {
+                    // Get the application to retrieve the user_id
+                    $application = Application::findOrFail($participant['application_id']);
+
+                    // Create the participant
+                    $scheduleParticipant = ScheduleParticipant::create([
+                        'schedule_id' => $schedule->schedule_id,
+                        'user_id' => $application->user_id,
+                        'application_id' => $application->application_id,
+                        'status' => 'Pending'
+                    ]);
+
+                    // Update the application status to the provided status
+                    $application->update(['status' => $validated['application_status']]);
+
+                    // Notify the applicant
+                    $this->notifyApplicantScheduled($schedule, $application);
+                }
             }
         }
 
@@ -94,7 +144,6 @@ class ScheduleController extends Controller
             'schedule_date' => 'required|date',
             'location' => 'required|string|max:255',
             'status' => 'required|string',
-            'notes' => 'nullable|string',
             'participants' => 'sometimes|array',
             'participants.*.application_id' => 'sometimes|exists:applications,application_id'
         ]);
@@ -104,8 +153,7 @@ class ScheduleController extends Controller
             'description' => $validated['description'],
             'schedule_date' => $validated['schedule_date'],
             'location' => $validated['location'],
-            'status' => $validated['status'],
-            'notes' => $validated['notes']
+            'status' => $validated['status']
         ]);
 
         // Update participant statuses based on schedule status
@@ -172,8 +220,7 @@ class ScheduleController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'schedule_date' => 'required|date',
-            'location' => 'required|string|max:255',
-            'notes' => 'nullable|string'
+            'location' => 'required|string|max:255'
         ]);
 
         $group = GroupSchedule::with('applications')->findOrFail($groupId);
@@ -184,7 +231,6 @@ class ScheduleController extends Controller
             'schedule_date' => $validated['schedule_date'],
             'location' => $validated['location'],
             'status' => 'Scheduled',
-            'notes' => $validated['notes'],
             'created_by' => auth()->id(),
             'group_id' => $groupId
         ]);
@@ -210,5 +256,119 @@ class ScheduleController extends Controller
         $group->update(['status' => 'Scheduled']);
 
         return redirect()->route('schedules.index')->with('success', 'Schedule created successfully');
+    }
+
+    /**
+     * Add a new participant to a schedule
+     */
+    public function addParticipant(Request $request, Schedule $schedule)
+    {
+        $validated = $request->validate([
+            'application_id' => 'required|exists:applications,application_id',
+            'status' => 'sometimes|string'
+        ]);
+
+        // Get the application to retrieve the user_id
+        $application = Application::findOrFail($validated['application_id']);
+
+        // Check if participant already exists
+        $existingParticipant = ScheduleParticipant::where('schedule_id', $schedule->schedule_id)
+            ->where('application_id', $validated['application_id'])
+            ->first();
+
+        if ($existingParticipant) {
+            return response()->json([
+                'message' => 'Participant already exists in this schedule',
+                'success' => false
+            ], 422);
+        }
+
+        // Create the participant with default status if not provided
+        $scheduleParticipant = ScheduleParticipant::create([
+            'schedule_id' => $schedule->schedule_id,
+            'user_id' => $application->user_id,
+            'application_id' => $application->application_id,
+            'status' => $validated['status'] ?? 'Pending'
+        ]);
+
+        // Notify the applicant
+        $this->notifyApplicantScheduled($schedule, $application);
+
+        // Reload the schedule with participants
+        $schedule->load([
+            'creator',
+            'participants.user.userDetail',
+            'participants.application.jobListing.position'
+        ]);
+
+        return response()->json([
+            'message' => 'Participant added successfully',
+            'schedule' => $schedule,
+            'success' => true
+        ]);
+    }
+
+    /**
+     * Update a participant's status
+     */
+    public function updateParticipant(Request $request, Schedule $schedule, ScheduleParticipant $participant)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:Pending,Confirmed,Declined,Attended,Cancelled'
+        ]);
+
+        // Ensure the participant belongs to the schedule
+        if ($participant->schedule_id !== $schedule->schedule_id) {
+            return response()->json([
+                'message' => 'Participant does not belong to this schedule',
+                'success' => false
+            ], 422);
+        }
+
+        $participant->update([
+            'status' => $validated['status']
+        ]);
+
+        // Reload the schedule with participants
+        $schedule->load([
+            'creator',
+            'participants.user.userDetail',
+            'participants.application.jobListing.position'
+        ]);
+
+        return response()->json([
+            'message' => 'Participant status updated successfully',
+            'schedule' => $schedule,
+            'success' => true
+        ]);
+    }
+
+    /**
+     * Remove a participant from a schedule
+     */
+    public function removeParticipant(Schedule $schedule, ScheduleParticipant $participant)
+    {
+        // Ensure the participant belongs to the schedule
+        if ($participant->schedule_id !== $schedule->schedule_id) {
+            return response()->json([
+                'message' => 'Participant does not belong to this schedule',
+                'success' => false
+            ], 422);
+        }
+
+        $participant->delete();
+
+        // Reload the schedule with participants
+        $schedule->load([
+            'creator',
+            'participants.user.userDetail',
+            'participants.application.jobListing.position'
+        ]);
+
+        return response()->json([
+            'message' => 'Participant removed successfully',
+            'schedule' => $schedule,
+            'success' => true
+        ]);
     }
 }

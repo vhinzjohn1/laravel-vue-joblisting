@@ -46,7 +46,7 @@
 
             <!-- Right: Search Field -->
             <div class="relative">
-                <InputField
+                <TextInput
                     type="text"
                     :modelValue="searchQuery"
                     @update:modelValue="immediateSearch"
@@ -276,7 +276,6 @@
 <script setup>
 import { ref, computed, watch, onMounted, shallowRef, useSlots } from "vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputField from "@/Components/InputField.vue";
 
 // Props definition including conditionalColumns prop
 const props = defineProps({
@@ -287,7 +286,7 @@ const props = defineProps({
     enableRowCheckbox: { type: Boolean, default: false },
     sortable: { type: Boolean, default: true },
     rowClick: { type: String, default: '' },
-    action: { 
+    action: {
         type: [String, Array],
         default: null,
         validator: (value) => {
@@ -633,7 +632,7 @@ const showActionsColumn = computed(() => {
     if (props.action !== null) {
         return true;
     }
-    
+
     // If no action prop is set, show if we have the default edit/delete buttons
     return true; // Default to showing actions column for backward compatibility
 });

@@ -7,7 +7,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import CaptchaVerification from '@/Components/CaptchaVerification.vue';
 import FormContainer from '@/Components/FormContainer.vue';
-import InputField from '@/Components/InputField.vue';
+import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
 import axios from 'axios';
 
@@ -105,7 +105,7 @@ const handleCaptchaVerified = async ({ token, code }) => {
                 <form @submit.prevent="submit">
                     <div>
                         <InputLabel for="login" value="Email/Username" />
-                        <InputField
+                        <TextInput
                             id="login"
                             type="text"
                             class="block mt-1 w-full"
@@ -121,7 +121,7 @@ const handleCaptchaVerified = async ({ token, code }) => {
 
                     <div class="mt-4">
                         <InputLabel for="password" value="Password" />
-                        <InputField
+                        <TextInput
                             id="password"
                             type="password"
                             class="block mt-1 w-full"

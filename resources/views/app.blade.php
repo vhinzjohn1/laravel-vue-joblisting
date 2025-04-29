@@ -47,6 +47,9 @@
 
     <!-- JS Hashing Library for File Deduplication -->
     <script src="https://cdn.jsdelivr.net/npm/spark-md5@3.0.2/spark-md5.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">

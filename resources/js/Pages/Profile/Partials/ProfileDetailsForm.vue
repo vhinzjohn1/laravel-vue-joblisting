@@ -11,6 +11,7 @@ const emit = defineEmits(["step-completed"]);
 const isFormValid = ref(false);
 const userCredentials = ref();
 const currentRoute = usePage().url;
+const user = usePage().props.auth.user;
 
 const form = useForm({
     firstname: "",
@@ -24,13 +25,15 @@ const form = useForm({
 // Function to check if required fields in userDetails are filled
 function areFetchedFieldsFilled(details) {
     const requireEmail = currentRoute !== '/complete-profile';
+    const isHR = user.role_name === 'hr';
+
     return (
         details &&
         details.firstname && details.firstname.trim() !== "" &&
         details.lastname && details.lastname.trim() !== "" &&
         details.middle_name && details.middle_name.trim() !== "" &&
         details.phone_number && details.phone_number !== "" &&
-        details.eligibility && details.eligibility.trim() !== "" &&
+        (!isHR || (details.eligibility && details.eligibility.trim() !== "")) &&
         (!requireEmail || (details.email && details.email.trim() !== ""))
     );
 }
@@ -63,13 +66,15 @@ const fetchUserDetails = async () => {
 };
 
 const saveProfileDetails = async () => {
+    const isHR = user.role_name === 'hr';
+
     // Don't submit if required fields are not filled
     if (
         !form.firstname ||
         !form.lastname ||
         !form.middle_name ||
         !form.phone_number ||
-        !form.eligibility ||
+        (!isHR && !form.eligibility) ||
         (currentRoute !== '/complete-profile' && !form.email)
     ) {
         return;
@@ -184,6 +189,7 @@ onMounted(() => {
                                 class="block w-full rounded-none rounded-r-md"
                                 v-model="form.phone_number"
                                 maxlength="10"
+                                isPhoneNumber
                                 placeholder="9123456789"
                                 required
                             />
@@ -218,7 +224,7 @@ onMounted(() => {
                         />
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-2" v-if="user.role_name !== 'hr'">
                         <InputLabel
                             for="eligibility"
                             value="Eligibility (Optional)"
@@ -255,10 +261,10 @@ onMounted(() => {
             <div class="flex justify-end">
                 <PrimaryButton
                     type="submit"
-                    :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || !form.eligibility || (currentRoute !== '/complete-profile' && !form.email)"
+                    :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || (user.role_name !== 'hr' && !form.eligibility) || (currentRoute !== '/complete-profile' && !form.email)"
                     :class="[
                         'px-6 py-2',
-                        form.firstname && form.lastname && form.middle_name && form.phone_number && form.eligibility && (currentRoute === '/complete-profile' || form.email)
+                        form.firstname && form.lastname && form.middle_name && form.phone_number && (user.role_name === 'hr' || form.eligibility) && (currentRoute === '/complete-profile' || form.email)
                             ? 'bg-green-700 hover:bg-green-800'
                             : 'bg-green-300 cursor-not-allowed',
                     ]"

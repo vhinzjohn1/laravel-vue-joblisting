@@ -8,25 +8,9 @@
                 <h1 class="mb-6 text-3xl font-bold text-center">Register Page</h1>
 
                 <form @submit.prevent="submit">
-                    <div>
-                        <InputLabel for="name" value="Name" />
-                        <InputField
-                            id="name"
-                            type="text"
-                            class="block mt-1 w-full"
-                            v-model="form.name"
-                            placeholder="Enter your full name"
-                            required
-                            icon="fas fa-user"
-                            autofocus
-                            autocomplete="name"
-                        />
-                        <InputError class="mt-2" :message="form.errors.name" />
-                    </div>
-
                     <div class="mt-4">
                         <InputLabel for="username" value="Username" />
-                        <InputField
+                        <TextInput
                             id="username"
                             type="text"
                             class="block mt-1 w-full"
@@ -40,7 +24,7 @@
 
                     <div class="mt-4">
                         <InputLabel for="email" value="Email" />
-                        <InputField
+                        <TextInput
                             id="email"
                             type="email"
                             class="block mt-1 w-full"
@@ -54,7 +38,7 @@
 
                     <div class="mt-4">
                         <InputLabel for="password" value="Password" />
-                        <InputField
+                        <TextInput
                             id="password"
                             type="password"
                             class="block mt-1 w-full"
@@ -69,7 +53,7 @@
 
                     <div class="mt-4">
                         <InputLabel for="password_confirmation" value="Confirm Password" />
-                        <InputField
+                        <TextInput
                             id="password_confirmation"
                             type="password"
                             class="block mt-1 w-full"
@@ -114,13 +98,12 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import CaptchaVerification from '@/Components/CaptchaVerification.vue';
 import FormContainer from '@/Components/FormContainer.vue';
-import InputField from '@/Components/InputField.vue';
+import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
 import axios from 'axios';
 
 const showCaptcha = ref(false);
 const form = useForm({
-    name: '',
     email: '',
     password: '',
     password_confirmation: '',
@@ -135,7 +118,6 @@ const submit = async () => {
     // First validate registration data without CAPTCHA
     try {
         await axios.post(route('register.validate'), {
-            name: form.name,
             username: form.username,
             email: form.email,
             password: form.password,

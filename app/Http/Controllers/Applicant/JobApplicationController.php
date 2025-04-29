@@ -237,8 +237,8 @@ class JobApplicationController extends Controller
             $request->validate([
                 'job_listing_id' => 'required|exists:job_listings,job_listing_id',
                 'education' => 'required|array|min:1',
-                'trainings' => 'required|array|min:1',
-                'experiences' => 'required|array|min:1',
+                'trainings' => 'array',
+                'experiences' => 'array',
             ]);
 
             // Validate document references (IDs or hashes)
@@ -330,7 +330,7 @@ class JobApplicationController extends Controller
             }
 
             // Store trainings
-            foreach ($request->trainings as $training) {
+            foreach (($request->trainings ?? []) as $training) {
                 if (isset($training['training_id'])) {
                     // If training_id exists, just associate it
                     Training::where('training_id', $training['training_id'])
@@ -347,7 +347,7 @@ class JobApplicationController extends Controller
             }
 
             // Store experiences
-            foreach ($request->experiences as $experience) {
+            foreach (($request->experiences ?? []) as $experience) {
                 if (isset($experience['experience_id'])) {
                     WorkExperience::where('experience_id', $experience['experience_id'])
                         ->update(['user_id' => auth()->id()]);

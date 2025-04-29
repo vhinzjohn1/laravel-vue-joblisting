@@ -13,7 +13,7 @@
                         {{ job.title }} - {{ job.position.position_name }}
                     </h3>
                     <p class="text-sm text-gray-600">
-                        {{ job.category.name }} | Closes on
+                        {{ job.position.category }} | Closes on
                         {{ new Date(job.closing_date).toLocaleDateString() }}
                     </p>
                 </div>
@@ -39,12 +39,6 @@
                     @update:selected-trainings="updateTrainings"
                     @select="onTrainingSelect"
                 />
-                <p
-                    v-if="showValidation && validationErrors.trainings"
-                    class="mt-1 text-sm text-red-500"
-                >
-                    Please select at least one training record
-                </p>
 
                 <!-- Experience Section -->
                 <experience-section
@@ -53,12 +47,6 @@
                     @update:selected-experiences="updateExperiences"
                     @select="onExperienceSelect"
                 />
-                <p
-                    v-if="showValidation && validationErrors.experiences"
-                    class="mt-1 text-red-500 text-md"
-                >
-                    Please select at least one experience record
-                </p>
 
                 <!-- Document Upload Section -->
                 <document-upload-section
@@ -161,6 +149,8 @@ const props = defineProps({
     },
 });
 
+console.log('this is the job', props.job)
+
 const emit = defineEmits(["close", "submitted"]);
 
 // Simplified computed properties
@@ -202,8 +192,6 @@ const formSubmitting = ref(false);
 // Add validation state
 const validationErrors = ref({
     education: false,
-    trainings: false,
-    experiences: false,
     documents: false,
 });
 
@@ -292,26 +280,14 @@ const validateEducation = () => {
     return form.education.length > 0;
 };
 
-const validateTraining = () => {
-    return form.trainings.length > 0;
-};
-
-const validateExperience = () => {
-    return form.experiences.length > 0;
-};
-
 const validateDocuments = () => {
     return Object.values(form.documents).every((doc) => doc !== null);
 };
 
 const validateForm = () => {
     showValidation.value = true;
-    validationErrors.value = {
-        education: !validateEducation(),
-        trainings: !validateTraining(),
-        experiences: !validateExperience(),
-        documents: !validateDocuments(),
-    };
+    validationErrors.value.education = !validateEducation();
+    validationErrors.value.documents = !validateDocuments();
     return !Object.values(validationErrors.value).some((error) => error);
 };
 

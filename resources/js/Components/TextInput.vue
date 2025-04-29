@@ -1,5 +1,8 @@
 <script setup>
-import { computed, ref, nextTick, watch, onMounted } from "vue";
+import { computed, ref, nextTick, watch, onMounted, useAttrs } from "vue";
+
+defineOptions({ inheritAttrs: false });
+const $attrs = useAttrs();
 
 const model = defineModel({
     default: null,
@@ -52,6 +55,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    isPhoneNumber: {
+        type: Boolean,
+        default: false,
+    },
     disabled: {
         type: Boolean,
         default: false,
@@ -60,7 +67,7 @@ const props = defineProps({
         type: [String, Number],
         default: null,
     },
-    
+
 });
 
 const input = ref(null);
@@ -236,9 +243,15 @@ onMounted(() => {
         <div class="relative">
             <span
                 v-if="isCurrency"
-                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none z-10"
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none z-10"
             >
                 {{ currencySign }}
+            </span>
+            <span
+                v-if="isPhoneNumber"
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none z-10"
+            >
+                +63
             </span>
             <input
                 v-model="inputValue"
@@ -252,12 +265,14 @@ onMounted(() => {
                 :readonly="readOnly"
                 @input="isCurrency && handleInput($event)"
                 @keydown="isCurrency && handleKeyDown($event)"
+                v-bind="{...$attrs, class: undefined}"
                 :class="[
                     'w-full p-2 text-sm rounded-lg border focus:outline-none focus:ring-2',
                     errors
                         ? 'border-red-500 ring-1 ring-red-500 focus:ring-red-500'
                         : 'border-gray-300 focus:ring-green-700',
-                    isCurrency ? 'pl-7 pr-10' : 'pr-10',
+                    (isCurrency || isPhoneNumber) ? 'pl-14 pr-10' : 'pr-10',
+                    $attrs.class
                 ]"
                 :required="required"
             />

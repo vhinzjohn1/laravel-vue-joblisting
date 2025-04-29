@@ -37,7 +37,7 @@ class ManageApplicationController extends Controller
                 'Qualified',
                 'Disqualified',
                 'Competency Exam',
-                'Rejected',
+                'Not Selected',
                 'Interview',
                 'Accepted'
 
@@ -82,7 +82,7 @@ class ManageApplicationController extends Controller
                 'Qualified',
                 'Disqualified',
                 'Competency Exam',
-                'Rejected',
+                'Not Selected',
                 'Interview',
                 'Accepted',
             ]
@@ -152,7 +152,7 @@ class ManageApplicationController extends Controller
                 'Qualified',
                 'Disqualified',
                 'Competency Exam',
-                'Rejected',
+                'Not Selected',
                 'Interview',
                 'Accepted'
             ]

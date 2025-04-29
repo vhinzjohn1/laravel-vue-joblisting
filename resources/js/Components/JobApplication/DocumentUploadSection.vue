@@ -22,11 +22,12 @@
             <h3 class="text-amber-800 font-medium">
                 Guidelines for Document Uploads
             </h3>
-            <p class="text-sm text-amber-700 mt-1">
-                All documents must be in PDF format. For multi-page documents,
-                combine all pages into a single PDF file. Each file has a
-                maximum size limit of 10MB.
-            </p>
+            <ul class="list-disc text-sm text-amber-700 mt-1 ml-6">
+                <li>All documents must be in PDF format.</li>
+                <li>For multi-page documents, combine all pages into a single PDF file.</li>
+                <li>Each file has a maximum size limit of 10MB.</li>
+                <li>If not applicable, please upload a blank PDF file.</li>
+            </ul>
         </div>
 
         <!-- Application Letter -->

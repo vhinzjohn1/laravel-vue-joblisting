@@ -39,10 +39,12 @@ class JobPositionController extends Controller
             $validated = $request->validate([
                 'position_name' => 'required|string|max:255',
                 'item_number' => 'required|string|max:255|unique:positions,item_number',
-                'years_experience' => 'required|numeric',
-                'amount' => 'required|numeric',
+                'salary_grade' => 'nullable|string',
                 'education_level' => 'required|string',
-                'training_hours' => 'required|numeric',
+                'training_hours' => 'nullable|numeric',
+                'years_experience' => 'nullable|numeric',
+                'employment_type' => 'required|string',
+                'category' => 'required|string',
                 'eligibility' => 'required|string',
             ]);
 
@@ -57,13 +59,15 @@ class JobPositionController extends Controller
 
             // Create the salary grade
             $salaryGrade = SalaryGrade::create([
-                'amount' => $validated['amount']
+                'salary_grade' => empty($validated['salary_grade']) ? 'Minimum Wage' : $validated['salary_grade']
             ]);
 
             // Create the position
             $position = Position::create([
                 'position_name' => $validated['position_name'],
                 'item_number' => $validated['item_number'],
+                'employment_type' => $validated['employment_type'],
+                'category' => $validated['category'],
                 'salary_grade_id' => $salaryGrade->salary_grade_id,
                 'minimum_requirement_id' => $minimumRequirement->minimum_requirement_id
             ]);
@@ -108,19 +112,22 @@ class JobPositionController extends Controller
             $validated = $request->validate([
                 'position_name' => 'required|string|max:255|unique:positions,position_name,' . $id . ',position_id',
                 'item_number' => 'required|string|max:255|unique:positions,item_number,' . $id . ',position_id',
-                'years_experience' => 'required|numeric',
-                'amount' => 'required|numeric',
+                'years_experience' => 'nullable|numeric',
+                'employment_type' => 'required|string',
                 'salary_grade_id' => 'required|numeric',
                 'position_id' => 'required|numeric',
                 'education_level' => 'required|string',
-                'training_hours' => 'required|numeric',
+                'category' => 'required|string',
+                'training_hours' => 'nullable|numeric',
+                'salary_grade' => 'nullable|string',
                 'eligibility' => 'required|string',
+                'employment_type' => 'required|string',
                 'minimum_requirement_id' => 'nullable|numeric',
             ]);
 
             // Update the salary grade
             $salaryGrade = SalaryGrade::findOrFail($validated['salary_grade_id']);
-            $salaryGrade->amount = $validated['amount'];
+            $salaryGrade->salary_grade = empty($validated['salary_grade']) ? 'Minimum Wage' : $validated['salary_grade'];
             $salaryGrade->save();
 
             // Update or create the minimum requirement
@@ -145,6 +152,8 @@ class JobPositionController extends Controller
             $position = Position::findOrFail($validated['position_id']);
             $position->position_name = $validated['position_name'];
             $position->item_number = $validated['item_number'];
+            $position->category = $validated['category'];
+            $position->employment_type = $validated['employment_type'];
             $position->salary_grade_id = $salaryGrade->salary_grade_id;
             $position->minimum_requirement_id = $minimumRequirement->minimum_requirement_id;
             $position->save();

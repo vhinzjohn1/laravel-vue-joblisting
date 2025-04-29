@@ -31,7 +31,7 @@
                         </div>
 
                         <div v-else class="space-y-4">
-                            <DataTable
+                            <!-- <DataTable
                                 :data="filteredJobs"
                                 :columns="[
                                     {
@@ -66,7 +66,244 @@
                                 ]"
                                 @edit="editJob"
                                 @delete="deleteJob"
-                            />
+                            /> -->
+
+                            <!-- Seach Functions -->
+                            <div class="w-full flex justify-end mb-2">
+                                <div class="w-full sm:w-auto">
+                                    <TextInput
+                                        v-model="searchQuery"
+                                        placeholder="Search job listings..."
+                                        class="w-full sm:w-64"
+                                    />
+                                </div>
+                            </div>
+
+
+                            <!-- New Format for Data Table -->
+                            <div class="table-responsive">
+                                <table class="min-w-full border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                rowspan="2"
+                                            >
+                                                No.
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                rowspan="2"
+                                            >
+                                                Title
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                rowspan="2"
+                                            >
+                                                Plantilla Item No.
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                rowspan="2"
+                                            >
+                                                Salary Grade
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                rowspan="2"
+                                            >
+                                                Category
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                colspan="4"
+                                            >
+                                                Qualification Standards
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                rowspan="2"
+                                            >
+                                                Status
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0"
+                                                rowspan="2"
+                                            >
+                                                Action
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"
+                                            >
+                                                Education
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"
+                                            >
+                                                Training
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"
+                                            >
+                                                Experience
+                                            </th>
+                                            <th
+                                                class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"
+                                            >
+                                                Eligibility
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for="(filteredJob, index) in paginatedJobs"
+                                            :key="filteredJob.job_listing_id"
+                                            class="border-b hover:bg-gray-50 transition"
+                                        >
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{ (currentPage - 1) * perPage + index + 1 }}
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{ filteredJob.title }}
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{
+                                                    filteredJob.position
+                                                        .item_number
+                                                }}
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{
+                                                    filteredJob.position
+                                                        .salary_grade
+                                                        .salary_grade
+                                                }}
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{
+                                                    filteredJob.position
+                                                        .category
+                                                }}
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{
+                                                    filteredJob.position
+                                                        .minimum_requirement
+                                                        .education_level
+                                                }}
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{
+                                                    filteredJob.position
+                                                        .minimum_requirement
+                                                        .training_hours
+                                                }}
+                                                hours
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{
+                                                    filteredJob.position
+                                                        .minimum_requirement
+                                                        .years_experience
+                                                }}
+                                                years
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                {{
+                                                    filteredJob.position
+                                                        .minimum_requirement
+                                                        .eligibility
+                                                }}
+                                                Eligibility
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                <span
+                                                    class="px-2 py-1 text-xs font-semibold rounded-full"
+                                                    :class="[
+                                                        filteredJob.status ===
+                                                        'Active'
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : filteredJob.status ===
+                                                                'Draft'
+                                                              ? 'bg-yellow-100 text-yellow-700'
+                                                              : 'bg-red-100 text-red-700',
+                                                    ]"
+                                                >
+                                                    {{ filteredJob.status }}
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 text-sm"
+                                            >
+                                                <div
+                                                    class="flex flex-col sm:flex-row gap-2"
+                                                >
+                                                    <button
+                                                        class="flex-1 px-3 py-1 text-white bg-green-600 rounded hover:bg-green-700 transition"
+                                                        @click="
+                                                            editJob(filteredJob)
+                                                        "
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        class="flex-1 px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700 transition"
+                                                        @click="
+                                                            deleteJob(
+                                                                filteredJob.job_listing_id,
+                                                            )
+                                                        "
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mt-4 flex justify-end space-x-2">
+                                    <button
+                                        @click="currentPage--"
+                                        :disabled="currentPage === 1"
+                                        class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                                    >
+                                        Previous
+                                    </button>
+                                    <span class="px-3 py-1">
+                                        Page {{ currentPage }} of {{ totalPages }}
+                                    </span>
+                                    <button
+                                        @click="currentPage++"
+                                        :disabled="currentPage === totalPages"
+                                        class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -146,7 +383,10 @@
                                         Salary Grade
                                     </label>
                                     <p class="text-gray-700 py-2">
-                                        {{ selectedPosition?.salary_grade?.amount ? `₱${selectedPosition.salary_grade.amount.toLocaleString()}` : '-' }}
+                                        {{
+                                            selectedPosition?.salary_grade
+                                                ?.salary_grade || "-"
+                                        }}
                                     </p>
                                 </div>
 
@@ -158,7 +398,12 @@
                                         Item Number
                                     </label>
                                     <p class="text-gray-700 py-2">
-                                        {{ selectedPosition?.item_number || '-' }}
+                                        {{
+                                            selectedPosition?.item_number === ""
+                                                ? "CoS/Job Order"
+                                                : selectedPosition?.item_number ||
+                                                  "-"
+                                        }}
                                     </p>
                                 </div>
                             </div>
@@ -170,17 +415,9 @@
                                 >
                                     Category *
                                 </label>
-                                <CustomSelect
-                                    :options="[
-                                        { value: 'Teaching' },
-                                        { value: 'Non-Teaching' },
-                                    ]"
-                                    v-model="newJob.category"
-                                    placeholder="Select a category"
-                                    :value-key="'value'"
-                                    :display-format="(option) => option.value"
-                                    required
-                                />
+                                <p class="text-gray-700 py-2">
+                                    {{ selectedPosition?.category || "-" }}
+                                </p>
                             </div>
                         </div>
 
@@ -420,7 +657,10 @@
                                         Salary Grade
                                     </label>
                                     <p class="text-gray-700 py-2">
-                                        {{ selectedPosition?.salary_grade?.amount ? `₱${selectedPosition.salary_grade.amount.toLocaleString()}` : '-' }}
+                                        {{
+                                            selectedPosition?.salary_grade
+                                                ?.salary_grade || "-"
+                                        }}
                                     </p>
                                 </div>
 
@@ -432,7 +672,12 @@
                                         Item Number
                                     </label>
                                     <p class="text-gray-700 py-2">
-                                        {{ selectedPosition?.item_number || '-' }}
+                                        {{
+                                            selectedPosition?.item_number === ""
+                                                ? "CoS/Job Order"
+                                                : selectedPosition?.item_number ||
+                                                  "-"
+                                        }}
                                     </p>
                                 </div>
                             </div>
@@ -444,17 +689,9 @@
                                 >
                                     Category *
                                 </label>
-                                <CustomSelect
-                                    :options="[
-                                        { value: 'Teaching' },
-                                        { value: 'Non-Teaching' },
-                                    ]"
-                                    v-model="editingJob.category"
-                                    placeholder="Select a category"
-                                    :value-key="'value'"
-                                    :display-format="(option) => option.value"
-                                    required
-                                />
+                                <p class="text-gray-700 py-2">
+                                    {{ selectedPosition?.category || "-" }}
+                                </p>
                             </div>
                         </div>
 
@@ -633,8 +870,6 @@ import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import { usePage, Head } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
-import InputField from "@/Components/InputField.vue";
-import DataTable from "@/Components/DataTable.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
 import TextArea from "@/Components/TextArea.vue";
@@ -663,14 +898,31 @@ jobs.value.forEach((job) => {
 const searchQuery = ref("");
 const filteredJobs = computed(() => {
     if (!searchQuery.value) return jobs.value;
-
     const query = searchQuery.value.toLowerCase();
     return jobs.value.filter(
         (job) =>
             job.title.toLowerCase().includes(query) ||
-            job.description.toLowerCase().includes(query) ||
-            job.position.position_name.toLowerCase().includes(query),
+            (job.position?.position_name || "").toLowerCase().includes(query) ||
+            (job.position?.item_number || "").toLowerCase().includes(query) ||
+            (job.position?.category || "").toLowerCase().includes(query) ||
+            ((job.position?.salary_grade?.salary_grade || "") + "").toLowerCase().includes(query) ||
+            (job.status || "").toLowerCase().includes(query) ||
+            (job.closing_date || "").toLowerCase().includes(query)
     );
+});
+
+console.log("This is the filtered jobs", filteredJobs.value);
+
+// Pagination state
+const currentPage = ref(1);
+const perPage = ref(10);
+const totalPages = computed(() => Math.ceil(filteredJobs.value.length / perPage.value));
+const paginatedJobs = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value;
+    return filteredJobs.value.slice(start, start + perPage.value);
+});
+watch(filteredJobs, () => {
+    currentPage.value = 1;
 });
 
 // Modal state
@@ -680,6 +932,7 @@ const selectedPosition = ref(null);
 
 const handlePositionSelect = (option) => {
     selectedPosition.value = option;
+    console.log("Selected Position:", selectedPosition.value);
 };
 
 // Modified new job form data
@@ -926,5 +1179,14 @@ watch(
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-responsive table {
+    min-width: 900px; /* Adjust as needed for your columns */
 }
 </style>

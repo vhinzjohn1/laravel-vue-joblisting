@@ -48,17 +48,24 @@
                                             title: 'Item Number',
                                         },
                                         {
-                                            key: 'minimum_requirement.years_experience',
-                                            title: 'Year Experience',
+                                            key: 'category',
+                                            title: 'Category',
                                         },
                                         {
-                                            key: 'salary_grade.amount',
+                                            key: 'employment_type',
+                                            title: 'Employment Type',
+                                        },
+                                        {
+                                            key: 'salary_grade.salary_grade',
                                             title: 'Salary Grade',
-                                            currency: '₱',
                                         },
                                         {
                                             key: 'minimum_requirement.education_level',
                                             title: 'Education',
+                                        },
+                                        {
+                                            key: 'minimum_requirement.years_experience',
+                                            title: 'Years Experience',
                                         },
                                         {
                                             key: 'minimum_requirement.training_hours',
@@ -107,6 +114,39 @@
                     />
                     </div>
                     <div class="form-group">
+                    <label for="category" class="block mb-1 text-sm font-medium text-gray-700">
+                        Category
+                    </label>
+                    <select
+                        id="category"
+                        v-model="form.category"
+                        required
+                        placeholder="Enter category"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    >
+                        <option value="" disabled>Select Category</option>
+                        <option value="Teaching">Teaching</option>
+                        <option value="Non-Teaching">Non-Teaching</option>
+                    </select>
+                    </div>
+                    <div class="form-group">
+                    <label for="employment_type" class="block mb-1 text-sm font-medium text-gray-700">
+                        Employment Type
+                    </label>
+                    <select
+                        id="employment_type"
+                        v-model="form.employment_type"
+                        required
+                        placeholder="Enter employment type"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    >
+                        <option value="" disabled>Select Employment Type</option>
+                        <option value="Plantilla">Plantilla</option>
+                        <option value="CoS">CoS</option>
+                        <option value="Job Order">Job Order</option>
+                    </select>
+                    </div>
+                    <div v-if="form.employment_type === 'Plantilla'" class="form-group">
                     <label for="item_number" class="block mb-1 text-sm font-medium text-gray-700">
                         Item Number
                     </label>
@@ -119,16 +159,14 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="amount" class="block mb-1 text-sm font-medium text-gray-700">
-                        Salary Grade
+                    <label for="salary_grade" class="block mb-1 text-sm font-medium text-gray-700">
+                        Salary Grade (Optional)
                     </label>
                     <TextInput
-                        id="amount"
-                        isCurrency
-                        v-model="form.amount"
-                        placeholder="0.00"
-                        required
-                        class="w-full"
+                        id="salary_grade"
+                        v-model="form.salary_grade"
+                        placeholder="SG-1"
+                        class="w-full uppercase"
                     />
                     </div>
                 </div>
@@ -255,11 +293,44 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="edit_item_number" class="block mb-1 text-sm font-medium text-gray-700">
+                    <label for="category" class="block mb-1 text-sm font-medium text-gray-700">
+                        Category
+                    </label>
+                    <select
+                        id="category"
+                        v-model="form.category"
+                        required
+                        placeholder="Enter category"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    >
+                        <option value="" disabled>Select Category</option>
+                        <option value="Teaching">Teaching</option>
+                        <option value="Non-Teaching">Non-Teaching</option>
+                    </select>
+                    </div>
+                    <div class="form-group">
+                    <label for="employment_type" class="block mb-1 text-sm font-medium text-gray-700">
+                        Employment Type
+                    </label>
+                    <select
+                        id="employment_type"
+                        v-model="form.employment_type"
+                        required
+                        placeholder="Enter employment type"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    >
+                        <option value="" disabled>Select Employment Type</option>
+                        <option value="Plantilla">Plantilla</option>
+                        <option value="CoS">CoS</option>
+                        <option value="Job Order">Job Order</option>
+                    </select>
+                    </div>
+                    <div v-if="form.employment_type === 'Plantilla'" class="form-group">
+                    <label for="item_number" class="block mb-1 text-sm font-medium text-gray-700">
                         Item Number
                     </label>
                     <TextInput
-                        id="edit_item_number"
+                        id="item_number"
                         v-model="form.item_number"
                         placeholder="Enter Item number"
                         required
@@ -267,16 +338,14 @@
                     />
                     </div>
                     <div class="form-group">
-                    <label for="edit_amount" class="block mb-1 text-sm font-medium text-gray-700">
-                        Salary Grade
+                    <label for="edit_salary_grade" class="block mb-1 text-sm font-medium text-gray-700">
+                        Salary Grade (Optional)
                     </label>
                     <TextInput
-                        id="edit_amount"
-                        isCurrency
-                        v-model="form.amount"
-                        placeholder="0.00"
-                        required
-                        class="w-full"
+                        id="edit_salary_grade"
+                        v-model="form.salary_grade"
+                        placeholder="SG-1"
+                        class="w-full uppercase"
                     />
                     </div>
                 </div>
@@ -401,8 +470,10 @@ const form = useForm({
     position_name: "",
     item_number: "",
     years_experience: "",
-    amount: "",
+    salary_grade: "",
     position_id: "",
+    category: "",
+    employment_type: "",
     salary_grade_id: "",
     education_level: "Bachelor's degree",
     training_hours: "",
@@ -434,9 +505,11 @@ const saveJobPosition = () => {
 const showEdit = (item) => {
     form.position_name = item.position_name;
     form.item_number = item.item_number;
-    form.amount = item.salary_grade.amount;
+    form.salary_grade = item.salary_grade.salary_grade;
     form.position_id = item.position_id;
     form.salary_grade_id = item.salary_grade_id;
+    form.category = item.category;
+    form.employment_type = item.employment_type;
 
     // Add minimum requirement fields
     if (item.minimum_requirement) {
