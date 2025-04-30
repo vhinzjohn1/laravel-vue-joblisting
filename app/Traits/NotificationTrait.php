@@ -51,13 +51,8 @@ trait NotificationTrait
             ]
         ]);
 
-        // Send email to applicant
-        try {
-            SendEmailJob::dispatch($notification, $user);
-        } catch (\Exception $e) {
-            // Log email sending failure but don't break the flow
-            Log::error("Failed to send notification email to {$user->email}: " . $e->getMessage());
-        }
+        // Send email in background
+        $this->sendEmailInBackground($notification, $user);
     }
 
     public function notifyApplicantScheduled($schedule, $application, $isUpdate = false)
@@ -91,13 +86,8 @@ trait NotificationTrait
             ]
         ]);
 
-        // Send email to applicant
-        try {
-            SendEmailJob::dispatch($notification, $user);
-        } catch (\Exception $e) {
-            // Log email sending failure but don't break the flow
-            Log::error("Failed to send schedule notification email to {$user->email}: " . $e->getMessage());
-        }
+        // Send email in background
+        $this->sendEmailInBackground($notification, $user);
     }
 
     /**
@@ -122,12 +112,55 @@ trait NotificationTrait
             'data' => $data
         ]);
 
-        // Send email to applicant
+        // Send email in background
+        $this->sendEmailInBackground($notification, $user);
+    }
+
+    /**
+     * Send email in background using exec
+     */
+    private function sendEmailInBackground(Notification $notification, User $user)
+    {
         try {
-            SendEmailJob::dispatch($notification, $user);
+            // Make sure we have valid IDs
+            if (!$notification->notification_id || !$user->user_id) {
+                Log::error('Invalid notification or user ID', [
+                    'notification' => $notification->toArray(),
+                    'user' => $user->toArray()
+                ]);
+                return;
+            }
+
+            $command = sprintf(
+                'cd %s && php artisan email:send %d %d >> %s/storage/logs/email.log 2>&1 &',
+                base_path(),
+                $notification->notification_id,
+                $user->user_id,
+                base_path()
+            );
+
+            Log::info('Executing email command', [
+                'command' => $command,
+                'notification_id' => $notification->notification_id,
+                'user_id' => $user->user_id
+            ]);
+
+            $output = [];
+            $returnVar = 0;
+            exec($command, $output, $returnVar);
+
+            if ($returnVar !== 0) {
+                Log::error('Failed to execute email command', [
+                    'return_var' => $returnVar,
+                    'output' => $output
+                ]);
+            }
         } catch (\Exception $e) {
-            // Log email sending failure but don't break the flow
-            Log::error("Failed to send custom notification email to {$user->email}: " . $e->getMessage());
+            Log::error('Error in sendEmailInBackground: ' . $e->getMessage(), [
+                'exception' => $e,
+                'notification_id' => $notification->notification_id,
+                'user_id' => $user->user_id
+            ]);
         }
     }
 }

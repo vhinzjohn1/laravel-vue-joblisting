@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Traits\NotificationTrait;
 use App\Jobs\SendEmailJob;
+use Illuminate\Support\Facades\Log;
 
 class EmailController extends Controller
 {
@@ -27,9 +28,19 @@ class EmailController extends Controller
             'subject' => "Test Email from CMU Job Listings"
         ];
 
-        Mail::to($data['email'])->send(new SendEmail($data));
+        // Create a notification
+        $notification = Notification::create([
+            'user_id' => auth()->id(),
+            'type' => 'test',
+            'message' => $data['message'],
+            'is_read' => false,
+            'data' => $data
+        ]);
 
-        return response()->json(['message' => 'Email sent successfully']);
+        // Send email in background
+        $this->sendEmailInBackground($notification, auth()->user());
+
+        return response()->json(['message' => 'Email will be sent in the background']);
     }
 
     /**
@@ -61,10 +72,58 @@ class EmailController extends Controller
             ]
         ]);
 
-        // Send notification email
-        Mail::to($user->email)->send(new NotificationEmail($notification, $user));
+        // Send email in background
+        $this->sendEmailInBackground($notification, $user);
 
-        return response()->json(['message' => 'Test notification email sent successfully']);
+        return response()->json(['message' => 'Test notification email will be sent in the background']);
+    }
+
+    /**
+     * Send email in background using exec
+     */
+    private function sendEmailInBackground(Notification $notification, User $user)
+    {
+        try {
+            // Make sure we have valid IDs
+            if (!$notification->notification_id || !$user->user_id) {
+                Log::error('Invalid notification or user ID', [
+                    'notification' => $notification->toArray(),
+                    'user' => $user->toArray()
+                ]);
+                return;
+            }
+
+            $command = sprintf(
+                'cd %s && php artisan email:send %d %d >> %s/storage/logs/email.log 2>&1 &',
+                base_path(),
+                $notification->notification_id,
+                $user->user_id,
+                base_path()
+            );
+
+            Log::info('Executing email command', [
+                'command' => $command,
+                'notification_id' => $notification->notification_id,
+                'user_id' => $user->user_id
+            ]);
+
+            $output = [];
+            $returnVar = 0;
+            exec($command, $output, $returnVar);
+
+            if ($returnVar !== 0) {
+                Log::error('Failed to execute email command', [
+                    'return_var' => $returnVar,
+                    'output' => $output
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in sendEmailInBackground: ' . $e->getMessage(), [
+                'exception' => $e,
+                'notification_id' => $notification->notification_id,
+                'user_id' => $user->user_id
+            ]);
+        }
     }
 
     /**
