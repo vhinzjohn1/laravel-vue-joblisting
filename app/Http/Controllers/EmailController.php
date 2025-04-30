@@ -9,6 +9,7 @@ use App\Mail\NotificationEmail;
 use App\Models\User;
 use App\Models\Notification;
 use App\Traits\NotificationTrait;
+use App\Jobs\SendEmailJob;
 
 class EmailController extends Controller
 {

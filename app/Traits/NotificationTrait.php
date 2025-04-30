@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Mail\NotificationEmail;
+use App\Jobs\SendEmailJob;
 
 trait NotificationTrait
 {
@@ -52,7 +53,7 @@ trait NotificationTrait
 
         // Send email to applicant
         try {
-            Mail::to($user->email)->send(new NotificationEmail($notification, $user));
+            SendEmailJob::dispatch($notification, $user);
         } catch (\Exception $e) {
             // Log email sending failure but don't break the flow
             Log::error("Failed to send notification email to {$user->email}: " . $e->getMessage());
@@ -92,7 +93,7 @@ trait NotificationTrait
 
         // Send email to applicant
         try {
-            Mail::to($user->email)->send(new NotificationEmail($notification, $user));
+            SendEmailJob::dispatch($notification, $user);
         } catch (\Exception $e) {
             // Log email sending failure but don't break the flow
             Log::error("Failed to send schedule notification email to {$user->email}: " . $e->getMessage());
@@ -123,7 +124,7 @@ trait NotificationTrait
 
         // Send email to applicant
         try {
-            Mail::to($user->email)->send(new NotificationEmail($notification, $user));
+            SendEmailJob::dispatch($notification, $user);
         } catch (\Exception $e) {
             // Log email sending failure but don't break the flow
             Log::error("Failed to send custom notification email to {$user->email}: " . $e->getMessage());
