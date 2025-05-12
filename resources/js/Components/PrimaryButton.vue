@@ -2,6 +2,7 @@
     <button
         :disabled="disabled"
         class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase bg-green-700 rounded-md border border-transparent transition duration-150 ease-in-out hover:bg-green-600 focus:bg-green-600 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+        :class="{ 'cursor-not-allowed': loading || disabled }"
     >
         <span v-if="loading" class="mr-2 loader"></span>
         <slot />

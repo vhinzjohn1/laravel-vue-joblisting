@@ -23,6 +23,10 @@ class WelcomeController extends Controller
     public function showBlade()
     {
         if (auth()->check()) {
+            // For admin users, redirect to HR dashboard instead of admin dashboard
+            if (auth()->user()->role_name === 'admin') {
+                return redirect()->route('hr.index');
+            }
             return redirect()->route(auth()->user()->role_name . '.index');
         }
         $jobListings = $this->index();

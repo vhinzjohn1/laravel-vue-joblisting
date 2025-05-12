@@ -28,6 +28,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\HR\ArchiveController;
 use App\Http\Controllers\HR\GroupScheduleController;
 
 // =======================
@@ -67,13 +68,14 @@ Route::middleware('auth')->group(function () {
 // =======================
 // HR ROUTES
 // =======================
-Route::middleware(['auth', 'role:hr'])->group(function () {
+Route::middleware(['auth', 'role:hr,admin'])->group(function () {
     Route::resource('hr', HRController::class);
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
     Route::resource('job-position', JobPositionController::class);
     Route::resource('groups', GroupScheduleController::class);
     Route::resource('selection-lineup', SelectionLineupController::class);
+    Route::resource('archive', ArchiveController::class);
 });
 
 // =======================
@@ -109,7 +111,7 @@ Route::middleware(['auth'])->group(function () {
 // =======================
 // ADMIN ROUTES
 // =======================
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'admin', 'role:admin'])->group(function () {
     Route::resource('admin', AdminController::class);
 });
 

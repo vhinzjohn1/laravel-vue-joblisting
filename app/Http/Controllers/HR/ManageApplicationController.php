@@ -14,6 +14,22 @@ class ManageApplicationController extends Controller
     use NotificationTrait;
 
     /**
+     * List of application statuses
+     * 
+     * @var array
+     */
+    protected $statuses = [
+        'Pending',
+        'Qualified',
+        'Disqualified',
+        'Competency Exam',
+        'Not Selected',
+        'Lack Requirements',
+        'Interview',
+        'Accepted'
+    ];
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -32,16 +48,7 @@ class ManageApplicationController extends Controller
 
         return Inertia::render('HR/ManageApplication/ManageApplications', [
             'applications' => $applications,
-            'statuses' => [
-                'Pending',
-                'Qualified',
-                'Disqualified',
-                'Competency Exam',
-                'Not Selected',
-                'Interview',
-                'Accepted'
-
-            ]
+            'statuses' => $this->statuses
         ]);
     }
 
@@ -77,15 +84,7 @@ class ManageApplicationController extends Controller
 
         return Inertia::render('HR/ManageApplication/ApplicationDetails', [
             'application' => $application,
-            'statuses' => [
-                'Pending',
-                'Qualified',
-                'Disqualified',
-                'Competency Exam',
-                'Not Selected',
-                'Interview',
-                'Accepted',
-            ]
+            'statuses' => $this->statuses
         ]);
     }
 
@@ -147,15 +146,7 @@ class ManageApplicationController extends Controller
         return response()->json([
             'message' => 'Application status updated successfully',
             'applications' => $application,
-            'statuses' => [
-                'Pending',
-                'Qualified',
-                'Disqualified',
-                'Competency Exam',
-                'Not Selected',
-                'Interview',
-                'Accepted'
-            ]
+            'statuses' => $this->statuses
         ], 200);
     }
 

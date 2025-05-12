@@ -38,7 +38,6 @@ class JobPositionController extends Controller
         try {
             $validated = $request->validate([
                 'position_name' => 'required|string|max:255',
-                'item_number' => 'required|string|max:255|unique:positions,item_number',
                 'salary_grade' => 'nullable|string',
                 'education_level' => 'required|string',
                 'training_hours' => 'nullable|numeric',
@@ -65,24 +64,23 @@ class JobPositionController extends Controller
             // Create the position
             $position = Position::create([
                 'position_name' => $validated['position_name'],
-                'item_number' => $validated['item_number'],
+                'item_number' => $validated['item_number'] ?? '',
                 'employment_type' => $validated['employment_type'],
                 'category' => $validated['category'],
                 'salary_grade_id' => $salaryGrade->salary_grade_id,
                 'minimum_requirement_id' => $minimumRequirement->minimum_requirement_id
             ]);
 
-            // return as the whole position as json
-            return response()->json([
-                'success' => true,
+            // Fetch updated positions
+            $positions = Position::with(['salaryGrade', 'minimumRequirement'])->orderBy('created_at', 'desc')->get();
+
+            // Return Inertia response
+            return back()->with([
                 'message' => 'Job Position created successfully',
-                'data' => Position::with(['salaryGrade', 'minimumRequirement'])->orderBy('created_at', 'desc')->get(),
-            ], 201);
+                'positions' => $positions
+            ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            return back()->withErrors(['message' => $e->getMessage()]);
         }
     }
 
@@ -111,7 +109,6 @@ class JobPositionController extends Controller
         try {
             $validated = $request->validate([
                 'position_name' => 'required|string|max:255|unique:positions,position_name,' . $id . ',position_id',
-                'item_number' => 'required|string|max:255|unique:positions,item_number,' . $id . ',position_id',
                 'years_experience' => 'nullable|numeric',
                 'employment_type' => 'required|string',
                 'salary_grade_id' => 'required|numeric',
@@ -151,24 +148,23 @@ class JobPositionController extends Controller
             // Update the position
             $position = Position::findOrFail($validated['position_id']);
             $position->position_name = $validated['position_name'];
-            $position->item_number = $validated['item_number'];
+            $position->item_number = $validated['item_number'] ?? 'Minimum Wage';
             $position->category = $validated['category'];
             $position->employment_type = $validated['employment_type'];
             $position->salary_grade_id = $salaryGrade->salary_grade_id;
             $position->minimum_requirement_id = $minimumRequirement->minimum_requirement_id;
             $position->save();
 
-            // return as the whole position as json
-            return response()->json([
-                'success' => true,
+            // Fetch updated positions
+            $positions = Position::with(['salaryGrade', 'minimumRequirement'])->orderBy('created_at', 'desc')->get();
+
+            // Return Inertia response
+            return back()->with([
                 'message' => 'Job Position updated successfully',
-                'data' => Position::with(['salaryGrade', 'minimumRequirement'])->orderBy('created_at', 'desc')->get(),
-            ], 200);
+                'positions' => $positions
+            ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            return back()->withErrors(['message' => $e->getMessage()]);
         }
     }
 

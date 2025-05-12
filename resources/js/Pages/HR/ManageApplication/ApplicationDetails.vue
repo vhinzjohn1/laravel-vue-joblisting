@@ -417,25 +417,6 @@
                                                                     }}
                                                                 </p>
                                                             </div>
-                                                            <div
-                                                                v-if="
-                                                                    training.certificate_url
-                                                                "
-                                                            >
-                                                                <label
-                                                                    class="block text-sm font-medium text-gray-500"
-                                                                    >Certificate</label
-                                                                >
-                                                                <a
-                                                                    :href="
-                                                                        training.certificate_url
-                                                                    "
-                                                                    target="_blank"
-                                                                    class="mt-1 text-blue-600 hover:text-blue-800"
-                                                                    >View
-                                                                    Certificate</a
-                                                                >
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -773,9 +754,9 @@
                                                         placeholder="Add any notes about this status change"
                                                     ></textarea>
                                                 </div>
-                                                <button
+                                                <PrimaryButton
                                                     type="submit"
-                                                    class="w-full bg-green-700 text-white py-3 px-4 rounded-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                                                    class="w-full bg-green-700 text-white py-3 px-4 rounded-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
                                                     :disabled="form.processing"
                                                 >
                                                     {{
@@ -783,7 +764,7 @@
                                                             ? "Updating..."
                                                             : "Update Status"
                                                     }}
-                                                </button>
+                                                </PrimaryButton>
                                             </form>
                                         </div>
 
@@ -974,6 +955,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     application: {
@@ -985,6 +967,9 @@ const props = defineProps({
         required: true,
     },
 });
+
+// Loading state for status update
+const isLoading = ref(false);
 
 // Create a reactive reference for the application data
 const application = ref(props.application);
@@ -1134,7 +1119,7 @@ const closeDocumentSidebar = () => {
 
 // Status update functionality
 const updateStatus = async () => {
-    console.log("this is the status change: ", form.status);
+    isLoading.value = true;
     // Check if the new status is the same as the current status
     if (form.status === application.value.status) {
         showToast({
@@ -1157,7 +1142,6 @@ const updateStatus = async () => {
         // Update the application data with the response from the server
         if (response.data) {
             const data = response.data;
-            console.log("this is the response: ", data.applications);
 
             application.value = data.applications;
 
@@ -1171,7 +1155,6 @@ const updateStatus = async () => {
         // Reset remarks field
         form.remarks = "";
     } catch (error) {
-        console.error("Error updating status:", error);
         showToast({
             icon: "error",
             title: "Failed to update status",
@@ -1181,6 +1164,8 @@ const updateStatus = async () => {
                 "An error occurred",
             success: false,
         });
+    } finally {
+        isLoading.value = false;
     }
 };
 
@@ -1221,6 +1206,7 @@ const showToast = (config) => {
     Swal.fire({
         position: "top-end",
         showConfirmButton: false,
+        showCloseButton: true,
         timer: 3000,
         toast: true,
         ...config,

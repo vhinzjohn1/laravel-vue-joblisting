@@ -4,19 +4,27 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class Admin
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
     {
-        $role = $request->user()->role_name ?? null;
-
-        if ($role !== 'admin') {
-            return redirect()->back()->with('error', 'Access denied. You are not authorized to access this page.');
+        if (auth()->check() && auth()->user()->role_name === 'admin') {
+            return $next($request);
         }
-        // If you want to add role-checking logic later, you can do it here.
-        // For now, just pass the request to the next middleware/controller.
-        return $next($request);
+
+        // Only redirect if trying to access admin routes
+        if (strpos($request->path(), 'admin') === 0) {
+            return redirect('/')->with('error', 'You do not have admin access.');
+        }
+
+        // For other routes, just abort with 403
+        abort(403, 'Unauthorized access.');
     }
 }

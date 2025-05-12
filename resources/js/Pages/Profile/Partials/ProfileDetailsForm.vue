@@ -12,6 +12,7 @@ const isFormValid = ref(false);
 const userCredentials = ref();
 const currentRoute = usePage().url;
 const user = usePage().props.auth.user;
+const isLoading = ref(false);
 
 const form = useForm({
     firstname: "",
@@ -40,6 +41,7 @@ function areFetchedFieldsFilled(details) {
 
 const fetchUserDetails = async () => {
     try {
+        isLoading.value = true;
         const response = await axios.get(route("profile.user-details"));
         console.log('This is the props user', response.data.userDetails);
         if (response.data) {
@@ -60,12 +62,14 @@ const fetchUserDetails = async () => {
                 emit("step-completed");
             }
         }
+        isLoading.value = false;
     } catch (error) {
         console.error("Error fetching user details:", error);
     }
 };
 
 const saveProfileDetails = async () => {
+    isLoading.value = true;
     const isHR = user.role_name === 'hr';
 
     // Don't submit if required fields are not filled
@@ -83,10 +87,12 @@ const saveProfileDetails = async () => {
     try {
         await axios.post(route("profile.store-details"), form.data());
         showSuccessAlert();
+        isLoading.value = false;
         isFormValid.value = true;
         emit("step-completed");
     } catch (error) {
         console.error("Error saving profile details:", error);
+        isLoading.value = false;
     }
 };
 
@@ -261,6 +267,7 @@ onMounted(() => {
             <div class="flex justify-end">
                 <PrimaryButton
                     type="submit"
+                    :loading="isLoading"
                     :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || (user.role_name !== 'hr' && !form.eligibility) || (currentRoute !== '/complete-profile' && !form.email)"
                     :class="[
                         'px-6 py-2',

@@ -1,5 +1,5 @@
 <template>
-  <AdminLayout>
+  <HRLayout>
     <Head title="Admin Dashboard" />
     <template #header>
       <Header title="Admin Dashboard" />
@@ -214,13 +214,13 @@
         </form>
       </div>
     </Modal>
-  </AdminLayout>
+  </HRLayout>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
-import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
+import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import DataTable from "@/Components/DataTable.vue";
 import { useForm, usePage, Head } from "@inertiajs/vue3";

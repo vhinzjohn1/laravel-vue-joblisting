@@ -18,6 +18,11 @@ const isUserTourCompleted = computed(
 
 const showProfileDropdown = ref(false);
 
+// Check if the current user is an admin
+const isAdmin = computed(() => {
+    return usePage().props.auth.user.role_name === 'admin';
+});
+
 // Get the VGT instance
 const $vgt = useVgt();
 
@@ -170,6 +175,19 @@ const desktopTourSteps = [
     },
 ];
 
+// Admin-specific tour steps
+const adminTourSteps = isAdmin.value ? [
+    {
+        target: "#user-management-link",
+        title: "User Management",
+        content: "Manage user accounts, roles, and permissions",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    }
+] : [];
+
 // Mobile tour steps with hamburger menu first
 const mobileTourSteps = [
     {
@@ -218,6 +236,7 @@ const tourSteps = computed(() => {
             return [
                 ...mobileTourSteps.slice(0, 1), // Keep menu button step
                 ...desktopTourSteps, // Add all navigation steps
+                ...adminTourSteps, // Add admin-specific steps if user is admin
             ];
         } else {
             // Return just the initial steps (hamburger menu + placeholder)
@@ -225,7 +244,10 @@ const tourSteps = computed(() => {
         }
     } else {
         // For desktop: Return all desktop steps
-        return desktopTourSteps;
+        return [
+            ...desktopTourSteps,
+            ...adminTourSteps, // Add admin-specific steps if user is admin
+        ];
     }
 });
 
@@ -350,7 +372,12 @@ onMounted(async () => {
                 <Link :href="route('hr.index')" class="flex items-center">
                     <ApplicationLogo class="h-9 w-9 text-[#ffc001]" />
                     <span
-                        v-if="sidebarOpen"
+                        v-if="sidebarOpen && isAdmin"
+                        class="ml-3 text-lg font-bold text-white transition-opacity duration-300"
+                        >Admin</span
+                    >
+                    <span
+                        v-else-if="sidebarOpen"
                         class="ml-3 text-lg font-bold text-white transition-opacity duration-300"
                         >HR Personnel</span
                     >
@@ -360,6 +387,41 @@ onMounted(async () => {
             <!-- Navigation -->
             <nav class="overflow-y-auto flex-1 py-5">
                 <ul class="px-2 space-y-2">
+
+                    <!-- User Management Section (Admin Only) -->
+                    <li v-if="isAdmin">
+                        <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="user-management-link"
+                            :href="route('admin.index')"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
+                            :class="{
+                                'bg-[#ffc001] text-black': isActive('admin.index'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('admin.index'),
+                            }"
+                        >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActive('admin.index'),
+                                    }"
+                                >
+                                    <i class="fas fa-users-cog"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-200"
+                                    :class="{
+                                        'font-semibold': isActive('admin.index'),
+                                    }"
+                                    >User Management</span
+                                >
+                            </div>
+                        </Link>
+                    </li>
                     <!-- Dashboard -->
                     <li>
                         <Link
@@ -753,6 +815,118 @@ onMounted(async () => {
                                         <span>Group Schedule</span>
                                     </Link>
                                 </li> -->
+                            </ul>
+                        </transition>
+                    </li>
+
+
+                    <!-- Archive Page Dropdown -->
+                    <li class="relative">
+                        <div
+                            id="archive-link"
+                            @click="toggleDropdown('archive')"
+                            class="flex overflow-hidden relative justify-between items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer sidebar-link group"
+                            :class="{
+                                'text-white bg-[#034b1c]':
+                                    activeDropdown === 'archive' ||
+                                    isActiveGroup([
+                                        'archive.index',
+                                        'archive.show',
+                                        'groups.index',
+                                    ]),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    activeDropdown !== 'archive' &&
+                                    !isActiveGroup([
+                                        'archive.index',
+                                        'archive.show',
+                                        'groups.index',
+                                    ]),
+                            }"
+                        >
+                            <div class="flex items-center">
+                                <div
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-white':
+                                            isActiveGroup([
+                                                'archive.index',
+                                                'archive.show',
+                                                'groups.index',
+                                            ]) || activeDropdown === 'archive',
+                                    }"
+                                >
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-200"
+                                    :class="{
+                                        'font-semibold':
+                                            isActiveGroup([
+                                                'archive.index',
+                                                'archive.show',
+                                                'groups.index',
+                                            ]) || activeDropdown === 'archive',
+                                    }"
+                                    >Archive</span
+                                >
+                            </div>
+                            <div
+                                v-if="sidebarOpen"
+                                class="transition-transform duration-200"
+                                :class="{
+                                    'rotate-180': activeDropdown === 'archive',
+                                }"
+                            >
+                                <i
+                                    class="text-xs fas fa-chevron-down"
+                                    :class="{
+                                        'text-white':
+                                            activeDropdown === 'archive' ||
+                                            isActiveGroup([
+                                                'archive.index',
+                                                'archive.show',
+                                                'groups.index',
+                                            ]),
+                                    }"
+                                ></i>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown menu -->
+                        <transition
+                            enter-active-class="transition duration-200 ease-out"
+                            enter-from-class="opacity-0 transform scale-95"
+                            enter-to-class="opacity-100 transform scale-100"
+                            leave-active-class="transition duration-100 ease-in"
+                            leave-from-class="opacity-100 transform scale-100"
+                            leave-to-class="opacity-0 transform scale-95"
+                        >
+                            <ul
+                                v-show="activeDropdown === 'archive'"
+                                class="pr-2 pl-4 mt-1 ml-4 space-y-1"
+                            >
+                                <li>
+                                    <Link
+                                        :href="route('archive.index')"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('archive.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('archive.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="mr-2 fas fa-calendar-check"
+                                            :class="{
+                                                'text-black':
+                                                    isActive('archive.index'),
+                                            }"
+                                        ></i>
+                                        <span>Manage Archive</span>
+                                    </Link>
+                                </li>
                             </ul>
                         </transition>
                     </li>

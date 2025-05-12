@@ -73,7 +73,6 @@ import { ref, watch } from "vue";
 import axios from "axios";
 import { computed } from "vue";
 import { usePage } from "@inertiajs/vue3";
-import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
 import Header from "@/Components/Header/Header.vue";
@@ -90,7 +89,7 @@ const page = usePage()
 const userRole = computed(() => page.props.auth.user.role_name)
 
 const layouts = {
-  admin: AdminLayout,
+  admin: HRLayout,
   hr: HRLayout,
   applicant: ApplicantLayout
 }

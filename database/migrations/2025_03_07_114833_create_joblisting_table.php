@@ -53,7 +53,7 @@ return new class extends Migration
             ],
             [
                 'username' => 'applicant',
-                'email' => 'applicant@gmail.com',
+                'email' => 'vhinzjohn43@gmail.com',
                 'password' => bcrypt('admin123'),
                 'role_name' => 'applicant',
                 'created_at' => now(),
@@ -212,7 +212,7 @@ return new class extends Migration
             [
                 'education_level' => 'Bachelor\'s degree',
                 'training_hours' => 3,
-                'eligibility' => 'RA 1080 (Board/Bar/Court)',
+                'eligibility' => 'RA 1080 (Board/Bar)',
                 'years_experience' => 1,
                 'is_required' => true,
                 'created_at' => now(),
@@ -424,6 +424,25 @@ return new class extends Migration
             $table->index('status'); // For status filtering
             $table->index(['job_listing_id', 'status']); // For combined filtering
         });
+
+        Schema::create('temporary_files', function (Blueprint $table) {
+            $table->id();
+            $table->string('hash')->unique();
+            $table->string('filename');
+            $table->string('path');
+            $table->unsignedBigInteger('size');
+            $table->timestamps();
+        });
+
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
     }
 
     /**
@@ -450,5 +469,6 @@ return new class extends Migration
         Schema::dropIfExists('educational_backgrounds');
         Schema::dropIfExists('group_schedule_members');
         Schema::dropIfExists('group_schedules');
+        Schema::dropIfExists('temporary_files');
     }
 };

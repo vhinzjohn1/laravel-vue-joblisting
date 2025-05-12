@@ -1,7 +1,6 @@
 <script setup>
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
-import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import DeleteUserForm from "./Partials/DeleteUserForm.vue";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm.vue";
@@ -19,11 +18,10 @@ const activeTab = ref("profile"); // Default tab
 const getLayout = () => {
     switch (user.role_name) {
         case "hr":
+        case "admin":
             return HRLayout;
         case "applicant":
             return ApplicantLayout;
-        case "admin":
-            return AdminLayout;
         default:
             return AuthenticatedLayout;
     }
@@ -107,7 +105,7 @@ const showSuccessAlert = (action) => {
                                         Profile Information
                                     </button>
                                 </li>
-                                <li v-if="user.role_name !== 'hr'" class="w-full sm:flex-1 md:w-full">
+                                <li v-if="user.role_name !== 'hr' && user.role_name !== 'admin'" class="w-full sm:flex-1 md:w-full">
                                     <button
                                         @click="activeTab = 'education'"
                                         :class="[
@@ -120,7 +118,7 @@ const showSuccessAlert = (action) => {
                                         Educational Background
                                     </button>
                                 </li>
-                                <li v-if="user.role_name !== 'hr'" class="w-full sm:flex-1 md:w-full">
+                                <li v-if="user.role_name !== 'hr' && user.role_name !== 'admin'" class="w-full sm:flex-1 md:w-full">
                                     <button
                                         @click="activeTab = 'training'"
                                         :class="[
@@ -133,7 +131,7 @@ const showSuccessAlert = (action) => {
                                         Training & Certifications
                                     </button>
                                 </li>
-                                <li v-if="user.role_name !== 'hr'" class="w-full sm:flex-1 md:w-full">
+                                <li v-if="user.role_name !== 'hr' && user.role_name !== 'admin'" class="w-full sm:flex-1 md:w-full">
                                     <button
                                         @click="activeTab = 'experience'"
                                         :class="[

@@ -20,7 +20,9 @@ class ManageJobListingController extends Controller
             },
             'creator',
             'applications'
-        ])->get();
+        ])
+        ->where('status', '!=', 'Archived')
+        ->get();
 
         $positions = Position::with(['salaryGrade', 'minimumRequirement'])->get();
 
@@ -37,7 +39,7 @@ class ManageJobListingController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'closing_date' => 'required|date|after_or_equal:today',
-            'status' => 'required|string|in:Active,Draft,Closed'
+            'status' => 'required|string|in:Active,Draft,Closed,Archived'
         ]);
 
         if ($validator->fails()) {
@@ -82,7 +84,7 @@ class ManageJobListingController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'closing_date' => 'required|date|after_or_equal:today',
-            'status' => 'required|string|in:Active,Draft,Closed',
+            'status' => 'required|string|in:Active,Draft,Closed,Archived',
         ]);
 
         if ($validator->fails()) {
@@ -90,6 +92,16 @@ class ManageJobListingController extends Controller
         }
 
         $jobListing = JobListing::findOrFail($id);
+
+        // Validate archive status change
+        if ($request->status === 'Archived') {
+            // Only allow archiving if the current status is 'Closed'
+            if ($jobListing->status !== 'Closed') {
+                return response()->json([
+                    'message' => 'Job listing can only be archived from Closed status.'
+                ], 400);
+            }
+        }
 
         $jobListing->update([
             'position_id' => $request->position_id,
@@ -105,7 +117,9 @@ class ManageJobListingController extends Controller
             },
             'creator',
             'applications'
-        ])->get();
+        ])
+        ->where('status', '!=', 'Archived')
+        ->get();
 
         return response()->json($jobListings, 201);
     }

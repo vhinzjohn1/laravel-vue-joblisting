@@ -159,6 +159,7 @@ const handleCaptchaVerified = async ({ token, code }) => {
                                 type="submit"
                                 class="mt-4"
                                 :loading="isLoading"
+                                :disabled="isLoading"
                             >
                                 Log in
                             </PrimaryButton>

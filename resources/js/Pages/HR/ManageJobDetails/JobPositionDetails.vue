@@ -235,7 +235,7 @@
                         <option value="Career Service (Sub-Professional)">
                         Career Service (Sub-Professional)
                         </option>
-                        <option value="RA 1080 (Board/Bar/Court)">RA 1080 (Board/Bar/Court)</option>
+                        <option value="RA 1080 (Board/Bar)">RA 1080 (Board/Bar)</option>
                         <option value="PD 907">PD 907</option>
                     </select>
                     </div>
@@ -414,7 +414,7 @@
                         <option value="Career Service (Sub-Professional)">
                         Career Service (Sub-Professional)
                         </option>
-                        <option value="RA 1080 (Board/Bar/Court)">RA 1080 (Board/Bar/Court)</option>
+                        <option value="RA 1080 (Board/Bar)">RA 1080 (Board/Bar)</option>
                         <option value="PD 907">PD 907</option>
                     </select>
                     </div>
@@ -435,7 +435,7 @@
                 :loading="form.processing"
                 :disabled="form.processing"
                 >
-                Save Job Listing
+                Update Position
                 </PrimaryButton>
             </div>
             </div>
@@ -447,7 +447,6 @@
 
 <script setup>
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
-import AdminLayout from "@/Layouts/Admin/AdminLayout.vue";
 import { Head } from "@inertiajs/vue3";
 import Header from "@/Components/Header/Header.vue";
 import { usePage } from "@inertiajs/vue3";
@@ -461,8 +460,9 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 const page = usePage();
 const userRole = computed(() => page.props.auth.user.role_name);
 
+// Use HRLayout for both admin and HR roles
 const layouts = {
-    admin: AdminLayout,
+    admin: HRLayout,
     hr: HRLayout,
 };
 
@@ -488,18 +488,18 @@ const localJobPosition = ref(page.props.positions || "");
 console.log(page.props.positions);
 
 const saveJobPosition = () => {
-    axios
-        .post(route("job-position.store"), form)
-        .then((response) => {
+    form.post(route("job-position.store"), {
+        onSuccess: () => {
             showAddModal.value = false;
             form.reset();
-            localJobPosition.value = response.data.data;
+            localJobPosition.value = page.props.positions;
             showToast("add", true);
-        })
-        .catch((error) => {
-            console.error(error);
-            showToast("add", false, error.response.data.message);
-        });
+        },
+        onError: (errors) => {
+            console.error(errors);
+            showToast("add", false, errors.message);
+        }
+    });
 };
 
 const showEdit = (item) => {
@@ -525,18 +525,18 @@ const showEdit = (item) => {
 };
 
 const editJobPosition = () => {
-    axios
-        .put(route("job-position.update", form.position_id), form)
-        .then((response) => {
+    form.put(route("job-position.update", form.position_id), {
+        onSuccess: () => {
             showEditModal.value = false;
             form.reset();
-            localJobPosition.value = response.data.data;
+            localJobPosition.value = page.props.positions;
             showToast("edit", true);
-        })
-        .catch((error) => {
-            console.error(error);
-            showToast("edit", false, error.response.data.message);
-        });
+        },
+        onError: (errors) => {
+            console.error(errors);
+            showToast("edit", false, errors.message);
+        }
+    });
 };
 
 const deleteJobPosition = (jobPosition) => {

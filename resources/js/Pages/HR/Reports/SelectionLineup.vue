@@ -1,11 +1,19 @@
 <script setup>
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import Header from "@/Components/Header/Header.vue";
 import { computed, ref } from "vue";
 
+
+const auth = usePage().props.auth;
 // Add reactive variables for input fields
-const preparedBy = ref('HR Staff');
+const preparedBy = ref(
+    auth.user.first_name +
+        " " +
+        (auth.user.middle_name ? auth.user.middle_name[0] + "." : "") +
+        " " +
+        auth.user.last_name
+);
 const certifiedBy = ref('ATHENA JAN I. DERAYUNAN');
 import DataTable from "@/Components/DataTable.vue";
 
@@ -23,8 +31,6 @@ const statusOptions = [
     { value: "Pending", label: "Pending Review" },
     { value: "Rejected", label: "Rejected" },
 ];
-
-console.log("this is the props", props)
 
 // Filtered applicants based on statusFilter
 const filteredApplicants = computed(() => {

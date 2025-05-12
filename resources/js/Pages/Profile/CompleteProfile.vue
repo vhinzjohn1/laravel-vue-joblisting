@@ -290,9 +290,8 @@ onMounted(() => {
                             <div class="flex flex-col items-center">
                                 <!-- Step Circle -->
                                 <div
-                                    @click="skipToStep(step.number)"
                                     :class="[
-                                        'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm cursor-pointer transition-colors',
+                                        'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-colors',
                                         currentStep > step.number ||
                                         isStepComplete[step.number]
                                             ? 'bg-green-600 text-white'

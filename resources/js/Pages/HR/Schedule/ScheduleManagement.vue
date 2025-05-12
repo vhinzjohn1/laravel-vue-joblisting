@@ -334,7 +334,7 @@
                         >
                             Cancel
                         </button>
-                        <PrimaryButton type="submit" :disabled="processing">
+                        <PrimaryButton type="submit" :disabled="isLoading" :loading="isLoading">
                             {{
                                 editingSchedule
                                     ? "Update Schedule"
@@ -499,7 +499,8 @@
                     <div class="mt-4 flex justify-end">
                         <PrimaryButton
                             @click="addParticipantToSchedule"
-                            :disabled="!newParticipant.applicationId"
+                            :disabled="isLoading"
+                            :loading="isLoading"
                         >
                             Add Participant
                         </PrimaryButton>
@@ -538,6 +539,9 @@ const props = defineProps({
         required: true,
     },
 });
+
+// Loading State
+const isLoading = ref(false);
 
 console.log('This is the props: ', props)
 const showCreateModal = ref(false);
@@ -610,6 +614,8 @@ const addParticipantToSchedule = () => {
         return;
     }
 
+    isLoading.value = true;
+
     // Get the application to determine its current status
     const application = availableApplications.value.find(
         app => app.application_id === newParticipant.value.applicationId
@@ -637,10 +643,13 @@ const addParticipantToSchedule = () => {
             // Hide job listing selection if it was shown
             showJobListingSelection.value = false;
         }
+
+        isLoading.value = false;
     })
     .catch(error => {
         console.error('Error adding participant:', error);
         showToast("add", false);
+        isLoading.value = false;
     });
 };
 
@@ -797,6 +806,8 @@ const removeParticipant = (index) => {
 const handleSubmit = () => {
     processing.value = true;
 
+    isLoading.value = true;
+
     // Prepare form data
     const formData = prepareFormData();
 
@@ -821,11 +832,13 @@ const handleSubmit = () => {
             schedules.value = response.props.schedules;
             closeModal();
             processing.value = false;
+            isLoading.value = false;
             showToast("add");
         },
         onError: (error) => {
             showToast("add", false);
             processing.value = false;
+            isLoading.value = false;
         },
         preserveScroll: true, // Preserve scroll position
     };
@@ -847,6 +860,7 @@ const editSchedule = (schedule) => {
         selectedJobListing.value =
             schedule.participants[0].application.job_listing_id;
     }
+    isLoading.value = true;
     form.value = {
         title: schedule.title,
         description: schedule.description,
@@ -858,6 +872,7 @@ const editSchedule = (schedule) => {
         })),
     };
     showCreateModal.value = true;
+    isLoading.value = false;
 };
 
 const viewParticipants = (schedule) => {
@@ -896,6 +911,7 @@ const showToast = (action, isSuccess = true) => {
         icon: icon,
         title: title,
         iconColor: "#ffffff",
+        showCloseButton: true,
         showConfirmButton: false,
         timer: 3000,
         toast: true,

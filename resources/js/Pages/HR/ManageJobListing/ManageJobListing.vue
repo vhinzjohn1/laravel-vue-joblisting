@@ -225,7 +225,7 @@
                                                         .minimum_requirement
                                                         .years_experience
                                                 }}
-                                                years
+                                                year(s)
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2 text-sm"
@@ -261,6 +261,17 @@
                                                 <div
                                                     class="flex flex-col sm:flex-row gap-2"
                                                 >
+                                                    <!-- Button for archive -->
+                                                    <button
+                                                        class="flex-1 px-3 py-1 text-white bg-gray-600 rounded hover:bg-gray-700 transition"
+                                                        @click="
+                                                            archiveJob(
+                                                                filteredJob.job_listing_id,
+                                                            )
+                                                        "
+                                                    >
+                                                        Archive
+                                                    </button>
                                                     <button
                                                         class="flex-1 px-3 py-1 text-white bg-green-600 rounded hover:bg-green-700 transition"
                                                         @click="
@@ -455,8 +466,7 @@
                                 <CustomSelect
                                     :options="[
                                         { value: 'Active' },
-                                        { value: 'Draft' },
-                                        { value: 'Closed' },
+                                        { value: 'Draft' }
                                     ]"
                                     v-model="newJob.status"
                                     :value-key="'value'"
@@ -574,12 +584,13 @@
                     </button>
 
                     <!-- Save Button -->
-                    <button
+                    <PrimaryButton
                         type="submit"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                        :loading="isLoading"
+                        :disabled="isLoading"
                     >
                         Save Job Listing
-                    </button>
+                    </PrimaryButton>
                 </div>
             </form>
         </Modal>
@@ -731,6 +742,7 @@
                                         { value: 'Active' },
                                         { value: 'Draft' },
                                         { value: 'Closed' },
+                                        { value: 'Archived' },
                                     ]"
                                     v-model="editingJob.status"
                                     :value-key="'value'"
@@ -845,12 +857,13 @@
                     >
                         Cancel
                     </button>
-                    <button
+                    <PrimaryButton
                         type="submit"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                        :loading="isLoading"
+                        :disabled="isLoading"
                     >
                         Update Job Listing
-                    </button>
+                    </PrimaryButton>
                 </div>
             </form>
         </Modal>
@@ -868,7 +881,7 @@ import { ref, computed, watch } from "vue";
 import axios from "axios";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
-import { usePage, Head } from "@inertiajs/vue3";
+import { usePage, Head, router } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
@@ -879,6 +892,9 @@ import Modal from "@/Components/Modal.vue";
 const data = ref(usePage().props.jobListings);
 const positions = ref(usePage().props.positions);
 
+//loading state
+const isLoading = ref(false);
+
 // Modified job data structure to match database schema
 const jobs = ref(data.value);
 
@@ -887,6 +903,86 @@ const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleDateString();
+};
+
+const manualRefrehsh = () => {
+    router.reload()
+}
+
+// Function to archive a job listing
+const archiveJob = async (jobId) => {
+    // Confirm before archiving using SweetAlert2
+    const result = await Swal.fire({
+        title: 'Archive Job Listing',
+        text: 'Are you sure you want to archive this job listing? Only closed job listings can be archived.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, archive it!'
+    });
+
+    // If user cancels, exit the function
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    try {
+        isLoading.value = true;
+
+        // Attempt to archive the job listing
+        const response = await axios.post(route('archive.store'), {
+            id: jobId,
+            status: "Archived",
+            method: "archiveJoblisting"
+        });
+
+        // Remove the archived job from the list
+        jobs.value = jobs.value.filter((job) => job.id !== jobId);
+
+        // Show success message
+        Swal.fire({
+            icon: 'success',
+            title: 'Job Listing Archived',
+            text: response.data.message || 'Job listing has been successfully archived.',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+    } catch (error) {
+        // Handle specific error scenarios
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            Swal.fire({
+                icon: 'error',
+                title: 'Archiving Failed',
+                text: error.response.data.message || 'Failed to archive job listing. Please try again.',
+                confirmButtonText: 'OK'
+            });
+        } else if (error.request) {
+            // The request was made but no response was received
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Response',
+                text: 'No response received from the server. Please check your network connection.',
+                confirmButtonText: 'Retry'
+            });
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An unexpected error occurred. Please try again later.',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        // Log the full error for debugging
+        console.error("Error archiving job:", error);
+    } finally {
+        isLoading.value = false;
+    }
 };
 
 // Prepare data for display in DataTable
@@ -972,6 +1068,8 @@ const updateJob = () => {
     // Clear previous errors
     errors.value = {};
 
+    isLoading.value = true;
+
     axios
         .put(
             `/job-listing/${editingJob.value.job_listing_id}`,
@@ -999,11 +1097,43 @@ const updateJob = () => {
             showSuccessAlert("update");
         })
         .catch((error) => {
-            if (error.response && error.response.status === 422) {
-                // Store validation errors
-                errors.value = error.response.data.errors;
+            let errorMessage = "Failed to update job listing";
+
+            // Handle different types of errors
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                if (error.response.status === 422) {
+                    // Validation errors
+                    errors.value = error.response.data.errors;
+                    errorMessage = error.response.data.message || "Validation failed";
+                } else if (error.response.data && error.response.data.message) {
+                    // Server returned a specific error message
+                    errorMessage = error.response.data.message;
+                }
+            } else if (error.request) {
+                // The request was made but no response was received
+                errorMessage = "No response received from the server";
             }
+
+            // Show error toast
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "Error!",
+                text: errorMessage,
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                customClass: {
+                    popup: "bg-red-500 text-white",
+                },
+            });
+
             console.error("Error updating job listing:", error);
+        })
+        .finally(() => {
+            isLoading.value = false;
         });
 };
 
@@ -1011,6 +1141,7 @@ const updateJob = () => {
 const saveJob = () => {
     // Clear previous errors
     errors.value = {};
+    isLoading.value = true;
 
     const jobToAdd = {
         position_id: newJob.value.position_id,
@@ -1044,6 +1175,21 @@ const saveJob = () => {
                 errors.value = error.response.data.errors;
             }
             console.error("Error creating job listing:", error.response.data);
+            Swal.fire({
+                        position: "top-end",
+                        icon: "error",
+                        title: "Error!",
+                        text: "Failed to create job listing.",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        toast: true,
+                        customClass: {
+                            popup: "bg-red-500 text-white",
+                        },
+                    });
+        })
+        .finally(() => {
+            isLoading.value = false;
         });
 };
 
@@ -1082,6 +1228,7 @@ const showSuccessAlert = (action) => {
         icon: "success",
         title: title,
         iconColor: "#ffffffff",
+        showCloseButton: true,
         showConfirmButton: false,
         timer: 3000, // Toast will disappear after 3 seconds
         toast: true, // Enable toast mode
