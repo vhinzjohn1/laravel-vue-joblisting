@@ -14,9 +14,6 @@
     {{-- Favicon --}}
     <link rel="icon" type="image/x-icon" href="{{ asset('cmu-favicon.png') }}">
 
-    <!-- Use Tailwind cdn for production-->
-    {{-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> --}}
-
     {{-- Using tailwind.js for development --}}
     <script src="{{ asset('js/tailwind.js') }}"></script>
 

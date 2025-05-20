@@ -41,7 +41,6 @@ function areFetchedFieldsFilled(details) {
 
 const fetchUserDetails = async () => {
     try {
-        isLoading.value = true;
         const response = await axios.get(route("profile.user-details"));
         console.log('This is the props user', response.data.userDetails);
         if (response.data) {
@@ -62,7 +61,6 @@ const fetchUserDetails = async () => {
                 emit("step-completed");
             }
         }
-        isLoading.value = false;
     } catch (error) {
         console.error("Error fetching user details:", error);
     }

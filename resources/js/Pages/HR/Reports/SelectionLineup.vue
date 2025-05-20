@@ -542,7 +542,10 @@ const print = () => {
     }
 
     @page {
-        margin: 0mm;
+        margin-top: 2cm;
+        margin-right: 1cm;
+        margin-bottom: 1cm;
+        margin-left: 1cm;
     }
 
     html,

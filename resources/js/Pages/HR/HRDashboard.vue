@@ -301,8 +301,11 @@ const getInitials = (firstName, lastName) => {
 const navigateToSection = (section) => {
     const routes = {
         'total_applications': 'applications.index',
+        'applications': 'applications.index',
         'active_jobs': 'job-listing.index',
+        'job_listings': 'job-listing.index',
         'upcoming_interviews': 'schedules.index',
+        'schedules': 'schedules.index',
         'total_candidates': 'applications.index'
     };
 
