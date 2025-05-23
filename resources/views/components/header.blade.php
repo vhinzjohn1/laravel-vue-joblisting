@@ -50,6 +50,7 @@
             <div class="flex flex-col space-y-4">
                 <a href="#home" class="text-green-800 hover:text-green-600">Home</a>
                 <a href="#how-to-apply" class="text-green-800 hover:text-green-600">How to Apply</a>
+                <a href="view-job-listing" class="text-green-800 hover:text-green-600">Job Listings</a>
                 <a href="#about" class="text-green-800 hover:text-green-600">About</a>
                 <div class="flex flex-col space-y-2">
                     @if (Route::has('login'))
