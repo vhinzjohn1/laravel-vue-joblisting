@@ -29,21 +29,17 @@ class WelcomeController extends Controller
             }
             return redirect()->route(auth()->user()->role_name . '.index');
         }
-        $jobListings = $this->index();
         return view('welcome', [
             'canLogin'    => Route::has('login'),
             'canRegister' => Route::has('register'),
-            'jobListings' => $jobListings
         ]);
     }
 
     public function showInertia()
     {
-        $jobListings = $this->index();
         return \Inertia\Inertia::render('Welcome', [
             'canLogin'    => Route::has('login'),
             'canRegister' => Route::has('register'),
-            'jobListings' => $jobListings
         ]);
     }
     /**

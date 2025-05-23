@@ -52,6 +52,7 @@
                 <document-upload-section
                     :documents="form.documents"
                     :document-upload-loading="documentUploadLoading"
+                    :job-listing-id="job.job_listing_id"
                     @update:document="handleDocumentUpdate"
                     @remove:document="handleDocumentRemove"
                     @upload-complete="handleDocumentUploadComplete"
@@ -64,8 +65,13 @@
                         class="flex-1 text-right"
                     >
                         <p class="font-bold text-red-500 text-md">
-                            Please upload all required documents
+                            Please upload all required documents:
                         </p>
+                        <ul class="text-sm text-red-500 mt-1">
+                            <li v-for="(error, docType) in validationErrors.missingDocuments" :key="docType">
+                                {{ getDocumentDisplayName(docType) }}
+                            </li>
+                        </ul>
                     </div>
 
                     <button
@@ -149,9 +155,19 @@ const props = defineProps({
     },
 });
 
-console.log('this is the job', props.job)
-
 const emit = defineEmits(["close", "submitted"]);
+
+// Document name mapping for display
+const documentDisplayNames = {
+    application_letter: 'Letter of Intent/Application Letter',
+    personal_data_sheet: 'Personal Data Sheet (PDS)',
+    work_experience_sheet: 'Work Experience Sheet (WES)',
+    transcript_and_diploma: 'Transcript of Records (TOR) and Diploma',
+    eligibility_proof: 'Authenticated Proof of Eligibility',
+    performance_rating: 'Latest Performance Rating (DPCR/IPCR)',
+    training_certificates: 'Certificate of Trainings, Special Orders, etc.',
+    employment_certificate: 'Certificate of Employment'
+};
 
 // Simplified computed properties
 const educationOptions = computed(() => props.existingEducation);
@@ -193,9 +209,15 @@ const formSubmitting = ref(false);
 const validationErrors = ref({
     education: false,
     documents: false,
+    missingDocuments: {}
 });
 
 const showValidation = ref(false);
+
+// Helper function to get document display name
+const getDocumentDisplayName = (docType) => {
+    return documentDisplayNames[docType] || docType;
+};
 
 // Update handlers for child components
 const updateEducations = (educations) => {
@@ -229,8 +251,8 @@ const closeModal = () => {
 
 const handleDocumentUpdate = (docType, file) => {
     // Clear validation error for this document type when a new file is uploaded
-    if (validationErrors.value[`documents.${docType}`]) {
-        delete validationErrors.value[`documents.${docType}`];
+    if (validationErrors.value.missingDocuments[docType]) {
+        delete validationErrors.value.missingDocuments[docType];
     }
 
     // Set loading state for this specific document type
@@ -277,82 +299,148 @@ const handleDocumentUploadComplete = (docType, fileInfo) => {
 
 // Validation functions
 const validateEducation = () => {
-    return form.education.length > 0;
+    const isValid = form.education.length > 0;
+    console.log('Education validation:', { isValid, education: form.education });
+    return isValid;
 };
 
 const validateDocuments = () => {
-    return Object.values(form.documents).every((doc) => doc !== null);
-};
+    console.log('Starting document validation');
+    // Get required documents from the DocumentUploadSection component
+    const requiredDocuments = document.querySelectorAll('[data-required-document]');
+    console.log('Required documents found:', requiredDocuments.length);
 
-const validateForm = () => {
-    showValidation.value = true;
-    validationErrors.value.education = !validateEducation();
-    validationErrors.value.documents = !validateDocuments();
-    return !Object.values(validationErrors.value).some((error) => error);
-};
+    const missingDocuments = {};
+    let isValid = true;
 
-const submitApplication = () => {
-    if (!validateForm()) {
-        return;
-    }
+    requiredDocuments.forEach(doc => {
+        const docType = doc.getAttribute('data-required-document');
+        console.log('Checking document:', docType, form.documents[docType]);
 
-    // Set form submission loading state
-    formSubmitting.value = true;
-
-    // Create FormData to handle file uploads
-    const formData = new FormData();
-    formData.append("job_listing_id", form.job_listing_id);
-
-    // Add education data
-    form.education.forEach((edu, index) => {
-        Object.keys(edu).forEach((key) => {
-            formData.append(`education[${index}][${key}]`, edu[key] || "");
-        });
-    });
-
-    // Add training data
-    form.trainings.forEach((training, index) => {
-        Object.keys(training).forEach((key) => {
-            formData.append(`trainings[${index}][${key}]`, training[key] || "");
-        });
-    });
-
-    // Add experience data
-    form.experiences.forEach((exp, index) => {
-        Object.keys(exp).forEach((key) => {
-            formData.append(`experiences[${index}][${key}]`, exp[key] || "");
-        });
-    });
-
-    // Add document references (send serverFile.id or serverFile.hash, not the file itself)
-    Object.keys(form.documents).forEach((docType) => {
-        const doc = form.documents[docType];
-        if (doc && doc.serverFile) {
-            // Prefer using serverFile.id, fallback to hash if needed
-            formData.append(`documents[${docType}]`, doc.serverFile.id || doc.serverFile.hash);
+        if (!form.documents[docType] || !form.documents[docType].serverFile) {
+            console.log('Missing document:', docType);
+            missingDocuments[docType] = true;
+            isValid = false;
         }
     });
 
-    // Submit the form using axios with FormData
-    axios
-        .post(route("job-application.store"), formData, {
+    console.log('Document validation result:', { isValid, missingDocuments });
+    validationErrors.value.missingDocuments = missingDocuments;
+    return isValid;
+};
+
+const validateForm = () => {
+    console.log('Starting form validation');
+    showValidation.value = true;
+
+    const educationValid = validateEducation();
+    const documentsValid = validateDocuments();
+
+    validationErrors.value = {
+        education: !educationValid,
+        documents: !documentsValid,
+        missingDocuments: validationErrors.value.missingDocuments
+    };
+
+    console.log('Form validation result:', {
+        educationValid,
+        documentsValid,
+        validationErrors: validationErrors.value
+    });
+
+    return educationValid && documentsValid;
+};
+
+const submitApplication = async () => {
+    console.log('Starting application submission');
+
+    if (!validateForm()) {
+        console.log('Form validation failed:', validationErrors.value);
+        return;
+    }
+
+    console.log('Form validation passed, proceeding with submission');
+
+    try {
+        // Set form submission loading state
+        formSubmitting.value = true;
+
+        // Create FormData to handle file uploads
+        const formData = new FormData();
+        formData.append("job_listing_id", form.job_listing_id);
+
+        // Add education data
+        form.education.forEach((edu, index) => {
+            Object.keys(edu).forEach((key) => {
+                formData.append(`education[${index}][${key}]`, edu[key] || "");
+            });
+        });
+
+        // Add training data
+        form.trainings.forEach((training, index) => {
+            Object.keys(training).forEach((key) => {
+                formData.append(`trainings[${index}][${key}]`, training[key] || "");
+            });
+        });
+
+        // Add experience data
+        form.experiences.forEach((exp, index) => {
+            Object.keys(exp).forEach((key) => {
+                formData.append(`experiences[${index}][${key}]`, exp[key] || "");
+            });
+        });
+
+        // Add document references (send serverFile.id or serverFile.hash, not the file itself)
+        Object.keys(form.documents).forEach((docType) => {
+            const doc = form.documents[docType];
+            if (doc && doc.serverFile) {
+                // Prefer using serverFile.id, fallback to hash if needed
+                formData.append(`documents[${docType}]`, doc.serverFile.id || doc.serverFile.hash);
+            }
+        });
+
+        console.log('Submitting form data:', {
+            job_listing_id: form.job_listing_id,
+            education: form.education,
+            trainings: form.trainings,
+            experiences: form.experiences,
+            documents: form.documents
+        });
+
+        // Submit the form using axios with FormData
+        const response = await axios.post(route("job-application.store"), formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
-            },
-        })
-        .then((response) => {
-            formSubmitting.value = false;
-            closeModal();
-            router.visit(route("job-application.show", props.job.job_listing_id));
-            showToast("Application Submitted Successfully");
-        })
-        .catch((error) => {
-            formSubmitting.value = false;
-            console.log(error);
-            showErrorToast(
-                "There was an error submitting your application. Please try again.",
-            );
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest"
+            }
         });
+
+        console.log('Response:', response.data);
+
+        formSubmitting.value = false;
+        closeModal();
+        router.visit(route("job-application.show", props.job.job_listing_id));
+        showToast("Application Submitted Successfully");
+    } catch (error) {
+        formSubmitting.value = false;
+        console.error('Error submitting application:', error);
+
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error('Error response:', error.response.data);
+            showErrorToast(error.response.data.message || "There was an error submitting your application. Please try again.");
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received:', error.request);
+            showErrorToast("No response received from server. Please check your connection and try again.");
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error setting up request:', error.message);
+            showErrorToast("There was an error submitting your application. Please try again.");
+        }
+    }
 };
 
 // Show success alert function

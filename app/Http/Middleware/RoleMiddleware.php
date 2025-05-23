@@ -19,9 +19,9 @@ class RoleMiddleware
     {
         $userRole = $request->user()->role_name ?? null;
 
-        // if profile is not completed, redirect to complete profile
-        if ($request->user()->profile_completed === false && $userRole === 'applicant') {
-            return redirect()->route('complete-profile.index');
+        // Skip profile completion check for verification routes
+        if ($request->is('verify-custom-email/*') || $request->is('custom-verification/*')) {
+            return $next($request);
         }
 
         // Check if the user's role is in the allowed roles

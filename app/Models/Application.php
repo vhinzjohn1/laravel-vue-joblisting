@@ -40,4 +40,8 @@ class Application extends Model
     {
         return $this->hasMany(ApplicationStatusHistory::class, 'application_id');
     }
+    public function selectionLineup()
+    {
+        return $this->hasOne(SelectionLineup::class, 'application_id');
+    }
 }

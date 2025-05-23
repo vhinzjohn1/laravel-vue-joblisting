@@ -21,6 +21,7 @@ class User extends Authenticatable
         'phone_number',
         'role_name',
         'profile_completed',
+        'email_verified_at',
     ];
 
     protected $attributes = [

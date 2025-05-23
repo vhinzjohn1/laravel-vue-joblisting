@@ -29,8 +29,12 @@ class NotificationEmail extends Mailable
             'name' => $user->name ?? $user->username,
             'message' => $notification->message,
             'subject' => $this->getSubjectFromType($notification->type),
-            'data' => $notification->data,
         ];
+
+        // Merge notification data with base data
+        if (!empty($notification->data)) {
+            $this->data = array_merge($this->data, $notification->data);
+        }
 
         // Add action URL if applicable
         if (!empty($notification->data)) {
@@ -43,8 +47,13 @@ class NotificationEmail extends Mailable
      */
     public function build()
     {
+        $view = match ($this->notification->type) {
+            'email_verification' => 'emails.verification',
+            default => 'emails.example'
+        };
+
         return $this->subject($this->data['subject'])
-            ->view('emails.example')
+            ->view($view)
             ->with('data', $this->data);
     }
 
@@ -54,6 +63,7 @@ class NotificationEmail extends Mailable
     private function getSubjectFromType(string $type): string
     {
         return match ($type) {
+            'email_verification' => 'Verify Your Email Address - CMU Job Listings',
             'new_application' => 'New Job Application Received',
             'status_change' => 'Application Status Update',
             'scheduled' => 'Interview Schedule Notification',

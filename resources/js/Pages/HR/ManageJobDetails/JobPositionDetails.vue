@@ -142,7 +142,7 @@
                     >
                         <option value="" disabled>Select Employment Type</option>
                         <option value="Plantilla">Plantilla</option>
-                        <option value="CoS">CoS</option>
+                        <option value="Contract of Service">Contract of Service</option>
                         <option value="Job Order">Job Order</option>
                     </select>
                     </div>
@@ -321,7 +321,7 @@
                     >
                         <option value="" disabled>Select Employment Type</option>
                         <option value="Plantilla">Plantilla</option>
-                        <option value="CoS">CoS</option>
+                        <option value="Contract of Service">Contract of Service</option>
                         <option value="Job Order">Job Order</option>
                     </select>
                     </div>

@@ -931,6 +931,41 @@ onMounted(async () => {
                         </transition>
                     </li>
 
+                    <!-- Required Documents -->
+                    <li>
+                        <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="required-documents-link"
+                            :href="route('required-documents.index')"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
+                            :class="{
+                                'bg-[#ffc001] text-black': isActive('required-documents.index'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('required-documents.index'),
+                            }"
+                        >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActive('required-documents.index'),
+                                    }"
+                                >
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-200"
+                                    :class="{
+                                        'font-semibold': isActive('required-documents.index'),
+                                    }"
+                                    >Required Documents</span
+                                >
+                            </div>
+                        </Link>
+                    </li>
+
                     <!-- Profile -->
                     <li>
                         <Link

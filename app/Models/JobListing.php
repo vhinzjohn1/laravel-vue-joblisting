@@ -17,6 +17,7 @@ class JobListing extends Model
         'category',
         'title',
         'description',
+        'batch_id',
         'closing_date',
         'status',
         'created_by',
@@ -49,5 +50,16 @@ class JobListing extends Model
     public function salaryGrade(): BelongsTo
     {
         return $this->belongsTo(SalaryGrade::class, 'salary_grade_id');
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(Batch::class, 'batch_id');
+    }
+
+    public function requiredDocuments()
+    {
+        return $this->belongsToMany(RequiredDocument::class, 'job_listing_required_documents', 'job_listing_id', 'required_document_id')
+            ->withTimestamps();
     }
 }

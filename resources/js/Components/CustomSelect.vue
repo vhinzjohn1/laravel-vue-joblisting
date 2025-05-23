@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
-import TextInput from "./TextInput.vue";
 
 const props = defineProps({
   options: {
@@ -112,40 +111,13 @@ const displayValue = computed(() => {
 });
 
 /**
- * Update dropdown position
- */
-const updateDropdownPosition = () => {
-  if (selectRef.value) {
-    const rect = selectRef.value.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const bottomSpace = windowHeight - rect.bottom;
-    // Decide whether to open upward or downward based on available space
-    const openUpward = bottomSpace < 200 && rect.top > 200;
-
-    if (openUpward) {
-      dropdownStyles.value = {
-        position: "absolute",
-        bottom: `${window.innerHeight - rect.top + window.scrollY}px`,
-        left: `${rect.left + window.scrollX}px`,
-        width: `${rect.width}px`,
-        maxHeight: `${Math.min(rect.top - 10, 300)}px`,
-      };
-    } else {
-      dropdownStyles.value = {
-        position: "absolute",
-        top: `${rect.bottom + window.scrollY}px`,
-        left: `${rect.left + window.scrollX}px`,
-        width: `${rect.width}px`,
-        maxHeight: `${Math.min(windowHeight - rect.bottom - 10, 300)}px`,
-      };
-    }
-  }
-};
-
-/**
  * Toggle dropdown open/close, focus search if open
  */
-const toggleDropdown = async () => {
+const toggleDropdown = async (event) => {
+  // Prevent the click from propagating to parent elements
+  event?.preventDefault();
+  event?.stopPropagation();
+
   isOpen.value = !isOpen.value;
   if (isOpen.value) {
     await nextTick();
@@ -153,6 +125,48 @@ const toggleDropdown = async () => {
       searchInputRef.value.focus();
     }
     updateDropdownPosition();
+  }
+};
+
+/**
+ * Update dropdown position
+ */
+const updateDropdownPosition = () => {
+  if (selectRef.value) {
+    const rect = selectRef.value.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const bottomSpace = windowHeight - rect.bottom;
+    const topSpace = rect.top;
+
+    // Calculate available space above and below
+    const spaceBelow = bottomSpace;
+    const spaceAbove = topSpace;
+
+    // Determine if we should open upward or downward
+    const openUpward = spaceBelow < 200 && spaceAbove > 200;
+
+    // Calculate the maximum height based on available space
+    const maxHeight = openUpward
+      ? Math.min(spaceAbove - 10, 300)
+      : Math.min(spaceBelow - 10, 300);
+
+    if (openUpward) {
+      dropdownStyles.value = {
+        position: "fixed",
+        bottom: `${windowHeight - rect.top}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        maxHeight: `${maxHeight}px`,
+      };
+    } else {
+      dropdownStyles.value = {
+        position: "fixed",
+        top: `${rect.bottom}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        maxHeight: `${maxHeight}px`,
+      };
+    }
   }
 };
 
@@ -169,6 +183,12 @@ const handleClickOutside = (event) => {
     isOpen.value = false;
     search.value = "";
   }
+};
+
+// Add new method to prevent scrolling
+const preventScroll = (event) => {
+  event?.preventDefault();
+  event?.stopPropagation();
 };
 
 /**
@@ -230,6 +250,7 @@ onUnmounted(() => {
     <!-- Main input field -->
     <div
       @click="toggleDropdown"
+      @mousedown.prevent
       tabindex="0"
       class="w-full p-2 text-sm rounded-lg border cursor-pointer bg-white flex items-center justify-between transition-all duration-200"
       :class="[
@@ -239,10 +260,10 @@ onUnmounted(() => {
       <span v-if="selectedOption" class="text-gray-900 truncate">
         {{ displayValue }}
       </span>
-      <span 
-        v-else 
+      <span
+        v-else
         class="text-gray-500 truncate overflow-hidden whitespace-nowrap w-full"
-        >
+      >
         {{ placeholder }}
       </span>
       <i class="fas fa-chevron-down text-gray-400"></i>
@@ -262,13 +283,15 @@ onUnmounted(() => {
       ></option>
     </select>
 
-    <!-- Teleport dropdown to avoid being cut off -->
+    <!-- Dropdown -->
     <Teleport to="body">
       <div
         v-if="isOpen"
         ref="dropdownRef"
         :style="dropdownStyles"
-        class="absolute z-50 border bg-white border-gray-300 rounded-md shadow-lg overflow-hidden"
+        class="fixed z-50 border bg-white border-gray-300 rounded-md shadow-lg overflow-hidden"
+        @mousedown.prevent
+        @click.prevent
       >
         <!-- Search input -->
         <div v-if="searchable" class="p-2 border-b">
@@ -278,16 +301,19 @@ onUnmounted(() => {
             placeholder="Search..."
             class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
             type="text"
+            @mousedown.prevent
+            @click.prevent
           />
         </div>
 
         <!-- Options list -->
-        <div class="overflow-y-auto">
+        <div class="overflow-y-auto" :style="{ maxHeight: '300px' }">
           <template v-if="filteredOptions.length">
             <div
               v-for="(option, index) in filteredOptions"
               :key="index"
               @click="selectOption(option)"
+              @mousedown.prevent
               class="px-4 py-2 cursor-pointer hover:bg-green-50 text-sm"
               :class="{
                 'bg-green-50 text-green-700': selectedOption &&
@@ -310,4 +336,12 @@ onUnmounted(() => {
 .border-gray-300 {
   border: 1px solid #d1d5db;
 }
+
+/* Prevent scrolling when dropdown is open */
+:deep(body) {
+  &.dropdown-open {
+    overflow: hidden;
+  }
+}
 </style>
+

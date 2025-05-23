@@ -11,6 +11,7 @@ use App\Models\Notification;
 use App\Traits\NotificationTrait;
 use App\Jobs\SendEmailJob;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class EmailController extends Controller
 {
@@ -152,5 +153,65 @@ class EmailController extends Controller
         );
 
         return response()->json(['message' => 'Notification with email sent successfully']);
+    }
+
+    /**
+     * Send a custom verification email using the notification system.
+     */
+    public function sendVerificationEmail(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        // Generate a signed verification URL
+        $verificationUrl = URL::temporarySignedRoute(
+            'custom-verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->user_id, 'hash' => sha1($user->email)]
+        );
+
+        // Create a notification for verification
+        $notification = Notification::create([
+            'user_id' => $user->user_id,
+            'type' => 'email_verification',
+            'message' => 'Please verify your email address by clicking the link below.',
+            'is_read' => false,
+            'data' => [
+                'verification_url' => $verificationUrl
+            ]
+        ]);
+
+        // Send email in background
+        $this->sendEmailInBackground($notification, $user);
+        return response()->json(['message' => 'Verification email will be sent in the background']);
+    }
+
+    /**
+     * Handle the verification link and update email_verified_at.
+     */
+    public function verifyCustomEmail(Request $request, $id, $hash)
+    {
+        $user = User::where('user_id', $id)->firstOrFail();
+        if (! hash_equals((string) $hash, sha1($user->email))) {
+            abort(403, 'Invalid verification link.');
+        }
+        if ($user->email_verified_at) {
+            return redirect()->route('complete-profile.index')->with('status', 'Email already verified.');
+        }
+        $user->email_verified_at = now();
+        $user->save();
+        // Optionally, mark all email_verification notifications as read
+        Notification::where('user_id', $user->user_id)
+            ->where('type', 'email_verification')
+            ->update(['is_read' => true]);
+
+        // If user is not logged in, log them in
+        if (!auth()->check()) {
+            auth()->login($user);
+        }
+
+        return redirect()->route('complete-profile.index')->with('status', 'Email verified successfully!');
     }
 }

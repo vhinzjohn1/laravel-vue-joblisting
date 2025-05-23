@@ -46,12 +46,12 @@ const props = defineProps({
         <header class="fixed z-50 w-full bg-white shadow-md">
             <nav class="container px-4 py-3 mx-auto sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center">
-                    <Link href="welcome" class="flex items-center space-x-3">
+                    <a href="/" class="flex items-center space-x-3">
                         <img :src="asset('img/cmulogo.png')" alt="CMU Logo" class="w-10 h-10 sm:w-12 sm:h-12 critical-image">
                         <span class="text-sm font-semibold text-green-800 sm:text-base lg:text-xl">
                             Central Mindanao University
                         </span>
-                    </Link>
+                    </a>
 
                     <!-- Hamburger Menu Button -->
                     <button @click="toggleMobileMenu" class="lg:hidden">
@@ -65,6 +65,7 @@ const props = defineProps({
                     <div class="hidden items-center space-x-8 lg:flex">
                         <a href="#home" class="text-green-800 hover:text-green-600">Home</a>
                         <a href="#how-to-apply" class="text-green-800 hover:text-green-600">Apply</a>
+                        <Link href="view-job-listing" class="text-green-800 hover:text-green-600">Job Listings</Link>
                         <a href="#about" class="text-green-800 hover:text-green-600">About</a>
                         <div class="flex space-x-4">
                             <Link v-if="props.canLogin" :href="route('login')" class="px-6 py-2 text-green-800 rounded-md border-2 border-green-800 transition-colors hover:bg-green-800 hover:text-white">

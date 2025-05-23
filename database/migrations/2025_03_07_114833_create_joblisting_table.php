@@ -269,10 +269,79 @@ return new class extends Migration
             ],
         ]);
 
+        // Create job_batches table
+        Schema::create('job_listing_batches', function (Blueprint $table) {
+            $table->id('batch_id');
+            $table->string('batch_name')->nullable();
+            $table->string('batch_code')->nullable();
+            $table->date('post_date');
+            $table->date('deadline');
+            $table->string('status')->default('Active');
+            $table->boolean('is_plantilla')->default(true);
+            $table->timestamps();
+
+            // Adding Indexes
+            $table->index('status');
+            $table->index('post_date');
+            $table->index('deadline');
+        });
+
+        // Create required documents table
+        Schema::create('required_documents', function (Blueprint $table) {
+            $table->id('required_document_id');
+            $table->string('document_name')->unique();
+            $table->timestamps();
+        });
+
+        // Seed required documents
+        DB::table('required_documents')->insert([
+            [
+                'document_name' => 'Letter of Intent/Application Letter',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'document_name' => 'Personal Data Sheet (PDS)',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'document_name' => 'Work Experience Sheet (WES)',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'document_name' => 'Transcript of Records (TOR) and Diploma',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'document_name' => 'Authenticated Proof of Eligibility',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'document_name' => 'Latest Performance Rating (DPCR/IPCR)',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'document_name' => 'Certificate of Trainings, Special Orders, etc.',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'document_name' => 'Certificate of Employment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        ]);
+
         // Create job_listings table
         Schema::create('job_listings', function (Blueprint $table) {
             $table->id('job_listing_id');
             $table->unsignedBigInteger('position_id')->nullable();
+            $table->unsignedBigInteger('batch_id')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->date('closing_date')->nullable();
@@ -281,21 +350,46 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('position_id')->references('position_id')->on('positions')->onDelete('cascade');
+            $table->foreign('batch_id')->references('batch_id')->on('job_listing_batches')->onDelete('set null');
             $table->foreign('created_by')->references('user_id')->on('users')->onDelete('set null');
-
             // Adding Index
             $table->index('status');
             $table->index('position_id');
+            $table->index('batch_id');
             $table->index('created_at');
         });
 
-        // Seed a sample job listing
+        // Create pivot table for job_listings and required_documents
+        Schema::create('job_listing_required_documents', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('job_listing_id');
+            $table->unsignedBigInteger('required_document_id');
+            $table->timestamps();
+
+            $table->foreign('job_listing_id')->references('job_listing_id')->on('job_listings')->onDelete('cascade');
+            $table->foreign('required_document_id')->references('required_document_id')->on('required_documents')->onDelete('cascade');
+        });
+
+        // Seed a sample job batch
+        $batchId = DB::table('job_listing_batches')->insertGetId([
+            'batch_name' => 'First Batch',
+            'batch_code' => '2025-01-PL',
+            'post_date' => '2025-05-22',
+            'deadline' => '2025-05-31',
+            'status' => 'Active',
+            'is_plantilla' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Seed a sample job listing with batch_id
         DB::table('job_listings')->insert([
             [
                 'position_id'  => 1, // Mathematics Teacher
+                'batch_id'     => $batchId,
                 'title'        => 'Mathematics Teacher Position',
                 'description'  => 'Join our academic team to teach mathematics subjects for high school students.',
-                'closing_date' => '2025-04-30',
+                'closing_date' => '2025-05-31',
                 'status'       => 'Active',
                 'created_by'   => 2, // hr user
                 'created_at'   => now(),
@@ -303,9 +397,10 @@ return new class extends Migration
             ],
             [
                 'position_id'  => 2, // Administrative Assistant
+                'batch_id'     => $batchId,
                 'title'        => 'Administrative Assistant Position',
                 'description'  => 'Support administrative operations with document handling, correspondence and scheduling.',
-                'closing_date' => '2025-05-15',
+                'closing_date' => '2025-05-31',
                 'status'       => 'Active',
                 'created_by'   => 2, // hr user
                 'created_at'   => now(),
@@ -313,6 +408,82 @@ return new class extends Migration
             ]
         ]);
 
+        // Seed a non-plantilla job batch
+        $nonPlantillaBatchId = DB::table('job_listing_batches')->insertGetId([
+            'batch_name' => 'Contract of Service Batch',
+            'batch_code' => '2025-01-COS',
+            'post_date' => '2025-05-22',
+            'deadline' => '2025-06-30',
+            'status' => 'Active',
+            'is_plantilla' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Seed non-plantilla job listings
+        DB::table('job_listings')->insert([
+            [
+                'position_id'  => 2, // Administrative Assistant (CoS)
+                'batch_id'     => $nonPlantillaBatchId,
+                'title'        => 'Contract of Service - Administrative Assistant',
+                'description'  => 'Temporary position for administrative support. Contract duration: 6 months with possible extension.',
+                'closing_date' => '2025-06-30',
+                'status'       => 'Active',
+                'created_by'   => 2, // hr user
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+            [
+                'position_id'  => 2, // Administrative Assistant (CoS)
+                'batch_id'     => $nonPlantillaBatchId,
+                'title'        => 'Job Order - Administrative Support',
+                'description'  => 'Short-term administrative support position. Duration: 3 months with possible renewal.',
+                'closing_date' => '2025-06-30',
+                'status'       => 'Active',
+                'created_by'   => 2, // hr user
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]
+        ]);
+
+        // Get all job listing IDs
+        $plantillaJobListingIds = DB::table('job_listings')
+            ->where('batch_id', $batchId)
+            ->pluck('job_listing_id')
+            ->toArray();
+
+        $nonPlantillaJobListingIds = DB::table('job_listings')
+            ->where('batch_id', $nonPlantillaBatchId)
+            ->pluck('job_listing_id')
+            ->toArray();
+
+        // Get required document IDs
+        $documentIds = DB::table('required_documents')->pluck('required_document_id')->toArray();
+
+        // Attach all required documents to plantilla job listings
+        foreach ($plantillaJobListingIds as $jobListingId) {
+            foreach ($documentIds as $documentId) {
+                DB::table('job_listing_required_documents')->insert([
+                    'job_listing_id' => $jobListingId,
+                    'required_document_id' => $documentId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        // Attach required documents to non-plantilla job listings (subset of documents)
+        $nonPlantillaDocumentIds = [1, 2, 3, 7, 8]; // Letter of Intent, PDS, WES, Certificate of Trainings, Certificate of Employment
+        foreach ($nonPlantillaJobListingIds as $jobListingId) {
+            foreach ($nonPlantillaDocumentIds as $documentId) {
+                DB::table('job_listing_required_documents')->insert([
+                    'job_listing_id' => $jobListingId,
+                    'required_document_id' => $documentId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
 
         Schema::create('applications', function (Blueprint $table) {
             $table->id('application_id');
@@ -323,6 +494,23 @@ return new class extends Migration
 
             $table->foreign('job_listing_id')->references('job_listing_id')->on('job_listings')->onDelete('cascade');
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+        });
+
+        Schema::create('selection_lineups', function (Blueprint $table) {
+            $table->id('selection_id');
+            $table->unsignedBigInteger('application_id')->nullable();
+            $table->string('name')->nullable(); // Full name (concatenated from user_details)
+            $table->text('education')->nullable(); // Education details
+            $table->text('training')->nullable(); // Training details
+            $table->text('experience')->nullable(); // Work experience details
+            $table->string('eligibility')->nullable(); // Eligibility details
+            $table->timestamps();
+
+            // Foreign key to applications table
+            $table->foreign('application_id')->references('application_id')->on('applications')->onDelete('cascade');
+
+            // Indexes for performance
+            $table->index('application_id');
         });
 
         Schema::create('applicant_documents', function (Blueprint $table) {
@@ -457,6 +645,7 @@ return new class extends Migration
         Schema::dropIfExists('applicant_documents');
         Schema::dropIfExists('applications');
         Schema::dropIfExists('job_listings');
+        Schema::dropIfExists('job_listing_batches');
         Schema::dropIfExists('positions');
         Schema::dropIfExists('salary_grades');
         Schema::dropIfExists('roles');

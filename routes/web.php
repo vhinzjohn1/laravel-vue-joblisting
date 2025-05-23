@@ -18,18 +18,20 @@ use App\Http\Controllers\HR\JobPositionController;
 use App\Http\Controllers\HR\ManageApplicationController;
 use App\Http\Controllers\HR\ManageJobListingController;
 use App\Http\Controllers\HR\ScheduleController;
-use App\Http\Controllers\HR\SelectionLineupController;
+use App\Http\Controllers\SelectionLineupController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileCompletionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileDetailsController;
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\BatchController;
 use App\Http\Controllers\HR\ArchiveController;
 use App\Http\Controllers\HR\GroupScheduleController;
+use App\Http\Controllers\RequiredDocumentController;
+use App\Http\Controllers\ViewJobListingController;
 
 // =======================
 // WELCOME & LANDING ROUTES
@@ -70,12 +72,16 @@ Route::middleware('auth')->group(function () {
 // =======================
 Route::middleware(['auth', 'role:hr,admin'])->group(function () {
     Route::resource('hr', HRController::class);
+    Route::put('job-listing/bulk-update', [ManageJobListingController::class, 'bulkUpdate'])->name('job-listing.bulk-update');
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
     Route::resource('job-position', JobPositionController::class);
     Route::resource('groups', GroupScheduleController::class);
     Route::resource('selection-lineup', SelectionLineupController::class);
     Route::resource('archive', ArchiveController::class);
+    Route::resource('batches', BatchController::class);
+    Route::resource('required-documents', RequiredDocumentController::class);
+    Route::post('/batches/archive', [BatchController::class, 'archive'])->name('batches.archive');
 });
 
 // =======================
@@ -98,6 +104,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
     Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+
+    // Required Documents route - accessible to all authenticated users
+    Route::get('required-documents', [RequiredDocumentController::class, 'index'])->name('required-documents.index');
 });
 
 // =======================
@@ -122,7 +131,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('send-email', EmailController::class);
     Route::get('test-notification-email', [EmailController::class, 'sendTestNotification'])->name('email.test-notification');
     Route::post('notify-applicant', [EmailController::class, 'notifyApplicant'])->name('email.notify-applicant');
+    Route::post('custom-verification/send', [EmailController::class, 'sendVerificationEmail'])->name('custom-verification.send');
 });
+
+// Verification route should be accessible without auth
+Route::get('verify-custom-email/{id}/{hash}', [EmailController::class, 'verifyCustomEmail'])
+    ->name('custom-verification.verify')
+    ->middleware('signed');
 
 // =======================
 // SCHEDULE ROUTES
@@ -140,4 +155,10 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/php-info', function () {
     return phpinfo();
 });
+
+// =======================
+// View Job Listing Routes
+// =======================
+Route::resource('view-job-listing', ViewJobListingController::class);
+
 require __DIR__ . '/auth.php';

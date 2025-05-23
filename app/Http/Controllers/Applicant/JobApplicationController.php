@@ -13,6 +13,8 @@ use App\Models\Training;
 use App\Models\WorkExperience;
 use App\Traits\NotificationTrait;
 use App\Models\TemporaryFile;
+use App\Models\UserDetail;
+use App\Models\SelectionLineup;
 
 class JobApplicationController extends Controller
 {
@@ -241,49 +243,63 @@ class JobApplicationController extends Controller
                 'experiences' => 'array',
             ]);
 
-            // Validate document references (IDs or hashes)
-            $documentTypes = [
-                'application_letter' => 'Application Letter',
-                'personal_data_sheet' => 'Personal Data Sheet',
-                'work_experience_sheet' => 'Work Experience Sheet',
-                'transcript_and_diploma' => 'Transcript and Diploma',
-                'eligibility_proof' => 'Eligibility Proof',
-                'performance_rating' => 'Performance Rating',
-                'training_certificates' => 'Training Certificates',
-                'employment_certificate' => 'Employment Certificate'
+            // Get the job listing and its required documents
+            $jobListing = JobListing::with('requiredDocuments')->findOrFail($request->job_listing_id);
+            $requiredDocuments = $jobListing->requiredDocuments;
+
+            // Map document names to their corresponding keys
+            $documentNameToKey = [
+                'Letter of Intent/Application Letter' => 'application_letter',
+                'Personal Data Sheet (PDS)' => 'personal_data_sheet',
+                'Work Experience Sheet (WES)' => 'work_experience_sheet',
+                'Transcript of Records (TOR) and Diploma' => 'transcript_and_diploma',
+                'Authenticated Proof of Eligibility' => 'eligibility_proof',
+                'Latest Performance Rating (DPCR/IPCR)' => 'performance_rating',
+                'Certificate of Trainings, Special Orders, etc.' => 'training_certificates',
+                'Certificate of Employment' => 'employment_certificate'
             ];
 
             $documentRefs = $request->input('documents', []);
             $documentsToAttach = [];
 
-            foreach ($documentTypes as $key => $label) {
-                if (empty($documentRefs[$key])) {
+            // Validate only the required documents
+            foreach ($requiredDocuments as $requiredDoc) {
+                $docKey = $documentNameToKey[$requiredDoc->document_name] ?? null;
+
+                if (!$docKey) {
+                    continue; // Skip if document name doesn't match our mapping
+                }
+
+                if (empty($documentRefs[$docKey])) {
                     return response()->json([
                         'message' => 'File Upload Error',
                         'errors' => [
-                            'document_name' => $label,
-                            'error' => $label . ' is required'
+                            'document_name' => $requiredDoc->document_name,
+                            'error' => $requiredDoc->document_name . ' is required'
                         ]
                     ], 422);
                 }
+
                 // Accept either a numeric ID or a hash string
-                $ref = $documentRefs[$key];
+                $ref = $documentRefs[$docKey];
                 $tempFile = null;
                 if (is_numeric($ref)) {
                     $tempFile = TemporaryFile::find($ref);
                 } else {
                     $tempFile = TemporaryFile::where('hash', $ref)->first();
                 }
+
                 if (!$tempFile) {
                     return response()->json([
                         'message' => 'File Reference Error',
                         'errors' => [
-                            'document_name' => $label,
-                            'error' => $label . ' file reference is invalid or expired'
+                            'document_name' => $requiredDoc->document_name,
+                            'error' => $requiredDoc->document_name . ' file reference is invalid or expired'
                         ]
                     ], 422);
                 }
-                $documentsToAttach[$key] = $tempFile;
+
+                $documentsToAttach[$docKey] = $tempFile;
             }
 
             // Validate remaining fields (education, trainings, experiences)
@@ -362,7 +378,7 @@ class JobApplicationController extends Controller
                 }
             }
 
-            // Attach documents to application
+            // Attach only the required documents to application
             foreach ($documentsToAttach as $docType => $tempFile) {
                 // Store file_path as relative to public storage
                 $filePathForDb = $tempFile->path;
@@ -376,10 +392,50 @@ class JobApplicationController extends Controller
                 ]);
             }
 
-            // Optionally: Clean up temporary files (if needed)
-
             // Notify HR about new application
             $this->notifyHRNewApplication($application);
+
+            // Get user details for selection lineup
+            $userDetail = UserDetail::where('user_id', auth()->id())->first();
+
+            // Get educational background
+            $education = EducationalBackground::where('user_id', auth()->id())
+                ->orderByDesc('year_graduated')
+                ->get()
+                ->map(function($edu) {
+                    return $edu->degree_course . "\n" . $edu->school_name;
+                })
+                ->join("\n");
+
+            // Get work experience
+            $experiences = WorkExperience::where('user_id', auth()->id())->get();
+            $totalYears = 0;
+            foreach ($experiences as $exp) {
+                $startDate = new \DateTime($exp->start_date);
+                $endDate = $exp->is_current_job ? new \DateTime() : new \DateTime($exp->end_date);
+                $interval = $startDate->diff($endDate);
+                $totalYears += $interval->y;
+            }
+            $experienceDetails = $totalYears . ' year(s) relevant experience';
+
+            // Get trainings
+            $trainings = Training::where('user_id', auth()->id())->get();
+            $trainingDetails = $trainings->map(function($training) {
+                return $training->duration_hours . ' hours' . "\n" . $training->title . ' at ' . $training->institution;
+            })
+            ->join("\n");
+
+            // Create selection lineup entry
+            SelectionLineup::create([
+                'application_id' => $application->application_id,
+                'name' => $userDetail ?
+                    trim($userDetail->firstname . ' ' . ($userDetail->middle_name ? $userDetail->middle_name . ' ' : '') . $userDetail->lastname) :
+                    'Unknown',
+                'education' => $education,
+                'training' => $trainingDetails,
+                'experience' => $experienceDetails,
+                'eligibility' => $userDetail ? $userDetail->eligibility : 'N/A'
+            ]);
 
             return response()->json([
                 'message' => 'Application submitted successfully',

@@ -32,6 +32,7 @@
 
         <!-- Application Letter -->
         <document-section
+            v-if="isDocumentRequired('application letter')"
             title="LETTER OF INTENT/APPLICATION LETTER"
             description="Application Letter should specify the POSITION
                     APPLIED FOR and the PLACE OF ASSIGNMENT. File should
@@ -48,6 +49,7 @@
 
         <!-- Personal Data Sheet -->
         <document-section
+            v-if="isDocumentRequired('personal data sheet')"
             title="PERSONAL DATA SHEET"
             description="The CS Form No. 212, Revised 2017 (Personal Data
                     Sheet) shall be duly accomplished. Ensure that all 4
@@ -64,6 +66,7 @@
 
         <!-- Work Experience Sheet -->
         <document-section
+            v-if="isDocumentRequired('work experience sheet')"
             title="WORK EXPERIENCE SHEET"
             description="The Work Experience Sheet shall be duly
                     accomplished. The Work Experience Sheet shall
@@ -81,6 +84,7 @@
 
         <!-- Transcript & Diploma -->
         <document-section
+            v-if="isDocumentRequired('transcript of records')"
             title="TRANSCRIPT OF RECORDS AND DIPLOMA"
             description="Include copies of your educational credentials.
                     Combine all pages into a single PDF file."
@@ -96,6 +100,7 @@
 
         <!-- Eligibility -->
         <document-section
+            v-if="isDocumentRequired('authenticated proof of eligibility')"
             title="AUTHENTICATED PROOF OF ELIGIBILITY"
             description="Authenticated Civil Service Commission (CSC)
                     Eligibility or Professional Regulation Commission
@@ -113,6 +118,7 @@
 
         <!-- Performance Rating -->
         <document-section
+            v-if="isDocumentRequired('latest performance rating')"
             title="LATEST PERFORMANCE RATING (DPCR/IPCR)"
             description="The latest Office/Division/Individual Performance
                     Commitment and Review Form. For external applicants
@@ -131,6 +137,7 @@
 
         <!-- Training Certificates -->
         <document-section
+            v-if="isDocumentRequired('certificate of trainings')"
             title="CERTIFICATES OF TRAININGS, SPECIAL ORDERS, ETC."
             description="The Certificate of Trainings Attended must be
                     arranged according to its presentation in the
@@ -148,6 +155,7 @@
 
         <!-- Employment Certificate -->
         <document-section
+            v-if="isDocumentRequired('certificate of employment')"
             title="CERTIFICATE OF EMPLOYMENT"
             description="Provide certificates from your current and previous
                     employers."
@@ -164,7 +172,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, ref, onMounted } from "vue";
 import DocumentSection from "./DocumentSection.vue";
 
 const props = defineProps({
@@ -176,7 +184,38 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    jobListingId: {
+        type: Number,
+        required: true,
+    },
 });
+
+const requiredDocuments = ref([]);
+
+onMounted(async () => {
+    try {
+        const response = await axios.get(route('required-documents.index'), {
+            params: {
+                jobListingId: props.jobListingId
+            },
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        console.log('This is the response', response);
+        requiredDocuments.value = response.data;
+    } catch (error) {
+        console.error('Error fetching required documents:', error);
+    }
+});
+
+// Add a computed property to check if a document is required
+const isDocumentRequired = (documentType) => {
+    return requiredDocuments.value.some(doc =>
+        doc.document_name.toLowerCase().includes(documentType.toLowerCase())
+    );
+};
 
 defineEmits(["update:document", "remove:document", "upload-complete"]);
 </script>

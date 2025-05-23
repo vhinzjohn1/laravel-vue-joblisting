@@ -115,12 +115,12 @@ class ProfileController extends Controller
     public function getUserDetails()
     {
         $user = auth()->user();
-        $userDetails = \App\Models\UserDetail::where('user_id', $user->user_id)->first();
-        $userCredentials = User::select('email', 'password')->where('user_id', $user->user_id)->first();
+        $userDetails = \App\Models\UserDetail::where('user_id', $user->user_id)->get();
+        $userCredentials = User::select('email', 'email_verified_at')->where('user_id', $user->user_id)->first();
 
         return response()->json([
             'userDetails' => $userDetails,
-            'userCredentials' => $userCredentials,
+            'userCredentials' => $userCredentials
         ]);
     }
 

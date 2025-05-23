@@ -4,57 +4,76 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobListing;
+use App\Models\JobListingBatch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use App\Models\Batch;
 
 class ArchiveController extends Controller
 {
     public function index()
     {
-        $jobListings = JobListing::with([
+        // Get archived batches
+        $archivedBatches = Batch::with(['jobListings' => function ($query) {
+            $query->with([
+                'position' => function ($query) {
+                    $query->with(['salaryGrade', 'minimumRequirement']);
+                },
+                'creator',
+                'applications'
+            ])
+            ->where('status', '=', 'Archived');
+        }])
+        ->where('status', '=', 'Archived')
+        ->get();
+
+
+        // Get archived non-plantilla job listings
+        $archivedNonPlantilla = JobListing::with([
             'position' => function ($query) {
                 $query->with(['salaryGrade', 'minimumRequirement']);
             },
             'creator',
             'applications'
         ])
-            ->where('status', 'Archived')
-            ->get();
+        ->where('status', '=', 'Archived')
+        ->whereHas('batch', function($query) {
+            $query->where('is_plantilla', false);
+        })
+        ->get();
 
         return Inertia::render('HR/Archive/ManageArchive', [
-            'jobListings' => $jobListings
+            'archivedBatches' => $archivedBatches,
+            'archivedNonPlantilla' => $archivedNonPlantilla
         ]);
     }
 
     public function store(Request $request) {
-        // Check if request method is archiveJoblisting or updateStatus
         if ($request->method === 'archiveJoblisting') {
             return $this->archiveJoblisting($request, $request->id);
         } elseif ($request->method === 'updateStatus') {
             return $this->updateStatus($request, $request->id);
+        } elseif ($request->method === 'updateBatchStatus') {
+            return $this->updateBatchStatus($request, $request->id);
         }
     }
 
     public function archiveJoblisting(Request $request, string $id)
     {
         try {
-            // Find the job listing or fail
             $jobListing = JobListing::findOrFail($id);
 
-            // Validate that only closed job listings can be archived
             if ($jobListing->status !== 'Closed') {
                 return response()->json([
                     'message' => 'Only closed job listings can be archived.'
                 ], 400);
             }
 
-            // Update the job listing status to archived
             $jobListing->update([
                 'status' => 'Archived'
             ]);
 
-            // Return a success response
             return response()->json([
                 'message' => 'Job listing successfully archived.',
                 'jobListing' => $jobListing
@@ -71,16 +90,27 @@ class ArchiveController extends Controller
     public function updateStatus(Request $request, string $id)
     {
         try {
-            // Find the job listing or fail
             $jobListing = JobListing::findOrFail($id);
 
-            // Update the job listing status
-            $updated = $jobListing->update([
+            $jobListing->update([
                 'status' => $request->status
             ]);
 
-            // Get fresh data with relationships
-            $jobListings = JobListing::with([
+            // Get fresh data
+            $archivedBatches = Batch::with(['jobListings' => function ($query) {
+                $query->with([
+                    'position' => function ($query) {
+                        $query->with(['salaryGrade', 'minimumRequirement']);
+                    },
+                    'creator',
+                    'applications'
+                ])
+                ->where('status', '=', 'Archived');
+            }])
+            ->where('status', '=', 'Archived')
+            ->get();
+
+            $archivedNonPlantilla = JobListing::with([
                 'position' => function ($query) {
                     $query->with(['salaryGrade', 'minimumRequirement']);
                 },
@@ -88,17 +118,58 @@ class ArchiveController extends Controller
                 'applications'
             ])
             ->where('status', 'Archived')
+            ->whereHas('batch', function($query) {
+                $query->where('is_plantilla', false);
+            })
             ->get();
 
-            return Inertia::render('HR/Archive/ManageArchive', [
-                'jobListings' => $jobListings,
-                'flash' => [
-                    'message' => 'Job listing status updated successfully.'
-                ]
+            return response()->json([
+                'message' => 'Job listing status updated successfully.',
+                'archivedBatches' => $archivedBatches,
+                'archivedNonPlantilla' => $archivedNonPlantilla
             ]);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to update job listing status: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to update job listing status.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateBatchStatus(Request $request, string $id)
+    {
+        try {
+            $batch = Batch::findOrFail($id);
+
+            $batch->update([
+                'status' => $request->status
+            ]);
+
+            // Get fresh data
+            $archivedBatches = Batch::with(['jobListings' => function ($query) {
+                $query->with([
+                    'position' => function ($query) {
+                        $query->with(['salaryGrade', 'minimumRequirement']);
+                    },
+                    'creator',
+                    'applications'
+                ])
+                ->where('status', '=', 'Archived');
+            }])
+            ->where('status', '=', 'Archived')
+            ->get();
+
+            return response()->json([
+                'message' => 'Batch status updated successfully.',
+                'archivedBatches' => $archivedBatches
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update batch status.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

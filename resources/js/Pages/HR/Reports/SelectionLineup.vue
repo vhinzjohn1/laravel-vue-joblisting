@@ -4,7 +4,6 @@ import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import Header from "@/Components/Header/Header.vue";
 import { computed, ref } from "vue";
 
-
 const auth = usePage().props.auth;
 // Add reactive variables for input fields
 const preparedBy = ref(
@@ -22,6 +21,10 @@ const props = defineProps({
     jobListing: Object,
     applicants: Array,
 });
+
+// Add new refs for editing
+const isEditing = ref(false);
+const editedData = ref({});
 
 // Status filter
 const statusFilter = ref("All");
@@ -69,6 +72,65 @@ const viewDetails = (id) => {
 const print = () => {
     window.print();
 };
+
+// Function to start editing
+const startEditing = (applicant) => {
+    editedData.value = {
+        selection_id: applicant.selection_id,
+        name: applicant.name,
+        education: applicant.education,
+        training: applicant.training,
+        experience: applicant.experience,
+        eligibility: applicant.eligibility
+    };
+    isEditing.value = true;
+};
+
+// Function to save changes
+const saveChanges = async () => {
+    try {
+        const response = await axios.put(route('selection-lineup.update', { selection_lineup: editedData.value.selection_id }), editedData.value);
+        if (response.data.message) {
+            // Show success toast
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Success!",
+                text: "Selection lineup updated successfully",
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                customClass: {
+                    popup: "bg-green-500 text-white",
+                },
+            });
+            // Refresh the page to show updated data
+            router.reload();
+        }
+    } catch (error) {
+        console.error('Error saving changes:', error);
+        // Show error toast
+        Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: "Error!",
+            text: error.response?.data?.message || "Failed to update selection lineup",
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            customClass: {
+                popup: "bg-red-500 text-white",
+            },
+        });
+    }
+    isEditing.value = false;
+};
+
+// Function to cancel editing
+const cancelEditing = () => {
+    isEditing.value = false;
+    editedData.value = {};
+};
 </script>
 
 <template>
@@ -83,7 +145,7 @@ const print = () => {
             />
         </template>
 
-        <div>
+        <div class="print-header">
             <div class="py-1">
                 <div class="container-fluid">
                     <!-- Index View - List of Job Listings -->
@@ -340,90 +402,65 @@ const print = () => {
                                             <td
                                                 class="border border-gray-300 px-4 py-2 uppercase"
                                             >
-                                                {{ applicant.applicant_name.toUpperCase() }}
+                                                <input
+                                                    v-if="isEditing && editedData.selection_id === applicant.selection_id"
+                                                    v-model="editedData.name"
+                                                    type="text"
+                                                    class="w-full p-1 border rounded"
+                                                />
+                                                <span v-else>{{ applicant.name.toUpperCase() }}</span>
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
-                                                <div v-if="applicant.education">
-                                                    <!-- Process education data consistently -->
-                                                    <div v-for="(edu, index) in ensureArray(applicant.education)"
-                                                         :key="index"
-                                                         class="mb-2 pb-2"
-                                                         :class="{'border-b border-gray-200': index < ensureArray(applicant.education).length - 1}">
-                                                        <p class="text-sm">
-                                                            {{ edu.course || "N/A" }}
-                                                        </p>
-                                                        <p v-if="edu.school" class="text-xs">
-                                                            {{ edu.school }}
-                                                        </p>
+                                                <textarea
+                                                    v-if="isEditing && editedData.selection_id === applicant.selection_id"
+                                                    v-model="editedData.education"
+                                                    class="w-full p-1 border rounded"
+                                                    rows="3"
+                                                ></textarea>
+                                                <div v-else>
+                                                    <div v-for="(line, index) in applicant.education.split('\n')" :key="index">
+                                                        {{ line }}
                                                     </div>
                                                 </div>
-                                                <span
-                                                    v-else
-                                                    class="text-gray-400"
-                                                    >N/A</span
-                                                >
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
-                                                <div v-if="applicant.training">
-                                                    <!-- Process training data consistently -->
-                                                    <div v-for="(train, index) in ensureArray(applicant.training)"
-                                                         :key="index"
-                                                         class="mb-2 pb-2"
-                                                         :class="{'border-b border-gray-200': index < ensureArray(applicant.training).length - 1}">
-                                                        <p>
-                                                            {{ train.hours || "N/A" }} hours
-                                                        </p>
-                                                        <p class="text-sm">
-                                                            {{ train.details || "No details available" }}
-                                                        </p>
+                                                <textarea
+                                                    v-if="isEditing && editedData.selection_id === applicant.selection_id"
+                                                    v-model="editedData.training"
+                                                    class="w-full p-1 border rounded"
+                                                    rows="3"
+                                                ></textarea>
+                                                <div v-else>
+                                                    <div v-for="(line, index) in applicant.training.split('\n')" :key="index">
+                                                        {{ line }}
                                                     </div>
                                                 </div>
-                                                <span
-                                                    v-else
-                                                    class="text-gray-400"
-                                                    >N/A</span
-                                                >
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
-                                                <div v-if="applicant.experience">
-                                                    <!-- Process experience data consistently -->
-                                                    <div v-for="(exp, index) in ensureArray(applicant.experience)"
-                                                         :key="index"
-                                                         class="mb-2 pb-2"
-                                                         :class="{'border-b border-gray-200': index < ensureArray(applicant.experience).length - 1}">
-                                                        <p>
-                                                            {{ exp.years || "N/A" }}
-                                                        </p>
-                                                        <p class="text-sm">
-                                                            {{ exp.details || "No details available" }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <span
-                                                    v-else
-                                                    >N/A</span
-                                                >
+                                                <input
+                                                    v-if="isEditing && editedData.selection_id === applicant.selection_id"
+                                                    v-model="editedData.experience"
+                                                    type="text"
+                                                    class="w-full p-1 border rounded"
+                                                />
+                                                <span v-else>{{ applicant.experience }}</span>
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
-                                                <!-- Process eligibility data consistently -->
-                                                <div v-if="applicant.eligibility">
-                                                    <ul class="list-disc pl-4">
-                                                        <li v-for="(elig, index) in ensureArray(applicant.eligibility)"
-                                                            :key="index"
-                                                            class="mb-1">
-                                                            {{ elig }}
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <span v-else class="text-gray-400">N/A</span>
+                                                <input
+                                                    v-if="isEditing && editedData.selection_id === applicant.selection_id"
+                                                    v-model="editedData.eligibility"
+                                                    type="text"
+                                                    class="w-full p-1 border rounded"
+                                                />
+                                                <span v-else>{{ applicant.eligibility }}</span>
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2 no-print"
@@ -452,6 +489,33 @@ const print = () => {
                                                 >
                                                     {{ applicant.status }}
                                                 </span>
+                                            </td>
+                                            <td
+                                                class="border border-gray-300 px-4 py-2 no-print"
+                                            >
+                                                <div class="flex space-x-2">
+                                                    <button
+                                                        v-if="!isEditing || editedData.selection_id !== applicant.selection_id"
+                                                        @click="startEditing(applicant)"
+                                                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <template v-if="isEditing && editedData.selection_id === applicant.selection_id">
+                                                        <button
+                                                            @click="saveChanges"
+                                                            class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                                        >
+                                                            Save
+                                                        </button>
+                                                        <button
+                                                            @click="cancelEditing"
+                                                            class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </template>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -485,7 +549,7 @@ const print = () => {
                             class="card-footer border-t p-6 print:block"
                             v-if="!isIndex"
                         >
-                            <div class="print-signatures mt-12">
+                            <div class="print-signatures mt-10">
                                 <div
                                     class="grid grid-cols-1 md:grid-cols-2 gap-8"
                                 >
@@ -539,6 +603,10 @@ const print = () => {
         max-width: 100vw !important;
         margin: 0 !important;
         padding: 0 !important;
+    }
+
+    .print-header {
+        margin-top: -40px !important;
     }
 
     @page {
@@ -688,5 +756,16 @@ const print = () => {
     .overflow-x-auto {
         overflow: visible !important;
     }
+}
+
+/* Add styles for editable fields */
+input, textarea {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 60px;
 }
 </style>

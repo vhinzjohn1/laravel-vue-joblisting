@@ -51,9 +51,6 @@
             <!-- How to Apply Section -->
             @include('components.how-to-apply')
 
-            <!-- Job Listings Section -->
-            @include('components.job-listings-section')
-
             <!-- About Section -->
             @include('components.about-section')
 

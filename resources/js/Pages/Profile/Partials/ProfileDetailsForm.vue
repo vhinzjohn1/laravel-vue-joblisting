@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -10,9 +10,9 @@ const userDetails = ref(null);
 const emit = defineEmits(["step-completed"]);
 const isFormValid = ref(false);
 const userCredentials = ref();
-const currentRoute = usePage().url;
 const user = usePage().props.auth.user;
 const isLoading = ref(false);
+let pollingInterval = null;
 
 const form = useForm({
     firstname: "",
@@ -20,12 +20,14 @@ const form = useForm({
     middle_name: "",
     phone_number: "",
     eligibility: "",
-    email: ""
+    email: "",
+    email_verified_at: user.email_verified_at
 });
+
+const isEmailVerified = computed(() => !!form.email_verified_at);
 
 // Function to check if required fields in userDetails are filled
 function areFetchedFieldsFilled(details) {
-    const requireEmail = currentRoute !== '/complete-profile';
     const isHR = user.role_name === 'hr';
 
     return (
@@ -35,31 +37,27 @@ function areFetchedFieldsFilled(details) {
         details.middle_name && details.middle_name.trim() !== "" &&
         details.phone_number && details.phone_number !== "" &&
         (!isHR || (details.eligibility && details.eligibility.trim() !== "")) &&
-        (!requireEmail || (details.email && details.email.trim() !== ""))
+        form.email && form.email.trim() !== "" &&
+        isEmailVerified.value
     );
 }
 
 const fetchUserDetails = async () => {
     try {
         const response = await axios.get(route("profile.user-details"));
-        console.log('This is the props user', response.data.userDetails);
+        console.log('This is the response from the fetchUserDetails function', response.data);
         if (response.data) {
-            userDetails.value = response.data.userDetails; // Correctly assign userDetails
-            userCredentials.value = response.data.userCredentials; // Assign userCredentials
+            userDetails.value = response.data.userDetails;
+            userCredentials.value = response.data.userCredentials;
 
-            // Populate form fields with the fetched data
-            form.firstname = userDetails.value.firstname || "";
-            form.lastname = userDetails.value.lastname || "";
-            form.middle_name = userDetails.value.middle_name || "";
-            form.phone_number = userDetails.value.phone_number || "";
-            form.eligibility = userDetails.value.eligibility || "";
+            const details = Array.isArray(userDetails.value) ? userDetails.value[0] : userDetails.value;
+            form.firstname = details?.firstname || "";
+            form.lastname = details?.lastname || "";
+            form.middle_name = details?.middle_name || "";
+            form.phone_number = details?.phone_number || "";
+            form.eligibility = details?.eligibility || "";
             form.email = userCredentials.value.email || "";
-
-            // Check if required fields in fetched data are filled and emit "step-completed" if they are
-            if (areFetchedFieldsFilled(userDetails.value)) {
-                isFormValid.value = true;
-                emit("step-completed");
-            }
+            form.email_verified_at = userCredentials.value.email_verified_at || "";
         }
     } catch (error) {
         console.error("Error fetching user details:", error);
@@ -77,7 +75,8 @@ const saveProfileDetails = async () => {
         !form.middle_name ||
         !form.phone_number ||
         (!isHR && !form.eligibility) ||
-        (currentRoute !== '/complete-profile' && !form.email)
+        !form.email ||
+        !isEmailVerified.value
     ) {
         return;
     }
@@ -92,6 +91,37 @@ const saveProfileDetails = async () => {
         console.error("Error saving profile details:", error);
         isLoading.value = false;
     }
+};
+
+const resendVerificationEmail = () => {
+    axios.post(route('custom-verification.send'))
+        .then(() => {
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Verification email sent!",
+                text: "Please check your email to verify your account.",
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                color: "#ffffff",
+                background: "#22c55e",
+            });
+        })
+        .catch((error) => {
+            console.error("Error sending verification email:", error);
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "Error!",
+                text: "Failed to send verification email. Please try again.",
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                color: "#ffffff",
+                background: "#ef4444",
+            });
+        });
 };
 
 // Show success alert function
@@ -109,8 +139,27 @@ const showSuccessAlert = () => {
     });
 };
 
+// Polling function to only update email verification status
+const pollEmailVerificationStatus = async () => {
+    try {
+        const response = await axios.get(route("profile.user-details"));
+        console.log('This is the response from the polling function', response.data);
+        if (response.data && response.data.userCredentials) {
+            form.email_verified_at = response.data.userCredentials.email_verified_at || "";
+        }
+    } catch (error) {
+        console.error("Error polling email verification status:", error);
+    }
+};
+
 onMounted(() => {
     fetchUserDetails();
+    pollingInterval = setInterval(pollEmailVerificationStatus, 5000);
+});
+
+onUnmounted(() => {
+    if (pollingInterval) clearInterval(pollingInterval);
+    console.log('Unmounting the component');
 });
 </script>
 
@@ -204,15 +253,14 @@ onMounted(() => {
                         />
                     </div>
 
-                    <!-- Email if current route is complete-profile not show -->
-                    <div v-if="currentRoute !== '/complete-profile'">
+                    <!-- Email field - always show -->
+                    <div>
                         <InputLabel
                             for="email"
                             value="Email"
                             class="font-medium text-gray-700"
                         />
                         <div class="flex relative mt-1">
-
                             <TextInput
                                 id="email"
                                 type="email"
@@ -226,6 +274,24 @@ onMounted(() => {
                             class="mt-2"
                             :message="form.errors.email"
                         />
+                        <!-- Email verification status -->
+                        <div v-if="!isEmailVerified" class="mt-2">
+                            <p class="text-sm text-red-600">
+                                Your email is not verified.
+                                <button
+                                    type="button"
+                                    @click="resendVerificationEmail"
+                                    class="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                    Click here to resend verification email
+                                </button>
+                            </p>
+                        </div>
+                        <div v-else class="mt-2">
+                            <p class="text-sm text-green-600">
+                                Email verified ✓
+                            </p>
+                        </div>
                     </div>
 
                     <div class="md:col-span-2" v-if="user.role_name !== 'hr'">
@@ -266,10 +332,10 @@ onMounted(() => {
                 <PrimaryButton
                     type="submit"
                     :loading="isLoading"
-                    :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || (user.role_name !== 'hr' && !form.eligibility) || (currentRoute !== '/complete-profile' && !form.email)"
+                    :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || (user.role_name !== 'hr' && !form.eligibility) || !form.email || !isEmailVerified"
                     :class="[
                         'px-6 py-2',
-                        form.firstname && form.lastname && form.middle_name && form.phone_number && (user.role_name === 'hr' || form.eligibility) && (currentRoute === '/complete-profile' || form.email)
+                        form.firstname && form.lastname && form.middle_name && form.phone_number && (user.role_name === 'hr' || form.eligibility) && form.email && isEmailVerified
                             ? 'bg-green-700 hover:bg-green-800'
                             : 'bg-green-300 cursor-not-allowed',
                     ]"
