@@ -85,8 +85,14 @@
         <CaptchaVerification
             :is-open="showCaptcha"
             @close="showCaptcha = false"
-            @verified="handleCaptchaVerified"
-        />
+        >
+            <template #default>
+                <ClientCaptcha
+                    @verified="handleCaptchaVerified"
+                    placeholder="Enter the CAPTCHA code"
+                />
+            </template>
+        </CaptchaVerification>
     </GuestLayout>
 </template>
 
@@ -101,15 +107,15 @@ import FormContainer from '@/Components/FormContainer.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
 import axios from 'axios';
+import ClientCaptcha from '@/Components/ClientCaptcha.vue';
 
 const showCaptcha = ref(false);
+const isCaptchaVerified = ref(false);
 const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
     username: '',
-    captcha_token: '',
-    captcha_code: '',
 });
 
 const submit = async () => {
@@ -125,15 +131,16 @@ const submit = async () => {
         });
 
         // If validation passes, show CAPTCHA
-        if (!form.captcha_token || !form.captcha_code) {
+        if (!isCaptchaVerified.value) {
             showCaptcha.value = true;
             return;
         }
 
-        // If we have CAPTCHA, proceed with registration
+        // If CAPTCHA is verified, proceed with registration
         form.post(route('register'), {
             onFinish: () => {
-                form.reset('password', 'password_confirmation', 'captcha_token', 'captcha_code');
+                form.reset('password', 'password_confirmation');
+                isCaptchaVerified.value = false;
             },
         });
     } catch (error) {
@@ -148,9 +155,10 @@ const submit = async () => {
     }
 };
 
-const handleCaptchaVerified = ({ token, code }) => {
-    form.captcha_token = token;
-    form.captcha_code = code;
-    submit(); // Now submit with CAPTCHA
+const handleCaptchaVerified = (verified) => {
+    if (verified) {
+        isCaptchaVerified.value = true;
+        submit(); // Now submit with verified CAPTCHA
+    }
 };
 </script>

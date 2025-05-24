@@ -46,12 +46,6 @@ class LoginRequest extends FormRequest
         return [
             'login' => ['required', 'string'],
             'password' => ['required', 'string'],
-            'captcha_token' => ['required', 'string'],
-            'captcha_code' => ['required', 'string', 'size:6', function ($attribute, $value, $fail) {
-                if (!$this->captcha->validate($this->validated('captcha_token'), $this->validated('captcha_code'))) {
-                    $fail('The CAPTCHA code is invalid or has expired. Please try again.');
-                }
-            }],
         ];
     }
 

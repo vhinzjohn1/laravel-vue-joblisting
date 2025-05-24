@@ -8,6 +8,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import CaptchaVerification from '@/Components/CaptchaVerification.vue';
 import FormContainer from '@/Components/FormContainer.vue';
 import TextInput from '@/Components/TextInput.vue';
+import ClientCaptcha from '@/Components/ClientCaptcha.vue';
 import { ref } from 'vue';
 import axios from 'axios';
 
@@ -22,12 +23,11 @@ defineProps({
 
 const isLoading = ref(false);
 const showCaptcha = ref(false);
+const isCaptchaVerified = ref(false);
 const form = useForm({
     login: '',
     password: '',
     remember: false,
-    captcha_token: '',
-    captcha_code: '',
 });
 
 const submit = async () => {
@@ -56,39 +56,23 @@ const submit = async () => {
     }
 };
 
-const handleCaptchaVerified = async ({ token, code }) => {
-    isLoading.value = true;
-    console.log('CAPTCHA verified:', { token, code });
-
-    // First verify the CAPTCHA
-    try {
-        // CAPTCHA verified, proceed with login
-        form.captcha_token = token;
-        form.captcha_code = code;
-        form.clearErrors();
-
+const handleCaptchaVerified = (verified) => {
+    if (verified) {
+        isCaptchaVerified.value = true;
         // Submit the login form
         form.post(route('login'), {
             preserveScroll: true,
             onSuccess: () => {
-                form.reset('password', 'captcha_token', 'captcha_code');
+                form.reset('password');
                 showCaptcha.value = false;
+                isCaptchaVerified.value = false;
             },
             onError: (errors) => {
                 console.log('Login errors:', errors);
-                if (errors.captcha_code) {
-                    // Reset CAPTCHA if validation failed
-                    form.captcha_token = '';
-                    form.captcha_code = '';
-                    showCaptcha.value = true;
-
-                }
+                showCaptcha.value = true;
+                isCaptchaVerified.value = false;
             },
         });
-    } catch (error) {
-        console.log('CAPTCHA verification error:', error);
-        form.setError('captcha_code', error.response?.data?.message || 'Failed to verify CAPTCHA. Please try again.');
-        showCaptcha.value = true;
     }
 };
 </script>
@@ -181,7 +165,13 @@ const handleCaptchaVerified = async ({ token, code }) => {
             class="overflow-y-auto fixed inset-0 z-50"
             :is-open="showCaptcha"
             @close="showCaptcha = false"
-            @verified="handleCaptchaVerified"
-        />
+        >
+            <template #default>
+                <ClientCaptcha
+                    @verified="handleCaptchaVerified"
+                    placeholder="Enter the CAPTCHA code"
+                />
+            </template>
+        </CaptchaVerification>
     </GuestLayout>
 </template>
