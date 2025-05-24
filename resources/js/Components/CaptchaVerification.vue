@@ -109,6 +109,7 @@
                                                 ref="captchaRef"
                                                 @error="handleCaptchaError"
                                                 class="w-[320px] h-[100px] md:w-[360px] md:h-[120px]"
+                                                @keyup.enter="verifyCaptcha"
                                             />
                                         </div>
                                     </div>

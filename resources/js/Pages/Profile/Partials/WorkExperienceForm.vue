@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -25,6 +25,9 @@ const form = useForm({
     responsibilities: "",
 });
 
+const hasDateError = ref(false);
+const dateErrorMessage = ref("");
+
 const emit = defineEmits(["step-completed"]);
 
 const fetchExperiences = async () => {
@@ -41,7 +44,53 @@ const fetchExperiences = async () => {
     }
 };
 
+const validateDates = () => {
+    // Clear error if it's a current job
+    if (form.is_current_job) {
+        hasDateError.value = false;
+        dateErrorMessage.value = "";
+        return true;
+    }
+
+    // If either date is missing, don't show error yet
+    if (!form.start_date || !form.end_date) {
+        hasDateError.value = false;
+        dateErrorMessage.value = "";
+        return true;
+    }
+
+    const startDate = new Date(form.start_date);
+    const endDate = new Date(form.end_date);
+
+    // Compare dates
+    if (startDate > endDate) {
+        hasDateError.value = true;
+        dateErrorMessage.value = "Start date cannot be later than end date";
+        return false;
+    }
+
+    // Clear error if dates are valid
+    hasDateError.value = false;
+    dateErrorMessage.value = "";
+    return true;
+};
+
+// Watch for changes in dates and current job status
+watch(
+    [() => form.start_date, () => form.end_date, () => form.is_current_job],
+    ([start, end, isCurrent]) => {
+        if (isCurrent) {
+            form.end_date = "";
+        }
+        validateDates();
+    }
+);
+
 const addExperience = async () => {
+    if (!validateDates()) {
+        return;
+    }
+
     try {
         const response = await axios.post(
             route("profile-details.store", "experience"),
@@ -320,6 +369,7 @@ onMounted(() => {
                                 v-model="form.start_date"
                                 class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                                 required
+                                @change="validateDates"
                             />
                             <InputError :message="form.errors.start_date" />
                         </div>
@@ -337,9 +387,14 @@ onMounted(() => {
                                 :disabled="form.is_current_job"
                                 class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                                 :required="!form.is_current_job"
+                                @change="validateDates"
                             />
                             <InputError :message="form.errors.end_date" />
                         </div>
+                    </div>
+
+                    <div v-if="hasDateError" class="text-sm text-red-600">
+                        {{ dateErrorMessage }}
                     </div>
 
                     <div class="flex items-center">
@@ -348,6 +403,7 @@ onMounted(() => {
                             type="checkbox"
                             v-model="form.is_current_job"
                             class="text-green-600 rounded border-gray-300 shadow-sm focus:ring-green-500"
+                            @change="validateDates"
                         />
                         <label
                             for="is_current_job"
@@ -381,7 +437,7 @@ onMounted(() => {
                             Cancel
                         </button>
                         <PrimaryButton
-                            :disabled="form.processing"
+                            :disabled="form.processing || hasDateError"
                             class="bg-green-700 hover:bg-green-800"
                         >
                             Save Experience

@@ -35,6 +35,7 @@ class JobApplicationController extends Controller
             }
         ])
             ->where('status', 'Active')
+            ->where('closing_date', '>', now())
             ->get();
 
         return Inertia::render('Applicant/ViewJobs/ViewJobListings', [

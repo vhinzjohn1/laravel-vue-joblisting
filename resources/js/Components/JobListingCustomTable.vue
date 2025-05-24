@@ -20,7 +20,7 @@
                 <button
                     v-if="selectedItems.length > 0"
                     @click="handleBulkDelete"
-                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 text-sm"
+                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 text-sm"
                 >
                     Delete
                 </button>
@@ -79,6 +79,9 @@
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('status')">Status
                              <i v-if="sortColumn === 'status'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
                         </th>
+                        <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('place_assigned')">Place of Assignment
+                             <i v-if="sortColumn === 'place_assigned'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                        </th>
                     </tr>
                      <tr>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for checkbox column -->
@@ -94,6 +97,7 @@
                          <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for Closing Date column -->
                          <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for Date Created column -->
                          <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for status column -->
+                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for place of assignment column -->
                     </tr>
                 </thead>
                 <tbody>
@@ -118,7 +122,7 @@
                                 <span>{{ item.title }}</span>
                                 <button
                                     @click="handleView(item)"
-                                    class="text-blue-600 hover:text-blue-800"
+                                    class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-0"
                                 >
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -165,6 +169,9 @@
                                 {{ item.status }}
                             </span>
                         </td>
+                        <td class="border border-gray-300 px-4 py-2 text-sm">
+                            {{ item.place_assigned || '-' }}
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -190,6 +197,119 @@
                 Next
                 </button>
         </div>
+
+        <!-- View Job Modal -->
+        <Modal
+            :show="showViewModal"
+            @close="showViewModal = false"
+            title="Job Listing Details"
+            max-width="4xl"
+        >
+            <div class="p-6">
+                <div v-if="viewingJob" class="space-y-6">
+                    <!-- Basic Information -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">Basic Information</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Job Title</p>
+                                <p class="mt-1">{{ viewingJob.title }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Position</p>
+                                <p class="mt-1">{{ viewingJob.position?.position_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Item Number</p>
+                                <p class="mt-1">{{ viewingJob.position?.item_number === '' ? 'CoS/Job Order' : viewingJob.position?.item_number || '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Salary Grade</p>
+                                <p class="mt-1">{{ viewingJob.position?.salary_grade?.salary_grade || '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Category</p>
+                                <p class="mt-1">{{ viewingJob.position?.category || '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Status</p>
+                                <p class="mt-1">
+                                    <span
+                                        class="px-2 py-1 text-xs font-semibold rounded-full"
+                                        :class="[
+                                            viewingJob.status === 'Active'
+                                                ? 'bg-green-100 text-green-700'
+                                                : viewingJob.status === 'Draft'
+                                                ? 'bg-yellow-100 text-yellow-700'
+                                                : 'bg-red-100 text-red-700',
+                                        ]"
+                                    >
+                                        {{ viewingJob.status }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Place of Assignment</p>
+                                <p class="mt-1">{{ viewingJob.place_assigned || '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Closing Date</p>
+                                <p class="mt-1">{{ formatDate(viewingJob.closing_date) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">Job Description</h3>
+                        <p class="text-gray-700 whitespace-pre-wrap">{{ viewingJob.description }}</p>
+                    </div>
+
+                    <!-- Minimum Requirements -->
+                    <div v-if="viewingJob.position?.minimum_requirement">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">Minimum Requirements</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Education</p>
+                                <p class="mt-1">{{ viewingJob.position.minimum_requirement.education_level || '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Eligibility</p>
+                                <p class="mt-1">{{ viewingJob.position.minimum_requirement.eligibility || '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Training Required</p>
+                                <p class="mt-1">{{ viewingJob.position.minimum_requirement.training_hours ? viewingJob.position.minimum_requirement.training_hours + ' hours' : '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Experience Required</p>
+                                <p class="mt-1">{{ viewingJob.position.minimum_requirement.years_experience ? viewingJob.position.minimum_requirement.years_experience + ' year(s)' : '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Required Documents -->
+                    <div v-if="viewingJob.required_documents && viewingJob.required_documents.length > 0">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">Required Documents</h3>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li v-for="doc in viewingJob.required_documents" :key="doc.required_document_id" class="text-gray-700">
+                                {{ doc.document_name }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-4 mt-6 p-4 border-t">
+                <button
+                    type="button"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                    @click="showViewModal = false"
+                >
+                    Close
+                </button>
+            </div>
+        </Modal>
 
         <!-- Bulk Edit Modal -->
         <Modal
@@ -286,6 +406,10 @@ const sortDirection = ref('asc');
 
 // Pagination state
 const itemsPerPage = 10; // Define how many items per page
+
+// Add new refs for view modal
+const showViewModal = ref(false);
+const viewingJob = ref(null);
 
 // Computed properties
 const filteredItems = computed(() => {
@@ -423,7 +547,8 @@ const sortBy = (column) => {
 
 // Methods for actions
 const handleView = (item) => {
-    emit('view', item);
+    viewingJob.value = item;
+    showViewModal.value = true;
 };
 
 const handleEdit = (item) => {
@@ -450,8 +575,15 @@ const submitBulkEdit = () => {
 // Helper function to format date
 const formatDate = (dateString) => {
     if (!dateString) return '';
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    const date = new Date(dateString);
+    // Use UTC methods to prevent timezone conversion
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC' // Force UTC timezone
+    };
+    return date.toLocaleDateString(undefined, options);
 };
 
 // Watch for changes in selectedItems to emit update event
@@ -485,5 +617,10 @@ watch(selectedItems, (newVal) => {
 
 .fas.fa-sort::before {
  content: "\f0dc";
+}
+
+/* Add new styles for the view modal */
+.whitespace-pre-wrap {
+    white-space: pre-wrap;
 }
 </style>

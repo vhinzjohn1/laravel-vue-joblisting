@@ -6,7 +6,7 @@
         :max-width="'7xl'"
     >
         <div class="p-8 bg-gradient-to-br from-green-50 to-white">
-            <form @submit.prevent="submitApplication">
+            <form @submit.prevent="showConfirmation">
                 <!-- Header Information -->
                 <div class="pl-4 mb-8 border-l-4 border-green-800">
                     <h3 class="text-xl font-semibold text-gray-800">
@@ -119,12 +119,136 @@
             </form>
         </div>
     </Modal>
+
+    <!-- Confirmation Modal -->
+    <Modal
+        title="Confirm Application Details"
+        :show="showConfirmationModal"
+        @close="closeConfirmationModal"
+        :max-width="'7xl'"
+    >
+        <div class="p-8 bg-white">
+            <div class="space-y-6">
+                <!-- Education Section -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Education</h3>
+                    <div class="space-y-3">
+                        <div v-for="(edu, index) in form.education" :key="index" class="bg-gray-50 p-4 rounded-lg">
+                            <p class="font-medium">{{ edu.level }}</p>
+                            <p class="text-gray-600">{{ edu.school_name }}</p>
+                            <p class="text-gray-600">{{ edu.degree_course }}</p>
+                            <p v-if="edu.year_graduated" class="text-gray-600">Graduated: {{ edu.year_graduated }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Section -->
+                <div v-if="form.trainings.length > 0">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Trainings</h3>
+                    <div class="space-y-3">
+                        <div v-for="(training, index) in form.trainings" :key="index" class="bg-gray-50 p-4 rounded-lg">
+                            <p class="font-medium">{{ training.title }}</p>
+                            <p class="text-gray-600">{{ training.institution }}</p>
+                            <p class="text-gray-600">{{ training.duration_hours }} hours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Experience Section -->
+                <div v-if="form.experiences.length > 0">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Work Experience</h3>
+                    <div class="space-y-3">
+                        <div v-for="(exp, index) in form.experiences" :key="index" class="bg-gray-50 p-4 rounded-lg">
+                            <p class="font-medium">{{ exp.position }}</p>
+                            <p class="text-gray-600">{{ exp.company_name }}</p>
+                            <p class="text-gray-600">
+                                {{ new Date(exp.start_date).toLocaleDateString() }} -
+                                {{ exp.end_date ? new Date(exp.end_date).toLocaleDateString() : 'Present' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Documents</h3>
+                    <div class="space-y-4">
+                        <div v-for="(doc, docType) in form.documents" :key="docType">
+                            <template v-if="doc">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <p class="font-medium">{{ getDocumentDisplayName(docType) }}</p>
+                                            <p class="text-gray-600">{{ doc.name }}</p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button
+                                                type="button"
+                                                @click="showDocumentPreview(doc)"
+                                                class="text-blue-600 hover:text-blue-800"
+                                            >
+                                                <i class="fas fa-eye"></i> Preview
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-3 mt-6">
+                    <button
+                        type="button"
+                        @click="closeConfirmationModal"
+                        class="px-6 py-2.5 font-medium text-gray-700 rounded-lg border border-gray-300 transition hover:bg-gray-50"
+                    >
+                        Back to Edit
+                    </button>
+                    <button
+                        type="button"
+                        @click="submitApplication"
+                        :disabled="formSubmitting"
+                        class="px-6 py-2.5 bg-green-700 text-white rounded-lg hover:bg-green-800 transition font-medium shadow-sm disabled:opacity-75 disabled:cursor-wait flex items-center justify-center min-w-[120px]"
+                    >
+                        <span v-if="formSubmitting" class="mr-2">
+                            <svg class="mr-2 -ml-1 w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </span>
+                        {{ formSubmitting ? "Submitting..." : "Confirm & Submit" }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </Modal>
+
+    <!-- Document Preview Modal -->
+    <Modal
+        title="Document Preview"
+        :show="showDocumentPreviewModal"
+        @close="closeDocumentPreview"
+        :max-width="'4xl'"
+    >
+        <div class="p-4">
+            <div v-if="currentPreviewDocument" class="aspect-[3/4] w-full">
+                <iframe
+                    :src="previewDocumentUrl"
+                    class="w-full h-full border-0"
+                    type="application/pdf"
+                ></iframe>
+            </div>
+        </div>
+    </Modal>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
 import { useForm, router } from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
+import axios from "axios";
 
 // Import our new components
 import EducationSection from "./EducationSection.vue";
@@ -213,6 +337,12 @@ const validationErrors = ref({
 });
 
 const showValidation = ref(false);
+
+// Add new refs for confirmation modal and document preview
+const showConfirmationModal = ref(false);
+const showDocumentPreviewModal = ref(false);
+const previewDocumentUrl = ref(null);
+const currentPreviewDocument = ref(null);
 
 // Helper function to get document display name
 const getDocumentDisplayName = (docType) => {
@@ -351,21 +481,53 @@ const validateForm = () => {
     return educationValid && documentsValid;
 };
 
-const submitApplication = async () => {
-    console.log('Starting application submission');
-
+// Modify the form submission flow
+const showConfirmation = () => {
     if (!validateForm()) {
-        console.log('Form validation failed:', validationErrors.value);
         return;
     }
+    showConfirmationModal.value = true;
+};
 
-    console.log('Form validation passed, proceeding with submission');
+const closeConfirmationModal = () => {
+    showConfirmationModal.value = false;
+};
 
+const showDocumentPreview = (doc) => {
+    let fileUrl = null;
+    if (doc.serverFile && doc.serverFile.url) {
+        fileUrl = doc.serverFile.url;
+    } else if (doc.url) {
+        fileUrl = doc.url;
+    } else if (doc.serverFile && doc.serverFile.path) {
+        // Fallback if you store the path and can build a URL
+        fileUrl = `/storage/${doc.serverFile.path}`;
+    }
+    if (fileUrl) {
+        previewDocumentUrl.value = fileUrl;
+        currentPreviewDocument.value = doc;
+        showDocumentPreviewModal.value = true;
+    } else {
+        // Optionally show an error toast here
+        showErrorToast('No preview available for this document.');
+    }
+};
+
+const closeDocumentPreview = () => {
+    showDocumentPreviewModal.value = false;
+    if (previewDocumentUrl.value) {
+        URL.revokeObjectURL(previewDocumentUrl.value);
+        previewDocumentUrl.value = null;
+    }
+    currentPreviewDocument.value = null;
+};
+
+// Modify the existing submitApplication function
+const submitApplication = async () => {
     try {
-        // Set form submission loading state
         formSubmitting.value = true;
 
-        // Create FormData to handle file uploads
+        // Build FormData and send request (same as your original logic)
         const formData = new FormData();
         formData.append("job_listing_id", form.job_listing_id);
 
@@ -394,20 +556,10 @@ const submitApplication = async () => {
         Object.keys(form.documents).forEach((docType) => {
             const doc = form.documents[docType];
             if (doc && doc.serverFile) {
-                // Prefer using serverFile.id, fallback to hash if needed
                 formData.append(`documents[${docType}]`, doc.serverFile.id || doc.serverFile.hash);
             }
         });
 
-        console.log('Submitting form data:', {
-            job_listing_id: form.job_listing_id,
-            education: form.education,
-            trainings: form.trainings,
-            experiences: form.experiences,
-            documents: form.documents
-        });
-
-        // Submit the form using axios with FormData
         const response = await axios.post(route("job-application.store"), formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -416,28 +568,18 @@ const submitApplication = async () => {
             }
         });
 
-        console.log('Response:', response.data);
-
         formSubmitting.value = false;
+        closeConfirmationModal();
         closeModal();
         router.visit(route("job-application.show", props.job.job_listing_id));
         showToast("Application Submitted Successfully");
     } catch (error) {
         formSubmitting.value = false;
-        console.error('Error submitting application:', error);
-
         if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.error('Error response:', error.response.data);
             showErrorToast(error.response.data.message || "There was an error submitting your application. Please try again.");
         } else if (error.request) {
-            // The request was made but no response was received
-            console.error('No response received:', error.request);
             showErrorToast("No response received from server. Please check your connection and try again.");
         } else {
-            // Something happened in setting up the request that triggered an Error
-            console.error('Error setting up request:', error.message);
             showErrorToast("There was an error submitting your application. Please try again.");
         }
     }
@@ -487,5 +629,12 @@ const showErrorToast = (message) => {
 .validation-toast ul li {
     margin: 4px 0;
     font-size: 0.875rem;
+}
+
+/* Add new styles for the preview modal */
+.document-preview {
+    width: 100%;
+    height: 80vh;
+    border: none;
 }
 </style>

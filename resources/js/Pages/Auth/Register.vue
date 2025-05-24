@@ -140,7 +140,9 @@ const submit = async () => {
         if (error.response?.data?.errors) {
             const errors = error.response.data.errors;
             Object.keys(errors).forEach(key => {
-                form.setError(key, errors[key]);
+                // Convert array error to string if it's an array
+                const errorMessage = Array.isArray(errors[key]) ? errors[key][0] : errors[key];
+                form.setError(key, errorMessage);
             });
         }
     }

@@ -41,13 +41,17 @@
                             No batches found, please add one to proceed
                         </div>
 
-                        <div v-else class="space-y-4">
+                        <div v-else class="space-y-3">
 
                             <h1 class="text-xl font-bold uppercase tracking-wider text-center">
                                 Job Listing Batches
                             </h1>
+                            <div
+                                class="mx-auto w-24 h-1 bg-green-600 rounded-full"
+                            ></div>
                             <!-- Job listing Batches List (Collapsible) -->
                             <div v-for="batch in filteredBatches" :key="batch.batch_id" class="mt-4">
+
                                 <Collapsible
                                     :title="`${batch.batch_name} - ${batch.batch_code}`"
                                     :initially-open="false"
@@ -97,22 +101,14 @@
         <!-- Non-Plantilla Job Listings Section -->
         <Collapsible :initially-open="true" class="mt-4">
             <template #header>
-                <div class="flex items-center justify-between w-full">
-                    <h1 class="text-2xl font-bold uppercase tracking-wider">
+                <div class="flex flex-col items-center justify-center w-full space-y-3">
+                    <h1 class="text-xl font-bold uppercase tracking-wider text-center">
                         Non-Plantilla Job Listings
                     </h1>
-                    <div class="flex gap-2">
-                        <PrimaryButton @click.stop="() => {
-                            selectedBatch = {
-                                batch_id: 2,
-                                deadline: null,
-                                is_plantilla: 0
-                            };
-                            showAddModal = true;
-                        }">
-                            Add Job Listing
-                        </PrimaryButton>
-                    </div>
+                    <div
+                            class="mx-auto w-24 h-1 bg-green-600 rounded-full"
+                        ></div>
+
                 </div>
             </template>
 
@@ -120,10 +116,22 @@
                 <div class="space-y-4">
                     <!-- Search Bar for Non-Plantilla -->
                     <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center">
+                        <div class="flex items-center w-full justify-between">
                             <h1 class="text-xl font-semibold mr-4">
                                 Contract of Service & Job Order Positions
                             </h1>
+                            <div class="flex gap-2">
+                                <PrimaryButton @click.stop="() => {
+                                    selectedBatch = {
+                                        batch_id: 2,
+                                        deadline: null,
+                                        is_plantilla: 0
+                                    };
+                                    showAddModal = true;
+                                }">
+                                    Add Job Listing
+                                </PrimaryButton>
+                            </div>
                         </div>
                     </div>
 
@@ -257,7 +265,7 @@
             <form @submit.prevent="saveJob">
                 <div class="p-5">
                     <!-- Basic Information Section -->
-                    <div class="mb-6">
+                    <div class="mb-2">
                         <h6
                             class="font-semibold text-gray-800 mb-4 pb-2 border-b"
                         >
@@ -366,6 +374,7 @@
                                     type="date"
                                     v-model="newJob.closing_date"
                                     required
+                                    :max="selectedBatch?.is_plantilla ? selectedBatch?.deadline : null"
                                     :class="{
                                         'border-red-500': errors.closing_date,
                                     }"
@@ -397,6 +406,22 @@
                             </div>
                         </div>
                     </div>
+
+                     <!-- Place Assigned Section -->
+                     <div>
+                            <h6 class="font-semibold text-gray-800 mb-2 border-b">
+                                Place Assigned
+                            </h6>
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Place Assigned *
+                                </label>
+                                <TextInput
+                                    v-model="newJob.place_assigned"
+                                    required
+                                />
+                            </div>
+                        </div>
 
                     <!-- Job Description Section -->
                     <div class="mb-4">
@@ -551,7 +576,7 @@
             <form @submit.prevent="updateJob">
                 <div class="p-5">
                     <!-- Basic Information Section -->
-                    <div class="mb-6">
+                    <div class="mb-2">
                         <h6
                             class="font-semibold text-gray-800 mb-4 pb-2 border-b"
                         >
@@ -660,6 +685,7 @@
                                     type="date"
                                     v-model="editingJob.closing_date"
                                     required
+                                    :max="selectedBatch?.is_plantilla ? selectedBatch?.deadline : null"
                                     :class="{
                                         'border-red-500': errors.closing_date,
                                     }"
@@ -692,6 +718,22 @@
                             </div>
                         </div>
                     </div>
+
+                     <!-- Place Assigned Section -->
+                     <div>
+                            <h6 class="font-semibold text-gray-800 mb-2 border-b">
+                                Place Assigned
+                            </h6>
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Place Assigned *
+                                </label>
+                                <TextInput
+                                    v-model="editingJob.place_assigned"
+                                    required
+                                />
+                            </div>
+                        </div>
 
                     <!-- Job Description Section -->
                     <div class="mb-4">
@@ -1002,7 +1044,8 @@ const newJob = ref({
     status: "Draft",
     category: "",
     batch_id: null,
-    required_documents: []
+    required_documents: [],
+    place_assigned: ""
 });
 
 // Search functionality
@@ -1215,8 +1258,11 @@ const saveJob = () => {
         category: selectedPosition.value?.category || '', // Get category from selected position
         batch_id: selectedBatch.value?.batch_id || null, // Assign batch_id if a batch was selected
         created_by: usePage().props.auth.user.id,
-        required_documents: newJob.value.required_documents
+        required_documents: newJob.value.required_documents,
+        place_assigned: newJob.value.place_assigned
     };
+
+    console.log('This is the job to add', jobToAdd);
 
     axios
         .post("job-listing", jobToAdd)
@@ -1269,7 +1315,8 @@ const resetForm = () => {
         status: "Draft",
         category: "",
         batch_id: null,
-        required_documents: []
+        required_documents: [],
+        place_assigned: ""
     };
      selectedPosition.value = null; // Clear selected position
      errors.value = {}; // Clear errors
@@ -1592,16 +1639,25 @@ const handleBulkDelete = async (items) => {
         } catch (error) {
             console.error('Error deleting job listings:', error);
             let errorMessage = 'Failed to delete job listings.';
-            if (error.response?.data?.message) {
-                errorMessage = error.response.data.message;
+
+            if (error.response?.status === 422) {
+                if (error.response.data.jobListings) {
+                    // Handle bulk delete error with multiple job listings
+                    const jobListings = error.response.data.jobListings.join(', ');
+                    errorMessage = `Cannot delete the following job listings as they have applications: ${jobListings}`;
+                } else if (error.response.data.jobListing) {
+                    // Handle single job listing error
+                    errorMessage = `Cannot delete "${error.response.data.jobListing}" as it has applications.`;
+                }
             }
+
             Swal.fire({
                 position: "top-end",
                 icon: "error",
                 title: "Error!",
                 text: errorMessage,
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000, // Increased timer to give more time to read the message
                 toast: true,
                 customClass: {
                     popup: "bg-red-500 text-white",

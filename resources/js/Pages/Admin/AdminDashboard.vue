@@ -8,36 +8,122 @@
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white rounded-lg shadow overflow-hidden">
-          <button
-            class="bg-green-700 text-white font-semibold py-2 px-4 rounded float-right m-3 hover:bg-green-600"
-            @click="showAddModal = true"
-          >
-            Add
-          </button>
-          <DataTable
-            :data="data"
-            :pageSize="10"
-            :columns="[
-              {
-                key: 'user_id',
-                title: 'User ID',
-              },
-              {
-                key: 'username',
-                title: 'Username',
-              },
-              {
-                key: 'email',
-                title: 'Email',
-              },
-              {
-                key: 'role_name',
-                title: 'Role',
-              },
-            ]"
-            @edit="showEdit"
-            @delete="deleteItem"
-          />
+          <div class="p-4 flex justify-between items-center">
+            <div class="relative">
+              <input
+                type="text"
+                v-model="search"
+                placeholder="Search users..."
+                class="w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+            <button
+              class="bg-green-700 text-white font-semibold py-2 px-4 rounded hover:bg-green-600"
+              @click="showAddModal = true"
+            >
+              Add
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="user in data.data" :key="user.user_id">
+                  <td class="px-6 py-4 whitespace-nowrap">{{ user.user_id }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ user.username }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ user.email }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ user.role_name }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <button
+                      @click="showEdit(user)"
+                      class="text-indigo-600 hover:text-indigo-900 mr-3"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      @click="deleteItem(user)"
+                      class="text-red-600 hover:text-red-900"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+            <div class="flex-1 flex justify-between sm:hidden">
+              <button
+                @click="previousPage"
+                :disabled="data.current_page === 1"
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Previous
+              </button>
+              <button
+                @click="nextPage"
+                :disabled="data.current_page === data.last_page"
+                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Next
+              </button>
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-700">
+                  Showing
+                  <span class="font-medium">{{ data.from }}</span>
+                  to
+                  <span class="font-medium">{{ data.to }}</span>
+                  of
+                  <span class="font-medium">{{ data.total }}</span>
+                  results
+                </p>
+              </div>
+              <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <button
+                    @click="previousPage"
+                    :disabled="data.current_page === 1"
+                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    v-for="page in data.last_page"
+                    :key="page"
+                    @click="goToPage(page)"
+                    :class="[
+                      page === data.current_page
+                        ? 'z-10 bg-green-50 border-green-500 text-green-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
+                      'relative inline-flex items-center px-4 py-2 border text-sm font-medium'
+                    ]"
+                  >
+                    {{ page }}
+                  </button>
+                  <button
+                    @click="nextPage"
+                    :disabled="data.current_page === data.last_page"
+                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  >
+                    Next
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -218,16 +304,20 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import axios from "axios";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
-import DataTable from "@/Components/DataTable.vue";
 import { useForm, usePage, Head } from "@inertiajs/vue3";
 import Modal from "@/Components/Modal.vue";
 import TextInput from "@/Components/TextInput.vue";
+import debounce from 'lodash/debounce';
 
 const data = ref(usePage().props.users);
+const search = ref('');
+const currentPage = ref(1);
+const perPage = ref(10);
+
 const form = useForm({
   username: "",
   password: "",
@@ -238,6 +328,46 @@ const form = useForm({
 
 const showAddModal = ref(false);
 const showEditModal = ref(false);
+
+// Debounced search function
+const debouncedSearch = debounce(() => {
+  axios.get('/admin/0', {
+    params: {
+      page: currentPage.value,
+      search: search.value
+    }
+  }).then(response => {
+    data.value = response.data;
+  }).catch(error => {
+    console.error('Error searching users:', error);
+  });
+}, 500);
+
+// Watch for search changes
+watch(search, () => {
+  currentPage.value = 1;
+  debouncedSearch();
+});
+
+// Pagination methods
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    debouncedSearch();
+  }
+};
+
+const nextPage = () => {
+  if (currentPage.value < data.value.last_page) {
+    currentPage.value++;
+    debouncedSearch();
+  }
+};
+
+const goToPage = (page) => {
+  currentPage.value = page;
+  debouncedSearch();
+};
 
 const closeAddModal = () => {
   showAddModal.value = false;
@@ -275,8 +405,8 @@ const showToast = (action, isSuccess = true, message = "") => {
     title: title,
     iconColor: "#ffffff",
     showConfirmButton: false,
-    timer: 3000, // Toast will disappear after 3 seconds
-    toast: true, // Enable toast mode
+    timer: 3000,
+    toast: true,
     color: "#ffffff",
     background: background,
   };
@@ -285,7 +415,6 @@ const showToast = (action, isSuccess = true, message = "") => {
     toastOptions.text = message;
   }
 
-  // Using SweetAlert2 toast with custom styling
   Swal.fire(toastOptions);
 };
 
@@ -305,7 +434,11 @@ const closeEditModal = () => {
 
 const saveChanges = () => {
   axios
-    .post("admin", form)
+    .post("admin", form, {
+      params: {
+        page: currentPage.value
+      }
+    })
     .then((response) => {
       data.value = response.data;
       closeAddModal();
@@ -318,10 +451,13 @@ const saveChanges = () => {
 
 const editUser = () => {
   axios
-    .put(`admin/${form.user_id}`, form)
+    .put(`admin/${form.user_id}`, form, {
+      params: {
+        page: currentPage.value
+      }
+    })
     .then((response) => {
       data.value = response.data;
-      console.log(response.data);
       closeEditModal();
       showToast("edit");
     })
@@ -342,11 +478,13 @@ const deleteItem = (item) => {
   }).then((result) => {
     if (result.isConfirmed) {
       axios
-        .delete(`admin/${item.user_id}`)
-        .then(() => {
-          data.value = data.value.filter(
-            (user) => user.user_id !== item.user_id,
-          );
+        .delete(`admin/${item.user_id}`, {
+          params: {
+            page: currentPage.value
+          }
+        })
+        .then((response) => {
+          data.value = response.data;
           showToast("delete");
         })
         .catch((error) => {

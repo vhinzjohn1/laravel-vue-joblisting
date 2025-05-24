@@ -147,18 +147,36 @@ const desktopTourSteps = [
         },
     },
     {
-        target: "#reports-link",
-        title: "Reports",
-        content: "View reports for Selection Lineup",
+        target: "#schedule-management-link",
+        title: "Schedule Management",
+        content: "Manage interview schedules and appointments",
         popover: {
             position: "right",
             placement: "center",
         },
     },
     {
-        target: "#schedule-management-link",
-        title: "Schedule Management",
-        content: "Manage interview schedules and appointments",
+        target: "#required-documents-link",
+        title: "Required Documents",
+        content: "View and manage required documents for applications",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#archive-link",
+        title: "Archive",
+        content: "Access archived records and historical data",
+        popover: {
+            position: "right",
+            placement: "center",
+        },
+    },
+    {
+        target: "#reports-link",
+        title: "Reports",
+        content: "View reports for Selection Lineup",
         popover: {
             position: "right",
             placement: "center",
@@ -199,21 +217,16 @@ const mobileTourSteps = [
             placement: "center",
         },
         params: {
-            // Force 'Next' button instead of 'Done'
             buttonLabel: "Next",
-            // Make sure this isn't treated as the final step
             final: false,
         },
         onBeforeNext: () => {
             if (!showMobileMenu.value) {
-                // Stop the tour from advancing
                 return false;
             }
-            // Allow the tour to continue
             return true;
         },
     },
-    // Add a placeholder step to ensure the hamburger menu isn't treated as the final step
     {
         target: "#dashboard-link",
         title: "Placeholder",
@@ -222,7 +235,6 @@ const mobileTourSteps = [
             position: "right",
             placement: "center",
         },
-        // This step will never be shown as we'll trigger the sidebar open and refresh steps
         canShow: false,
     },
 ];
@@ -580,6 +592,111 @@ onMounted(async () => {
                         </Link>
                     </li>
 
+                    <!-- Schedule Management - Direct Link -->
+                    <li>
+                        <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="schedule-management-link"
+                            :href="route('schedules.index')"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
+                            :class="{
+                                'bg-[#ffc001] text-black': isActive('schedules.index'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('schedules.index'),
+                            }"
+                        >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActive('schedules.index'),
+                                    }"
+                                >
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-200"
+                                    :class="{
+                                        'font-semibold': isActive('schedules.index'),
+                                    }"
+                                    >Schedule</span
+                                >
+                            </div>
+                        </Link>
+                    </li>
+
+                    <!-- Required Documents -->
+                    <li>
+                        <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="required-documents-link"
+                            :href="route('required-documents.index')"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
+                            :class="{
+                                'bg-[#ffc001] text-black': isActive('required-documents.index'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('required-documents.index'),
+                            }"
+                        >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActive('required-documents.index'),
+                                    }"
+                                >
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-200"
+                                    :class="{
+                                        'font-semibold': isActive('required-documents.index'),
+                                    }"
+                                    >Required Documents</span
+                                >
+                            </div>
+                        </Link>
+                    </li>
+
+                    <!-- Archive - Direct Link -->
+                    <li>
+                        <Link
+                            as="button"
+                            :disabled="isTourActive"
+                            id="archive-link"
+                            :href="route('archive.index')"
+                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
+                            :class="{
+                                'bg-[#ffc001] text-black': isActive('archive.index'),
+                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                    !isActive('archive.index'),
+                            }"
+                        >
+                            <div class="flex items-center w-full">
+                                <div
+                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
+                                    :class="{
+                                        'text-black': isActive('archive.index'),
+                                    }"
+                                >
+                                    <i class="fas fa-archive"></i>
+                                </div>
+                                <span
+                                    v-if="sidebarOpen"
+                                    class="ml-3 font-medium transition-all duration-200"
+                                    :class="{
+                                        'font-semibold': isActive('archive.index'),
+                                    }"
+                                    >Archive</span
+                                >
+                            </div>
+                        </Link>
+                    </li>
+
                     <!-- Reports with dropdown -->
                     <li class="relative">
                         <div
@@ -685,285 +802,6 @@ onMounted(async () => {
                                 </li>
                             </ul>
                         </transition>
-                    </li>
-
-                    <!-- Schedule Management with Dropdown - Fixed reference -->
-                    <li class="relative">
-                        <div
-                            id="schedule-management-link"
-                            @click="toggleDropdown('schedule')"
-                            class="flex overflow-hidden relative justify-between items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer sidebar-link group"
-                            :class="{
-                                'text-white bg-[#034b1c]':
-                                    activeDropdown === 'schedule' ||
-                                    isActiveGroup([
-                                        'schedules.index',
-                                        'schedules.show',
-                                        'groups.index',
-                                    ]),
-                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    activeDropdown !== 'schedule' &&
-                                    !isActiveGroup([
-                                        'schedules.index',
-                                        'schedules.show',
-                                        'groups.index',
-                                    ]),
-                            }"
-                        >
-                            <div class="flex items-center">
-                                <div
-                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
-                                    :class="{
-                                        'text-white':
-                                            isActiveGroup([
-                                                'schedules.index',
-                                                'schedules.show',
-                                                'groups.index',
-                                            ]) || activeDropdown === 'schedule',
-                                    }"
-                                >
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <span
-                                    v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-200"
-                                    :class="{
-                                        'font-semibold':
-                                            isActiveGroup([
-                                                'schedules.index',
-                                                'schedules.show',
-                                                'groups.index',
-                                            ]) || activeDropdown === 'schedule',
-                                    }"
-                                    >Schedule</span
-                                >
-                            </div>
-                            <div
-                                v-if="sidebarOpen"
-                                class="transition-transform duration-200"
-                                :class="{
-                                    'rotate-180': activeDropdown === 'schedule',
-                                }"
-                            >
-                                <i
-                                    class="text-xs fas fa-chevron-down"
-                                    :class="{
-                                        'text-white':
-                                            activeDropdown === 'schedule' ||
-                                            isActiveGroup([
-                                                'schedules.index',
-                                                'schedules.show',
-                                                'groups.index',
-                                            ]),
-                                    }"
-                                ></i>
-                            </div>
-                        </div>
-
-                        <!-- Dropdown menu -->
-                        <transition
-                            enter-active-class="transition duration-200 ease-out"
-                            enter-from-class="opacity-0 transform scale-95"
-                            enter-to-class="opacity-100 transform scale-100"
-                            leave-active-class="transition duration-100 ease-in"
-                            leave-from-class="opacity-100 transform scale-100"
-                            leave-to-class="opacity-0 transform scale-95"
-                        >
-                            <ul
-                                v-show="activeDropdown === 'schedule'"
-                                class="pr-2 pl-4 mt-1 ml-4 space-y-1"
-                            >
-                                <li>
-                                    <Link
-                                        :href="route('schedules.index')"
-                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
-                                        :class="{
-                                            'bg-[#ffc001] text-black font-medium':
-                                                isActive('schedules.index'),
-                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                                !isActive('schedules.index'),
-                                        }"
-                                    >
-                                        <i
-                                            class="mr-2 fas fa-calendar-check"
-                                            :class="{
-                                                'text-black':
-                                                    isActive('schedules.index'),
-                                            }"
-                                        ></i>
-                                        <span>Manage Schedule</span>
-                                    </Link>
-                                </li>
-                                <!-- <li>
-                                    <Link
-                                        :href="route('groups.index')"
-                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
-                                        :class="{
-                                            'bg-[#ffc001] text-black font-medium':
-                                                isActive('groups.index'),
-                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                                !isActive('groups.index'),
-                                        }"
-                                    >
-                                        <i
-                                            class="mr-2 fas fa-users-cog"
-                                            :class="{
-                                                'text-black':
-                                                    isActive('groups.index'),
-                                            }"
-                                        ></i>
-                                        <span>Group Schedule</span>
-                                    </Link>
-                                </li> -->
-                            </ul>
-                        </transition>
-                    </li>
-
-
-                    <!-- Archive Page Dropdown -->
-                    <li class="relative">
-                        <div
-                            id="archive-link"
-                            @click="toggleDropdown('archive')"
-                            class="flex overflow-hidden relative justify-between items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer sidebar-link group"
-                            :class="{
-                                'text-white bg-[#034b1c]':
-                                    activeDropdown === 'archive' ||
-                                    isActiveGroup([
-                                        'archive.index',
-                                        'archive.show',
-                                        'groups.index',
-                                    ]),
-                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    activeDropdown !== 'archive' &&
-                                    !isActiveGroup([
-                                        'archive.index',
-                                        'archive.show',
-                                        'groups.index',
-                                    ]),
-                            }"
-                        >
-                            <div class="flex items-center">
-                                <div
-                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
-                                    :class="{
-                                        'text-white':
-                                            isActiveGroup([
-                                                'archive.index',
-                                                'archive.show',
-                                                'groups.index',
-                                            ]) || activeDropdown === 'archive',
-                                    }"
-                                >
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <span
-                                    v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-200"
-                                    :class="{
-                                        'font-semibold':
-                                            isActiveGroup([
-                                                'archive.index',
-                                                'archive.show',
-                                                'groups.index',
-                                            ]) || activeDropdown === 'archive',
-                                    }"
-                                    >Archive</span
-                                >
-                            </div>
-                            <div
-                                v-if="sidebarOpen"
-                                class="transition-transform duration-200"
-                                :class="{
-                                    'rotate-180': activeDropdown === 'archive',
-                                }"
-                            >
-                                <i
-                                    class="text-xs fas fa-chevron-down"
-                                    :class="{
-                                        'text-white':
-                                            activeDropdown === 'archive' ||
-                                            isActiveGroup([
-                                                'archive.index',
-                                                'archive.show',
-                                                'groups.index',
-                                            ]),
-                                    }"
-                                ></i>
-                            </div>
-                        </div>
-
-                        <!-- Dropdown menu -->
-                        <transition
-                            enter-active-class="transition duration-200 ease-out"
-                            enter-from-class="opacity-0 transform scale-95"
-                            enter-to-class="opacity-100 transform scale-100"
-                            leave-active-class="transition duration-100 ease-in"
-                            leave-from-class="opacity-100 transform scale-100"
-                            leave-to-class="opacity-0 transform scale-95"
-                        >
-                            <ul
-                                v-show="activeDropdown === 'archive'"
-                                class="pr-2 pl-4 mt-1 ml-4 space-y-1"
-                            >
-                                <li>
-                                    <Link
-                                        :href="route('archive.index')"
-                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
-                                        :class="{
-                                            'bg-[#ffc001] text-black font-medium':
-                                                isActive('archive.index'),
-                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                                !isActive('archive.index'),
-                                        }"
-                                    >
-                                        <i
-                                            class="mr-2 fas fa-calendar-check"
-                                            :class="{
-                                                'text-black':
-                                                    isActive('archive.index'),
-                                            }"
-                                        ></i>
-                                        <span>Manage Archive</span>
-                                    </Link>
-                                </li>
-                            </ul>
-                        </transition>
-                    </li>
-
-                    <!-- Required Documents -->
-                    <li>
-                        <Link
-                            as="button"
-                            :disabled="isTourActive"
-                            id="required-documents-link"
-                            :href="route('required-documents.index')"
-                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
-                            :class="{
-                                'bg-[#ffc001] text-black': isActive('required-documents.index'),
-                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    !isActive('required-documents.index'),
-                            }"
-                        >
-                            <div class="flex items-center w-full">
-                                <div
-                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
-                                    :class="{
-                                        'text-black': isActive('required-documents.index'),
-                                    }"
-                                >
-                                    <i class="fas fa-file-alt"></i>
-                                </div>
-                                <span
-                                    v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-200"
-                                    :class="{
-                                        'font-semibold': isActive('required-documents.index'),
-                                    }"
-                                    >Required Documents</span
-                                >
-                            </div>
-                        </Link>
                     </li>
 
                     <!-- Profile -->

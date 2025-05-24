@@ -10,6 +10,8 @@ import TextInput from "@/Components/TextInput.vue";
 // Job Listings
 const batches = usePage().props.batches;
 
+console.log('This is the props', usePage().props);
+
 // Modal state
 const showViewModal = ref(false);
 const selectedJob = ref(null);
@@ -34,8 +36,28 @@ const nonPlantillaPagination = ref({
 });
 
 // Filter batches into plantilla and non-plantilla
+const filteredPlantillaJobs = computed(() => {
+    if (!searchQuery.value) {
+        return batches.filter(batch => batch.is_plantilla === 1);
+    }
+    const query = searchQuery.value.toLowerCase();
+    return batches.filter(batch => batch.is_plantilla === 1).map(batch => ({
+        ...batch,
+        job_listings: batch.job_listings.filter(job =>
+            (job.title && job.title.toLowerCase().includes(query)) ||
+            (job.position?.position_name && job.position.position_name.toLowerCase().includes(query)) ||
+            (job.position?.item_number && job.position.item_number.toLowerCase().includes(query)) ||
+            (job.position?.category && job.position.category.toLowerCase().includes(query)) ||
+            (job.position?.salary_grade?.salary_grade && job.position.salary_grade.salary_grade.toString().toLowerCase().includes(query)) ||
+            (job.status && job.status.toLowerCase().includes(query)) ||
+            (job.place_assigned && job.place_assigned.toLowerCase().includes(query))
+        )
+    }));
+});
+
+// Update the plantillaBatches computed property to use filteredPlantillaJobs
 const plantillaBatches = computed(() => {
-    return batches.filter(batch => batch.is_plantilla === 1);
+    return filteredPlantillaJobs.value;
 });
 
 // Get all non-plantilla jobs from all batches
@@ -133,19 +155,22 @@ const navigateToRegister = () => {
 
     <GuestLayout :can-login="true" :can-register="true">
         <div class="relative w-full py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
                 <!-- Plantilla Job Listings Section -->
                 <Collapsible :initially-open="true" class="mb-8">
                     <template #header>
-                        <div class="flex items-center justify-between w-full">
-                            <h1 class="text-2xl font-bold uppercase tracking-wider">
+                        <div class="flex items-center justify-center flex-col w-full space-y-2">
+                            <h1 class="text-xl font-bold uppercase tracking-wider">
                                 Plantilla Positions
                             </h1>
+                            <div
+                                class="mx-auto w-24 h-1 bg-green-600 rounded-full"
+                            ></div>
                         </div>
                     </template>
 
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-gray-900">
+                        <div class="px-6 text-gray-900">
                             <div v-if="plantillaBatches.length === 0" class="text-center py-8 text-gray-500">
                                 No plantilla job listings available
                             </div>
@@ -154,7 +179,7 @@ const navigateToRegister = () => {
                                 <div v-for="batch in plantillaBatches" :key="batch.batch_id" class="mt-4">
                                     <Collapsible
                                         :title="`${batch.batch_name} - ${batch.batch_code}`"
-                                        :initially-open="false"
+                                        :initially-open="true"
                                     >
                                         <template #header>
                                             <div class="flex items-center justify-between w-full">
@@ -185,49 +210,88 @@ const navigateToRegister = () => {
 
                                         <!-- Job Listings Table -->
                                         <div class="overflow-x-auto">
-                                            <table class="min-w-full divide-y divide-gray-200">
-                                                <thead class="bg-gray-50">
+                                            <table class="min-w-full border-collapse">
+                                                <thead>
                                                     <tr>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Number</th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salary Grade</th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Closing Date</th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">No.</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Title</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Item Number</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Salary Grade</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Category</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0" colspan="4">Qualification Standards</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Closing Date</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Date Created</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Place of Assignment</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Education</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Training</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Experience</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Eligibility</th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                        <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="bg-white divide-y divide-gray-200">
-                                                    <tr v-for="job in paginatedJobs(batch)" :key="job.job_listing_id">
-                                                        <td class="px-6 py-4 whitespace-nowrap">
-                                                            <div class="text-sm font-medium text-gray-900">{{ job.title }}</div>
-                                                            <div class="text-sm text-gray-500">{{ job.position?.position_name }}</div>
+                                                <tbody>
+                                                    <tr v-if="paginatedJobs(batch).length === 0" class="border-b">
+                                                        <td colspan="13" class="border border-gray-300 px-3 py-2 text-sm text-center text-gray-500">
+                                                            No matching job listings found
                                                         </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            {{ job.position?.item_number || '-' }}
+                                                    </tr>
+                                                    <tr v-for="(job, index) in paginatedJobs(batch)"
+                                                        :key="job.job_listing_id"
+                                                        class="border-b transition-all duration-200 cursor-pointer hover:bg-blue-100 hover:shadow-md"
+                                                        @click="viewJobDetails(job)"
+                                                    >
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ (batchPagination[batch.batch_id].currentPage - 1) * batchPagination[batch.batch_id].perPage + index + 1 }}
                                                         </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            <div class="flex items-center space-x-2">
+                                                                <span>{{ job.title }}</span>
+                                                                <button
+                                                                    @click.stop="viewJobDetails(job)"
+                                                                    class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-0"
+                                                                >
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ job.position?.item_number === '' ? 'CoS/Job Order' : job.position?.item_number || '-' }}
+                                                        </td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
                                                             {{ job.position?.salary_grade?.salary_grade || '-' }}
                                                         </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ job.position?.category || '-' }}
+                                                        </td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ job.position?.minimum_requirement?.education_level || '-' }}
+                                                        </td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ job.position?.minimum_requirement?.training_hours ? job.position?.minimum_requirement?.training_hours + ' hours' : '-' }}
+                                                        </td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ job.position?.minimum_requirement?.years_experience ? job.position?.minimum_requirement?.years_experience + ' year(s)' : '-' }}
+                                                        </td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ job.position?.minimum_requirement?.eligibility || '-' }}
+                                                        </td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
                                                             {{ formatDate(job.closing_date) }}
                                                         </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap">
-                                                            <span :class="{
-                                                                'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
-                                                                'bg-green-100 text-green-800': job.status === 'Active',
-                                                                'bg-yellow-100 text-yellow-800': job.status === 'Draft',
-                                                                'bg-red-100 text-red-800': job.status === 'Closed'
-                                                            }">
-                                                                {{ job.status }}
-                                                            </span>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ formatDate(job.created_at) }}
                                                         </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                            <button
-                                                                @click="viewJobDetails(job)"
-                                                                class="text-indigo-600 hover:text-indigo-900"
-                                                            >
-                                                                View Details
-                                                            </button>
+                                                        <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                            {{ job.place_assigned || '-' }}
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -266,10 +330,13 @@ const navigateToRegister = () => {
                 <!-- Non-Plantilla Job Listings Section -->
                 <Collapsible :initially-open="true">
                     <template #header>
-                        <div class="flex items-center justify-between w-full">
-                            <h1 class="text-2xl font-bold uppercase tracking-wider">
+                        <div class="flex items-center justify-center flex-col w-full space-y-2">
+                            <h1 class="text-xl font-bold uppercase tracking-wider">
                                 Contract of Service & Job Order Positions
                             </h1>
+                            <div
+                                class="mx-auto w-24 h-1 bg-green-600 rounded-full"
+                            ></div>
                         </div>
                     </template>
 
@@ -292,45 +359,89 @@ const navigateToRegister = () => {
                             <div v-else>
                                 <!-- Job Listings Table -->
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
+                                    <table class="min-w-full border-collapse">
+                                        <thead>
                                             <tr>
-                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
-                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Closing Date</th>
-                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">No.</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Title</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Item Number</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Salary Grade</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Category</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0" colspan="4">Qualification Standards</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Closing Date</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Date Created</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm sticky top-0">Place of Assignment</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Education</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Training</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Experience</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm">Eligibility</th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
+                                                <th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-sm"></th>
                                             </tr>
                                         </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200">
-                                            <tr v-for="job in paginatedNonPlantillaJobs" :key="job.job_listing_id">
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm font-medium text-gray-900">{{ job.title }}</div>
-                                                    <div class="text-sm text-gray-500">{{ job.position?.position_name }}</div>
+                                        <tbody>
+                                            <tr v-if="paginatedNonPlantillaJobs.length === 0" class="border-b">
+                                                <td colspan="13" class="border border-gray-300 px-3 py-2 text-sm text-center text-gray-500">
+                                                    No matching job listings found
                                                 </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            </tr>
+                                            <tr v-for="(job, index) in paginatedNonPlantillaJobs"
+                                                :key="job.job_listing_id"
+                                                class="border-b transition-all duration-200 cursor-pointer hover:bg-blue-100 hover:shadow-md"
+                                                @click="viewJobDetails(job)"
+                                            >
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ (nonPlantillaPagination.currentPage - 1) * nonPlantillaPagination.perPage + index + 1 }}
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span>{{ job.title }}</span>
+                                                        <button
+                                                            @click.stop="viewJobDetails(job)"
+                                                            class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-0"
+                                                        >
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ job.position?.item_number === '' ? 'CoS/Job Order' : job.position?.item_number || '-' }}
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ job.position?.salary_grade?.salary_grade || '-' }}
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
                                                     {{ job.position?.category || '-' }}
                                                 </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ job.position?.minimum_requirement?.education_level || '-' }}
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ job.position?.minimum_requirement?.training_hours ? job.position?.minimum_requirement?.training_hours + ' hours' : '-' }}
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ job.position?.minimum_requirement?.years_experience ? job.position?.minimum_requirement?.years_experience + ' year(s)' : '-' }}
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ job.position?.minimum_requirement?.eligibility || '-' }}
+                                                </td>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
                                                     {{ formatDate(job.closing_date) }}
                                                 </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span :class="{
-                                                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
-                                                        'bg-green-100 text-green-800': job.status === 'Active',
-                                                        'bg-yellow-100 text-yellow-800': job.status === 'Draft',
-                                                        'bg-red-100 text-red-800': job.status === 'Closed'
-                                                    }">
-                                                        {{ job.status }}
-                                                    </span>
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ formatDate(job.created_at) }}
                                                 </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <button
-                                                        @click="viewJobDetails(job)"
-                                                        class="text-indigo-600 hover:text-indigo-900"
-                                                    >
-                                                        View Details
-                                                    </button>
+
+                                                <td class="border border-gray-300 px-3 py-2 text-sm">
+                                                    {{ job.place_assigned || '-' }}
                                                 </td>
                                             </tr>
                                         </tbody>

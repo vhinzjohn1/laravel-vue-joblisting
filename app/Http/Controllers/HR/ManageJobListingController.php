@@ -23,7 +23,8 @@ class ManageJobListingController extends Controller
                     $query->with(['salaryGrade', 'minimumRequirement']);
                 },
                 'creator',
-                'applications'
+                'applications',
+                'requiredDocuments'
             ])
             ->where('status', '!=', 'Archived');
         }])
@@ -54,11 +55,24 @@ class ManageJobListingController extends Controller
             'status' => 'required|string|in:Active,Draft,Closed,Archived',
             'batch_id' => 'required|exists:job_listing_batches,batch_id',
             'required_documents' => 'array',
-            'required_documents.*' => 'exists:required_documents,required_document_id'
+            'required_documents.*' => 'exists:required_documents,required_document_id',
+            'place_assigned' => 'required|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Get the batch to check its deadline
+        $batch = Batch::findOrFail($request->batch_id);
+
+        // Only validate closing date against batch deadline for plantilla batches
+        if ($batch->is_plantilla && strtotime($request->closing_date) > strtotime($batch->deadline)) {
+            return response()->json([
+                'errors' => [
+                    'closing_date' => ['Job listing closing date cannot be later than the batch deadline.']
+                ]
+            ], 422);
         }
 
         $jobListing = JobListing::create([
@@ -69,6 +83,7 @@ class ManageJobListingController extends Controller
             'status' => $request->status,
             'created_by' => Auth::id(),
             'batch_id' => $request->batch_id,
+            'place_assigned' => $request->place_assigned,
         ]);
 
         // Attach required documents if any
@@ -124,7 +139,8 @@ class ManageJobListingController extends Controller
             'closing_date' => 'required|date|after_or_equal:today',
             'status' => 'required|string|in:Active,Draft,Closed,Archived',
             'required_documents' => 'array',
-            'required_documents.*' => 'exists:required_documents,required_document_id'
+            'required_documents.*' => 'exists:required_documents,required_document_id',
+            'place_assigned' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -132,6 +148,18 @@ class ManageJobListingController extends Controller
         }
 
         $jobListing = JobListing::findOrFail($id);
+
+        // Get the batch to check its deadline
+        $batch = Batch::findOrFail($jobListing->batch_id);
+
+        // Only validate closing date against batch deadline for plantilla batches
+        if ($batch->is_plantilla && strtotime($request->closing_date) > strtotime($batch->deadline)) {
+            return response()->json([
+                'errors' => [
+                    'closing_date' => ['Job listing closing date cannot be later than the batch deadline.']
+                ]
+            ], 422);
+        }
 
         // Validate archive status change
         if ($request->status === 'Archived') {
@@ -148,6 +176,7 @@ class ManageJobListingController extends Controller
             'description' => $request->description,
             'closing_date' => $request->closing_date,
             'status' => $request->status,
+            'place_assigned' => $request->place_assigned,
         ]);
 
         // Sync required documents
@@ -188,10 +217,31 @@ class ManageJobListingController extends Controller
                 'items.*' => 'exists:job_listings,job_listing_id'
             ]);
 
+            // Check for job listings with applications
+            $jobListingsWithApplications = JobListing::whereIn('job_listing_id', $validated['items'])
+                ->whereHas('applications')
+                ->get();
+
+            if ($jobListingsWithApplications->isNotEmpty()) {
+                return response()->json([
+                    'message' => 'Cannot delete job listings that have applications.',
+                    'jobListings' => $jobListingsWithApplications->pluck('title')
+                ], 422);
+            }
+
             JobListing::whereIn('job_listing_id', $validated['items'])->delete();
         } else {
             // Handle single job listing deletion
             $jobListing = JobListing::findOrFail($id);
+
+            // Check if job listing has applications
+            if ($jobListing->applications()->exists()) {
+                return response()->json([
+                    'message' => 'Cannot delete job listing that has applications.',
+                    'jobListing' => $jobListing->title
+                ], 422);
+            }
+
             $jobListing->delete();
         }
 

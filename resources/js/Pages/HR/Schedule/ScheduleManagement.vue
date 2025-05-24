@@ -746,12 +746,7 @@ const prepareFormData = () => {
     // Create a new object to prevent modifying the original
     const formData = { ...form.value };
 
-    // If there's a schedule_date, ensure it's in ISO format
-    if (formData.schedule_date) {
-        // This ensures timezone consistency
-        const date = new Date(formData.schedule_date);
-        formData.schedule_date = date.toISOString();
-    }
+    console.log('This is the form data', formData);
 
     return formData;
 };

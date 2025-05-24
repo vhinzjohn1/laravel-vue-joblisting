@@ -15,8 +15,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-        // Get all Users with their roles
-        $users = User::select('user_id', 'username', 'email', 'role_name')->get();
+        $users = User::select('user_id', 'username', 'email', 'role_name')->paginate(10);
         return Inertia::render('Admin/AdminDashboard', ['users' => $users]);
     }
 
@@ -33,7 +32,7 @@ class AdminController extends Controller
         try {
             // Validate and automatically retrieve only the validated fields
             $data = $request->validate([
-                'username' => 'required|string',
+                'username' => 'required|string|unique:users',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|string|min:6|max:20',
                 'role_name' => 'required|string',
@@ -41,7 +40,8 @@ class AdminController extends Controller
 
             // Create a new User instance using mass assignment
             $createUser = User::create($data);
-            $users = User::all();
+            $users = User::select('user_id', 'username', 'email', 'role_name')
+                ->paginate(10, ['*'], 'page', $request->input('page', 1));
 
             return response()->json($users, 201);
         } catch (\Exception $e) {
@@ -55,7 +55,25 @@ class AdminController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show() {}
+    public function show(Request $request)
+    {
+        $query = User::select('user_id', 'username', 'email', 'role_name');
+
+        // Apply search if search term is provided
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('username', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%")
+                  ->orWhere('role_name', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Get paginated results
+        $users = $query->paginate(10, ['*'], 'page', $request->input('page', 1));
+
+        return response()->json($users);
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -90,7 +108,8 @@ class AdminController extends Controller
             // Update the user
             $user->update($data);
 
-            $users = User::select('user_id', 'username', 'email', 'role_name')->get();
+            $users = User::select('user_id', 'username', 'email', 'role_name')
+                ->paginate(10, ['*'], 'page', $request->input('page', 1));
 
             return response()->json($users, 200);
         } catch (\Exception $e) {
@@ -104,7 +123,7 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         try {
             // Find the user by ID
@@ -113,7 +132,10 @@ class AdminController extends Controller
             // Delete the user
             $user->delete();
 
-            return response()->json(['message' => 'User deleted successfully'], 200);
+            $users = User::select('user_id', 'username', 'email', 'role_name')
+                ->paginate(10, ['*'], 'page', $request->input('page', 1));
+
+            return response()->json($users, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occurred while deleting the user',

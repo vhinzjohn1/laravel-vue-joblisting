@@ -139,6 +139,37 @@ const showSuccessAlert = () => {
     });
 };
 
+const showValidationToast = () => {
+    const missingFields = [];
+
+    if (!form.firstname) missingFields.push('First Name');
+    if (!form.lastname) missingFields.push('Last Name');
+    if (!form.middle_name) missingFields.push('Middle Name');
+    if (!form.phone_number) missingFields.push('Phone Number');
+    if (user.role_name !== 'hr' && !form.eligibility) missingFields.push('Eligibility');
+    if (!form.email) missingFields.push('Email');
+    if (!isEmailVerified.value) missingFields.push('Email Verification');
+
+    Swal.fire({
+        position: "top-end",
+        icon: "warning",
+        title: "Required Fields Missing",
+        html: `
+            <div class="text-left">
+                <p class="mb-2">Please fill in the following required fields:</p>
+                <ul class="list-disc pl-4">
+                    ${missingFields.map(field => `<li>${field}</li>`).join('')}
+                </ul>
+            </div>
+        `,
+        showConfirmButton: false,
+        timer: 5000,
+        toast: true,
+        color: "#ffffff",
+        background: "#f59e0b",
+    });
+};
+
 // Polling function to only update email verification status
 const pollEmailVerificationStatus = async () => {
     try {
@@ -238,13 +269,15 @@ onUnmounted(() => {
                         <div class="flex relative mt-1">
                             <TextInput
                                 id="phone_number"
-                                type="number"
+                                type="tel"
                                 class="block w-full rounded-none rounded-r-md"
                                 v-model="form.phone_number"
                                 maxlength="10"
+                                pattern="[0-9]{10}"
                                 isPhoneNumber
-                                placeholder="9123456789"
+                                placeholder="9351234567"
                                 required
+                                @input="form.phone_number = form.phone_number.replace(/[^0-9]/g, '').slice(0, 10)"
                             />
                         </div>
                         <InputError
@@ -297,7 +330,7 @@ onUnmounted(() => {
                     <div class="md:col-span-2" v-if="user.role_name !== 'hr'">
                         <InputLabel
                             for="eligibility"
-                            value="Eligibility (Optional)"
+                            value="Eligibility"
                             class="font-medium text-gray-700"
                         />
                         <select
@@ -339,6 +372,7 @@ onUnmounted(() => {
                             ? 'bg-green-700 hover:bg-green-800'
                             : 'bg-green-300 cursor-not-allowed',
                     ]"
+                    @click="!form.firstname || !form.lastname || !form.middle_name || !form.phone_number || (user.role_name !== 'hr' && !form.eligibility) || !form.email || !isEmailVerified ? showValidationToast() : null"
                 >
                     Save Profile Details
                 </PrimaryButton>

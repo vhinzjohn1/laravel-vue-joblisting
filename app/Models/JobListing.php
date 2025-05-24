@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Carbon\Carbon;
 
 class JobListing extends Model
 {
@@ -20,12 +21,10 @@ class JobListing extends Model
         'batch_id',
         'closing_date',
         'status',
+        'place_assigned',
         'created_by',
     ];
 
-    protected $casts = [
-        'closing_date' => 'date',
-    ];
 
     public function position(): BelongsTo
     {

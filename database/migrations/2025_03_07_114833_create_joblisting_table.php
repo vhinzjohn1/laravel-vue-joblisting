@@ -15,7 +15,7 @@ return new class extends Migration
         // Create users table and seed dummy users
         Schema::create('users', function (Blueprint $table) {
             $table->id('user_id'); // Change primary key name
-            $table->string('username')->nullable();
+            $table->string('username')->nullable()->unique();
             $table->string('password');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -143,8 +143,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('position');
             $table->string('company_name');
-            $table->date('start_date');
-            $table->date('end_date')->nullable();
+            $table->string('start_date')->nullable();
+            $table->string('end_date')->nullable();
             $table->boolean('is_current_job')->default(false);
             $table->text('responsibilities')->nullable();
             $table->timestamps();
@@ -274,8 +274,8 @@ return new class extends Migration
             $table->id('batch_id');
             $table->string('batch_name')->nullable();
             $table->string('batch_code')->nullable();
-            $table->date('post_date');
-            $table->date('deadline');
+            $table->string('post_date')->nullable();
+            $table->string('deadline')->nullable();
             $table->string('status')->default('Active');
             $table->boolean('is_plantilla')->default(true);
             $table->timestamps();
@@ -344,8 +344,9 @@ return new class extends Migration
             $table->unsignedBigInteger('batch_id')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->date('closing_date')->nullable();
+            $table->string('closing_date')->nullable();
             $table->string('status')->nullable();
+            $table->string('place_assigned')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
@@ -392,17 +393,7 @@ return new class extends Migration
                 'closing_date' => '2025-05-31',
                 'status'       => 'Active',
                 'created_by'   => 2, // hr user
-                'created_at'   => now(),
-                'updated_at'   => now(),
-            ],
-            [
-                'position_id'  => 2, // Administrative Assistant
-                'batch_id'     => $batchId,
-                'title'        => 'Administrative Assistant Position',
-                'description'  => 'Support administrative operations with document handling, correspondence and scheduling.',
-                'closing_date' => '2025-05-31',
-                'status'       => 'Active',
-                'created_by'   => 2, // hr user
+                'place_assigned' => 'Valencia City',
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ]
@@ -430,6 +421,7 @@ return new class extends Migration
                 'closing_date' => '2025-06-30',
                 'status'       => 'Active',
                 'created_by'   => 2, // hr user
+                'place_assigned' => 'Malaybalay City',
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ],
@@ -441,6 +433,7 @@ return new class extends Migration
                 'closing_date' => '2025-06-30',
                 'status'       => 'Active',
                 'created_by'   => 2, // hr user
+                'place_assigned' => 'CMU',
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ]
@@ -557,7 +550,7 @@ return new class extends Migration
             $table->id('schedule_id');
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->timestamp('schedule_date')->nullable();
+            $table->string('schedule_date')->nullable();
             $table->string('location')->nullable();
             $table->string('status')->nullable();
             $table->text('notes')->nullable();

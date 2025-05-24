@@ -21,13 +21,15 @@ class ViewJobListingController extends Controller
                 'creator',
                 'applications'
             ])
-            ->where('status', '!=', 'Archived');
+            ->where('status', '=', 'Active')
+            ->where('closing_date', '>', now());
         }])
-        ->where('status', '!=', 'Archived')
+        ->where('status', '=', 'Active')
         ->get();
 
-        return Inertia::render('ViewJobListing', [
+        return Inertia::render('PreviewJobListing', [
             'batches' => $batches,
+            'date' => now(),
         ]);
     }
 

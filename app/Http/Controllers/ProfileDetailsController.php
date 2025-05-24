@@ -102,7 +102,7 @@ class ProfileDetailsController extends Controller
                 'start_date' => 'required|date',
                 'end_date' => 'required_if:is_current_job,false|nullable|date|after:start_date',
                 'is_current_job' => 'boolean',
-                'responsibilities' => 'required|string'
+                'responsibilities' => 'nullable|string'
             ]),
             default => abort(404),
         };
