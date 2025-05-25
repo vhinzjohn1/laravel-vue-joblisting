@@ -78,13 +78,31 @@ const error = ref('');
 const captchaText = ref('');
 const loading = ref(false);
 const canvasWidth = ref(300);
+const lastWidth = ref(0);
+const resizeTimeout = ref(null);
 
 const updateCanvasWidthAndDraw = async () => {
   if (canvas.value && canvas.value.parentElement) {
-    canvasWidth.value = canvas.value.parentElement.offsetWidth || 300;
-    await nextTick();
-    drawCaptcha();
+    const newWidth = canvas.value.parentElement.offsetWidth || 300;
+
+    // Only update if width actually changed significantly (more than 5px)
+    if (Math.abs(newWidth - lastWidth.value) > 5) {
+      canvasWidth.value = newWidth;
+      lastWidth.value = newWidth;
+      await nextTick();
+      drawCaptcha();
+    }
   }
+};
+
+// Debounced resize handler
+const handleResize = () => {
+  if (resizeTimeout.value) {
+    clearTimeout(resizeTimeout.value);
+  }
+  resizeTimeout.value = setTimeout(() => {
+    updateCanvasWidthAndDraw();
+  }, 250); // 250ms debounce
 };
 
 // Exclude 0 and O from the character set
@@ -179,13 +197,26 @@ const verifyCaptcha = async () => {
   }
 };
 
-onMounted(() => {
-  updateCanvasWidthAndDraw();
-  window.addEventListener('resize', updateCanvasWidthAndDraw);
+onMounted(async () => {
+  // Wait for next tick to ensure DOM is ready
+  await nextTick();
+
+  if (canvas.value && canvas.value.parentElement) {
+    lastWidth.value = canvas.value.parentElement.offsetWidth || 300;
+    canvasWidth.value = lastWidth.value;
+    // Ensure we draw the captcha after setting the width
+    await nextTick();
+    drawCaptcha();
+  }
+
+  window.addEventListener('resize', handleResize);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateCanvasWidthAndDraw);
+  window.removeEventListener('resize', handleResize);
+  if (resizeTimeout.value) {
+    clearTimeout(resizeTimeout.value);
+  }
 });
 
 defineExpose({
