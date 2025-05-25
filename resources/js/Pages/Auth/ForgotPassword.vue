@@ -16,7 +16,21 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('password.email'));
+    form.post(route('password.email'), {
+        onSuccess: () => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Verification Email Sent',
+                showConfirmButton: false,
+                timer: 3000,
+                background: '#22c55e',
+                color: '#ffffff',
+                iconColor: "#ffffff"
+            });
+        }
+    });
 };
 </script>
 

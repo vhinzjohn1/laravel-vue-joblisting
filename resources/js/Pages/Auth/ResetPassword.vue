@@ -27,6 +27,19 @@ const form = useForm({
 const submit = () => {
     form.post(route('password.store'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
+        onSuccess: () => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Password Reset Successfully',
+                showConfirmButton: false,
+                timer: 3000,
+                background: '#22c55e',
+                color: '#ffffff',
+                iconColor: "#ffffff"
+            });
+        }
     });
 };
 </script>
@@ -35,9 +48,10 @@ const submit = () => {
     <GuestLayout>
         <Head title="Reset Password" />
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
+        <div class="flex justify-center p-4 md:mt-10 w-full">
+                <form @submit.prevent="submit">
+                    <div>
+                        <InputLabel for="email" value="Email" />
 
                 <TextInput
                     id="email"
@@ -88,5 +102,6 @@ const submit = () => {
                 </PrimaryButton>
             </div>
         </form>
+        </div>
     </GuestLayout>
 </template>
