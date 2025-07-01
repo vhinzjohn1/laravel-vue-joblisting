@@ -64,10 +64,7 @@ const props = defineProps({
 
                     <!-- Desktop Menu -->
                     <div class="hidden items-center space-x-8 lg:flex">
-                        <a href="#home" class="text-green-800 hover:text-green-600">Home</a>
-                        <a href="#how-to-apply" class="text-green-800 hover:text-green-600">Apply</a>
-                        <Link href="view-job-listing" class="text-green-800 hover:text-green-600">Job Listings</Link>
-                        <a href="#about" class="text-green-800 hover:text-green-600">About</a>
+                        <a href="/" class="text-green-800 hover:text-green-600">Home</a>
                         <div class="flex space-x-4">
                             <Link v-if="props.canLogin" :href="route('login')" class="px-6 py-2 text-green-800 rounded-md border-2 border-green-800 transition-colors hover:bg-green-800 hover:text-white">
                                 Log in
@@ -91,9 +88,7 @@ const props = defineProps({
                             </svg>
                         </button>
                         <div class="flex flex-col mt-8 space-y-4">
-                            <a href="#home" class="text-lg text-green-800 hover:text-green-600">Home</a>
-                            <a href="#how-to-apply" class="text-lg text-green-800 hover:text-green-600">How to Apply</a>
-                            <a href="#about" class="text-lg text-green-800 hover:text-green-600">About</a>
+                            <a href="/" class="text-lg text-green-800 hover:text-green-600">Home</a>
                             <div class="flex flex-col mt-4 space-y-2">
                                 <Link v-if="props.canLogin" :href="route('login')" class="px-6 py-2 text-center text-green-800 rounded-md border-2 border-green-800 transition-colors hover:bg-green-800 hover:text-white">
                                     Log in
