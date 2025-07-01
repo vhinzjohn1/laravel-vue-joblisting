@@ -248,41 +248,25 @@ class JobApplicationController extends Controller
             $jobListing = JobListing::with('requiredDocuments')->findOrFail($request->job_listing_id);
             $requiredDocuments = $jobListing->requiredDocuments;
 
-            // Map document names to their corresponding keys
-            $documentNameToKey = [
-                'Letter of Intent/Application Letter' => 'application_letter',
-                'Personal Data Sheet (PDS)' => 'personal_data_sheet',
-                'Work Experience Sheet (WES)' => 'work_experience_sheet',
-                'Transcript of Records (TOR) and Diploma' => 'transcript_and_diploma',
-                'Authenticated Proof of Eligibility' => 'eligibility_proof',
-                'Latest Performance Rating (DPCR/IPCR)' => 'performance_rating',
-                'Certificate of Trainings, Special Orders, etc.' => 'training_certificates',
-                'Certificate of Employment' => 'employment_certificate'
-            ];
-
             $documentRefs = $request->input('documents', []);
             $documentsToAttach = [];
 
-            // Validate only the required documents
+            // Validate only the required documents using required_document_id as key
             foreach ($requiredDocuments as $requiredDoc) {
-                $docKey = $documentNameToKey[$requiredDoc->document_name] ?? null;
+                $docId = $requiredDoc->required_document_id;
 
-                if (!$docKey) {
-                    continue; // Skip if document name doesn't match our mapping
-                }
-
-                if (empty($documentRefs[$docKey])) {
+                if (empty($documentRefs[$docId])) {
                     return response()->json([
                         'message' => 'File Upload Error',
                         'errors' => [
-                            'document_name' => $requiredDoc->document_name,
+                            'document_id' => $docId,
                             'error' => $requiredDoc->document_name . ' is required'
                         ]
                     ], 422);
                 }
 
                 // Accept either a numeric ID or a hash string
-                $ref = $documentRefs[$docKey];
+                $ref = $documentRefs[$docId];
                 $tempFile = null;
                 if (is_numeric($ref)) {
                     $tempFile = TemporaryFile::find($ref);
@@ -294,13 +278,16 @@ class JobApplicationController extends Controller
                     return response()->json([
                         'message' => 'File Reference Error',
                         'errors' => [
-                            'document_name' => $requiredDoc->document_name,
+                            'document_id' => $docId,
                             'error' => $requiredDoc->document_name . ' file reference is invalid or expired'
                         ]
                     ], 422);
                 }
 
-                $documentsToAttach[$docKey] = $tempFile;
+                $documentsToAttach[$docId] = [
+                    'tempFile' => $tempFile,
+                    'document_name' => $requiredDoc->document_name
+                ];
             }
 
             // Validate remaining fields (education, trainings, experiences)
@@ -380,14 +367,14 @@ class JobApplicationController extends Controller
             }
 
             // Attach only the required documents to application
-            foreach ($documentsToAttach as $docType => $tempFile) {
-                // Store file_path as relative to public storage
+            foreach ($documentsToAttach as $docId => $docData) {
+                $tempFile = $docData['tempFile'];
                 $filePathForDb = $tempFile->path;
                 ApplicantDocument::create([
                     'user_id' => auth()->id(),
                     'application_id' => $application->application_id,
                     'document_name' => $tempFile->filename,
-                    'document_type' => $docType,
+                    'document_type' => $docData['document_name'], // Store the required document's name
                     'file_path' => $filePathForDb,
                     'is_verified' => false,
                 ]);

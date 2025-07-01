@@ -53,6 +53,12 @@ onMounted(() => {
         route().current("selection-lineup.show")
     ) {
         activeDropdown.value = "reports";
+    } else if (
+        route().current("job-position.index") ||
+        route().current("required-documents.index") ||
+        route().current("archive.index")
+    ) {
+        activeDropdown.value = "masterlist";
     }
 });
 
@@ -71,6 +77,11 @@ watch(
             newRoute === "selection-lineup.show"
         ) {
             activeDropdown.value = "reports";
+        } else if (
+            newRoute === "job-position.index" ||
+            newRoute === "required-documents.index"
+        ) {
+            activeDropdown.value = "masterlist";
         }
     },
 );
@@ -469,44 +480,6 @@ onMounted(async () => {
                         </Link>
                     </li>
 
-                    <!-- Job Position Details -->
-                    <li>
-                        <Link
-                            id="job-details-link"
-                            as="button"
-                            :disabled="isTourActive"
-                            :href="route('job-position.index')"
-                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
-                            :class="{
-                                'bg-[#ffc001] text-black':
-                                    isActive('job-position.index'),
-                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    !isActive('job-position.index'),
-                            }"
-                        >
-                            <div class="flex items-center w-full">
-                                <div
-                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
-                                    :class="{
-                                        'text-black':
-                                            isActive('job-position.index'),
-                                    }"
-                                >
-                                    <i class="fas fa-users-cog"></i>
-                                </div>
-                                <span
-                                    v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-200"
-                                    :class="{
-                                        'font-semibold':
-                                            isActive('job-position.index'),
-                                    }"
-                                    >Position Details</span
-                                >
-                            </div>
-                        </Link>
-                    </li>
-
                     <!-- Job Listings -->
                     <li>
                         <Link
@@ -627,74 +600,152 @@ onMounted(async () => {
                         </Link>
                     </li>
 
-                    <!-- Required Documents -->
-                    <li>
-                        <Link
-                            as="button"
-                            :disabled="isTourActive"
-                            id="required-documents-link"
-                            :href="route('required-documents.index')"
-                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
+                    <!-- Job Position Details and Required Documents grouped as Masterlist Dropdown -->
+                    <li class="relative">
+                        <div
+                            id="masterlist-link"
+                            @click="toggleDropdown('masterlist')"
+                            class="flex overflow-hidden relative justify-between items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer sidebar-link group"
                             :class="{
-                                'bg-[#ffc001] text-black': isActive('required-documents.index'),
+                                'text-white': isActiveGroup([
+                                    'job-position.index',
+                                    'required-documents.index',
+                                    'archive.index',
+                                ]),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    !isActive('required-documents.index'),
+                                    !isActiveGroup([
+                                        'job-position.index',
+                                        'required-documents.index',
+                                        'archive.index',
+                                    ]),
                             }"
                         >
-                            <div class="flex items-center w-full">
+                            <div class="flex items-center">
                                 <div
                                     class="flex justify-center items-center w-8 h-8 transition-all duration-300"
                                     :class="{
-                                        'text-black': isActive('required-documents.index'),
+                                        'text-white': isActiveGroup([
+                                            'job-position.index',
+                                            'required-documents.index',
+                                            'archive.index',
+                                        ]),
                                     }"
                                 >
-                                    <i class="fas fa-file-alt"></i>
+                                    <i class="fas fa-folder"></i>
                                 </div>
                                 <span
                                     v-if="sidebarOpen"
                                     class="ml-3 font-medium transition-all duration-200"
                                     :class="{
-                                        'font-semibold': isActive('required-documents.index'),
+                                        'font-semibold': isActiveGroup([
+                                            'job-position.index',
+                                            'required-documents.index',
+                                            'archive.index',
+                                        ]),
                                     }"
-                                    >Required Documents</span
+                                    >Masterlist</span
                                 >
                             </div>
-                        </Link>
-                    </li>
-
-                    <!-- Archive - Direct Link -->
-                    <li>
-                        <Link
-                            as="button"
-                            :disabled="isTourActive"
-                            id="archive-link"
-                            :href="route('archive.index')"
-                            class="flex overflow-hidden relative items-center px-4 py-2.5 w-full rounded-lg transition-all duration-200 sidebar-link group"
-                            :class="{
-                                'bg-[#ffc001] text-black': isActive('archive.index'),
-                                'text-gray-300 hover:bg-[#034b1c] hover:text-white':
-                                    !isActive('archive.index'),
-                            }"
+                            <div
+                                v-if="sidebarOpen"
+                                class="transition-transform duration-200"
+                                :class="{
+                                    'rotate-180': activeDropdown === 'masterlist',
+                                }"
+                            >
+                                <i
+                                    class="text-xs fas fa-chevron-down"
+                                    :class="{
+                                        'text-white': isActiveGroup([
+                                            'job-position.index',
+                                            'required-documents.index',
+                                            'archive.index',
+                                        ]),
+                                    }"
+                                ></i>
+                            </div>
+                        </div>
+                        <!-- Dropdown menu -->
+                        <transition
+                            enter-active-class="transition duration-200 ease-out"
+                            enter-from-class="opacity-0 transform scale-95"
+                            enter-to-class="opacity-100 transform scale-100"
+                            leave-active-class="transition duration-100 ease-in"
+                            leave-from-class="opacity-100 transform scale-100"
+                            leave-to-class="opacity-0 transform scale-95"
                         >
-                            <div class="flex items-center w-full">
-                                <div
-                                    class="flex justify-center items-center w-8 h-8 transition-all duration-300"
-                                    :class="{
-                                        'text-black': isActive('archive.index'),
-                                    }"
-                                >
-                                    <i class="fas fa-archive"></i>
-                                </div>
-                                <span
-                                    v-if="sidebarOpen"
-                                    class="ml-3 font-medium transition-all duration-200"
-                                    :class="{
-                                        'font-semibold': isActive('archive.index'),
-                                    }"
-                                    >Archive</span
-                                >
-                            </div>
-                        </Link>
+                            <ul
+                                v-show="activeDropdown === 'masterlist'"
+                                class="pr-2 pl-4 mt-1 ml-4 space-y-1"
+                            >
+                                <li>
+                                    <Link
+                                        id="job-details-link"
+                                        :disabled="isTourActive"
+                                        :href="route('job-position.index')"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('job-position.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('job-position.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="mr-2 fas fa-users-cog"
+                                            :class="{
+                                                'text-black': isActive('job-position.index'),
+                                            }"
+                                        ></i>
+                                        <span>Position Details</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        id="required-documents-link"
+                                        :disabled="isTourActive"
+                                        :href="route('required-documents.index')"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('required-documents.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('required-documents.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="mr-2 fas fa-file-alt"
+                                            :class="{
+                                                'text-black': isActive('required-documents.index'),
+                                            }"
+                                        ></i>
+                                        <span>Required Documents</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        id="archive-link"
+                                        :disabled="isTourActive"
+                                        :href="route('archive.index')"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium':
+                                                isActive('archive.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white':
+                                                !isActive('archive.index'),
+                                        }"
+                                    >
+                                        <i
+                                            class="mr-2 fas fa-archive"
+                                            :class="{
+                                                'text-black': isActive('archive.index'),
+                                            }"
+                                        ></i>
+                                        <span>Archive</span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </transition>
                     </li>
 
                     <!-- Reports with dropdown -->

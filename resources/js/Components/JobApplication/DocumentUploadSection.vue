@@ -30,143 +30,19 @@
             </ul>
         </div>
 
-        <!-- Application Letter -->
+        <!-- Document Sections: Now use DB-driven description -->
         <document-section
-            v-if="isDocumentRequired('application letter')"
-            title="LETTER OF INTENT/APPLICATION LETTER"
-            description="Application Letter should specify the POSITION
-                    APPLIED FOR and the PLACE OF ASSIGNMENT. File should
-                    be in Portable Document Format (PDF)."
-            document-type="application_letter"
-            :document="documents.application_letter"
-            :is-loading="documentUploadLoading.application_letter"
-            @update:document="
-                (file) => $emit('update:document', 'application_letter', file)
-            "
-            @remove="() => $emit('remove:document', 'application_letter')"
-            @upload-complete="$emit('upload-complete', 'application_letter', $event)"
-        />
-
-        <!-- Personal Data Sheet -->
-        <document-section
-            v-if="isDocumentRequired('personal data sheet')"
-            title="PERSONAL DATA SHEET"
-            description="The CS Form No. 212, Revised 2017 (Personal Data
-                    Sheet) shall be duly accomplished. Ensure that all 4
-                    pages of the PDS is filled-out."
-            document-type="personal_data_sheet"
-            :document="documents.personal_data_sheet"
-            :is-loading="documentUploadLoading.personal_data_sheet"
-            @update:document="
-                (file) => $emit('update:document', 'personal_data_sheet', file)
-            "
-            @remove="() => $emit('remove:document', 'personal_data_sheet')"
-            @upload-complete="$emit('upload-complete', 'personal_data_sheet', $event)"
-        />
-
-        <!-- Work Experience Sheet -->
-        <document-section
-            v-if="isDocumentRequired('work experience sheet')"
-            title="WORK EXPERIENCE SHEET"
-            description="The Work Experience Sheet shall be duly
-                    accomplished. The Work Experience Sheet shall
-                    coincide with the Personal Data Sheet and Service
-                    Record."
-            document-type="work_experience_sheet"
-            :document="documents.work_experience_sheet"
-            :is-loading="documentUploadLoading.work_experience_sheet"
-            @update:document="
-                (file) => $emit('update:document', 'work_experience_sheet', file)
-            "
-            @remove="() => $emit('remove:document', 'work_experience_sheet')"
-            @upload-complete="$emit('upload-complete', 'work_experience_sheet', $event)"
-        />
-
-        <!-- Transcript & Diploma -->
-        <document-section
-            v-if="isDocumentRequired('transcript of records')"
-            title="TRANSCRIPT OF RECORDS AND DIPLOMA"
-            description="Include copies of your educational credentials.
-                    Combine all pages into a single PDF file."
-            document-type="transcript_and_diploma"
-            :document="documents.transcript_and_diploma"
-            :is-loading="documentUploadLoading.transcript_and_diploma"
-            @update:document="
-                (file) => $emit('update:document', 'transcript_and_diploma', file)
-            "
-            @remove="() => $emit('remove:document', 'transcript_and_diploma')"
-            @upload-complete="$emit('upload-complete', 'transcript_and_diploma', $event)"
-        />
-
-        <!-- Eligibility -->
-        <document-section
-            v-if="isDocumentRequired('authenticated proof of eligibility')"
-            title="AUTHENTICATED PROOF OF ELIGIBILITY"
-            description="Authenticated Civil Service Commission (CSC)
-                    Eligibility or Professional Regulation Commission
-                    (PRC) License showing that the LICENSE IS NOT
-                    EXPIRED."
-            document-type="eligibility_proof"
-            :document="documents.eligibility_proof"
-            :is-loading="documentUploadLoading.eligibility_proof"
-            @update:document="
-                (file) => $emit('update:document', 'eligibility_proof', file)
-            "
-            @remove="() => $emit('remove:document', 'eligibility_proof')"
-            @upload-complete="$emit('upload-complete', 'eligibility_proof', $event)"
-        />
-
-        <!-- Performance Rating -->
-        <document-section
-            v-if="isDocumentRequired('latest performance rating')"
-            title="LATEST PERFORMANCE RATING (DPCR/IPCR)"
-            description="The latest Office/Division/Individual Performance
-                    Commitment and Review Form. For external applicants
-                    with no Performance Ratings, please upload a
-                    document specifying that Performance Rating is Not
-                    Applicable."
-            document-type="performance_rating"
-            :document="documents.performance_rating"
-            :is-loading="documentUploadLoading.performance_rating"
-            @update:document="
-                (file) => $emit('update:document', 'performance_rating', file)
-            "
-            @remove="() => $emit('remove:document', 'performance_rating')"
-            @upload-complete="$emit('upload-complete', 'performance_rating', $event)"
-        />
-
-        <!-- Training Certificates -->
-        <document-section
-            v-if="isDocumentRequired('certificate of trainings')"
-            title="CERTIFICATES OF TRAININGS, SPECIAL ORDERS, ETC."
-            description="The Certificate of Trainings Attended must be
-                    arranged according to its presentation in the
-                    Personal Data Sheet (Page 3: Descending Order). The
-                    Special Orders must be arranged in descending order."
-            document-type="training_certificates"
-            :document="documents.training_certificates"
-            :is-loading="documentUploadLoading.training_certificates"
-            @update:document="
-                (file) => $emit('update:document', 'training_certificates', file)
-            "
-            @remove="() => $emit('remove:document', 'training_certificates')"
-            @upload-complete="$emit('upload-complete', 'training_certificates', $event)"
-        />
-
-        <!-- Employment Certificate -->
-        <document-section
-            v-if="isDocumentRequired('certificate of employment')"
-            title="CERTIFICATE OF EMPLOYMENT"
-            description="Provide certificates from your current and previous
-                    employers."
-            document-type="employment_certificate"
-            :document="documents.employment_certificate"
-            :is-loading="documentUploadLoading.employment_certificate"
-            @update:document="
-                (file) => $emit('update:document', 'employment_certificate', file)
-            "
-            @remove="() => $emit('remove:document', 'employment_certificate')"
-            @upload-complete="$emit('upload-complete', 'employment_certificate', $event)"
+            v-for="doc in requiredDocuments"
+            :key="doc.required_document_id"
+            :data-required-document="doc.required_document_id"
+            :title="doc.document_name.toUpperCase()"
+            :description="doc.description"
+            :document-type="doc.required_document_id"
+            :document="documents[doc.required_document_id]"
+            :is-loading="documentUploadLoading[doc.required_document_id]"
+            @update:document="file => $emit('update:document', doc.required_document_id, file)"
+            @remove="$emit('remove:document', doc.required_document_id)"
+            @upload-complete="$emit('upload-complete', doc.required_document_id, $event)"
         />
     </div>
 </template>
@@ -203,19 +79,11 @@ onMounted(async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        console.log('This is the response', response);
         requiredDocuments.value = response.data;
     } catch (error) {
         console.error('Error fetching required documents:', error);
     }
 });
-
-// Add a computed property to check if a document is required
-const isDocumentRequired = (documentType) => {
-    return requiredDocuments.value.some(doc =>
-        doc.document_name.toLowerCase().includes(documentType.toLowerCase())
-    );
-};
 
 defineEmits(["update:document", "remove:document", "upload-complete"]);
 </script>

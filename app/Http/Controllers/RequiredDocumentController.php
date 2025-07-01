@@ -53,6 +53,8 @@ class RequiredDocumentController extends Controller
     {
         $validated = $request->validate([
             'document_name' => 'required|string|max:255|unique:required_documents,document_name',
+            'description' => 'required|string|max:255',
+            'is_required' => 'required|boolean',
         ]);
         $requiredDocument = RequiredDocument::create($validated);
 
@@ -83,10 +85,14 @@ class RequiredDocumentController extends Controller
     {
         $validated = $request->validate([
             'required_document_id' => 'required',
-            'document_name' => 'required|string|max:255|unique:required_documents,document_name,' . $requiredDocument->id . ',required_document_id',
+            'document_name' => 'required|string|max:255|unique:required_documents,document_name,' . $requiredDocument->required_document_id . ',required_document_id',
+            'description' => 'required|string|max:255',
+            'is_required' => 'required|boolean',
         ]);
         $requiredDocument->update([
             'document_name' => $validated['document_name'],
+            'description' => $validated['description'],
+            'is_required' => $validated['is_required'],
         ]);
 
         $requiredDocuments = RequiredDocument::all();

@@ -42,6 +42,10 @@
                                         key: 'document_name',
                                         title: 'Document Name',
                                     },
+                                    {
+                                        key: 'description',
+                                        title: 'Description',
+                                    },
                                 ]"
                                 @edit="showEdit"
                                 @delete="deleteDocument"
@@ -86,6 +90,21 @@
                                         autofocus
                                         class="w-full"
                                     />
+                                </div>
+                                <div class="form-group">
+                                    <label
+                                        for="description"
+                                        class="block mb-1 text-sm font-medium text-gray-700"
+                                    >
+                                        Description
+                                    </label>
+                                    <textarea
+                                        id="description"
+                                        v-model="form.description"
+                                        placeholder="Enter description"
+                                        class="w-full rounded border-gray-300 focus:border-green-700 focus:ring-green-700"
+                                        rows="3"
+                                    ></textarea>
                                 </div>
                             </div>
                         </div>
@@ -147,6 +166,21 @@
                                         class="w-full"
                                     />
                                 </div>
+                                <div class="form-group">
+                                    <label
+                                        for="edit_description"
+                                        class="block mb-1 text-sm font-medium text-gray-700"
+                                    >
+                                        Description
+                                    </label>
+                                    <textarea
+                                        id="edit_description"
+                                        v-model="form.description"
+                                        placeholder="Enter description"
+                                        class="w-full rounded border-gray-300 focus:border-green-700 focus:ring-green-700"
+                                        rows="3"
+                                    ></textarea>
+                                </div>
                             </div>
                             <div v-if="form.errors.document_name" class="text-red-500 text-sm mt-1">
                                 {{ form.errors.document_name }}
@@ -197,13 +231,13 @@ const layouts = {
     hr: HRLayout,
 };
 
-
-
 const requiredDocuments = ref(page.props.requiredDocuments);
 
 
 const form = useForm({
     document_name: "",
+    description: "",
+    is_required: false,
     required_document_id: "",
 });
 
@@ -228,6 +262,7 @@ const saveDocument = () => {
 const showEdit = (item) => {
     form.required_document_id = item.required_document_id;
     form.document_name = item.document_name;
+    form.description = item.description;
     showEditModal.value = true;
 };
 

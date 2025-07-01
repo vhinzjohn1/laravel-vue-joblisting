@@ -290,6 +290,8 @@ return new class extends Migration
         Schema::create('required_documents', function (Blueprint $table) {
             $table->id('required_document_id');
             $table->string('document_name')->unique();
+            $table->string('description')->nullable();
+            $table->boolean('is_required')->default(false);
             $table->timestamps();
         });
 
@@ -297,41 +299,49 @@ return new class extends Migration
         DB::table('required_documents')->insert([
             [
                 'document_name' => 'Letter of Intent/Application Letter',
+                'description' => 'Application Letter should specify the POSITION APPLIED FOR and the PLACE OF ASSIGNMENT. File should be in Portable Document Format (PDF).',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'document_name' => 'Personal Data Sheet (PDS)',
+                'description' => 'The CS Form No. 212, Revised 2017 (Personal Data Sheet) shall be duly accomplished. Ensure that all 4 pages of the PDS is filled-out.',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'document_name' => 'Work Experience Sheet (WES)',
+                'description' => 'The Work Experience Sheet shall be duly accomplished. The Work Experience Sheet shall coincide with the Personal Data Sheet and Service Record.',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'document_name' => 'Transcript of Records (TOR) and Diploma',
+                'description' => 'Include copies of your educational credentials. Combine all pages into a single PDF file.',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'document_name' => 'Authenticated Proof of Eligibility',
+                'description' => 'Authenticated Civil Service Commission (CSC) Eligibility or Professional Regulation Commission (PRC) License showing that the LICENSE IS NOT EXPIRED.',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'document_name' => 'Latest Performance Rating (DPCR/IPCR)',
+                'description' => 'The latest Office/Division/Individual Performance Commitment and Review Form. For external applicants with no Performance Ratings, please upload a document specifying that Performance Rating is Not Applicable.',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'document_name' => 'Certificate of Trainings, Special Orders, etc.',
+                'description' => 'The Certificate of Trainings Attended must be arranged according to its presentation in the Personal Data Sheet (Page 3: Descending Order). The Special Orders must be arranged in descending order.',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'document_name' => 'Certificate of Employment',
+                'description' => 'Provide certificates from your current and previous employers.',
                 'created_at' => now(),
                 'updated_at' => now()
             ]

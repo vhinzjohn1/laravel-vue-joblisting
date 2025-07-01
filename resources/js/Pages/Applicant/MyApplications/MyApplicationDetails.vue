@@ -252,11 +252,7 @@
                                                     <h4
                                                         class="text-sm font-medium text-gray-600 mb-2"
                                                     >
-                                                        {{
-                                                            formatDocumentType(
-                                                                documentType,
-                                                            )
-                                                        }}
+                                                        {{ docs[0]?.document_type || 'Document' }}
                                                     </h4>
 
                                                     <div
@@ -565,7 +561,6 @@ import { ref, computed } from "vue";
 import { Head } from "@inertiajs/vue3";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
 import Header from "@/Components/Header/Header.vue";
-import Breadcrumbs from "@/Components/Breadcrumbs/Breadcrumbs.vue";
 
 // Props
 const props = defineProps({

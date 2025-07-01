@@ -68,8 +68,8 @@
                             Please upload all required documents:
                         </p>
                         <ul class="text-sm text-red-500 mt-1">
-                            <li v-for="(error, docType) in validationErrors.missingDocuments" :key="docType">
-                                {{ getDocumentDisplayName(docType) }}
+                            <li v-for="(error, docId) in validationErrors.missingDocuments" :key="docId">
+                                {{ getDocumentDisplayName(docId) }}
                             </li>
                         </ul>
                     </div>
@@ -173,12 +173,12 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Documents</h3>
                     <div class="space-y-4">
-                        <div v-for="(doc, docType) in form.documents" :key="docType">
+                        <div v-for="(doc, docId) in form.documents" :key="docId">
                             <template v-if="doc">
                                 <div class="bg-gray-50 p-4 rounded-lg">
                                     <div class="flex items-start justify-between">
                                         <div>
-                                            <p class="font-medium">{{ getDocumentDisplayName(docType) }}</p>
+                                            <p class="font-medium">{{ getDocumentDisplayName(docId) }}</p>
                                             <p class="text-gray-600">{{ doc.name }}</p>
                                         </div>
                                         <div class="flex gap-2">
@@ -281,18 +281,6 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "submitted"]);
 
-// Document name mapping for display
-const documentDisplayNames = {
-    application_letter: 'Letter of Intent/Application Letter',
-    personal_data_sheet: 'Personal Data Sheet (PDS)',
-    work_experience_sheet: 'Work Experience Sheet (WES)',
-    transcript_and_diploma: 'Transcript of Records (TOR) and Diploma',
-    eligibility_proof: 'Authenticated Proof of Eligibility',
-    performance_rating: 'Latest Performance Rating (DPCR/IPCR)',
-    training_certificates: 'Certificate of Trainings, Special Orders, etc.',
-    employment_certificate: 'Certificate of Employment'
-};
-
 // Simplified computed properties
 const educationOptions = computed(() => props.existingEducation);
 const trainingOptions = computed(() => props.existingTrainings);
@@ -304,29 +292,11 @@ const form = useForm({
     education: [],
     trainings: [],
     experiences: [],
-    documents: {
-        application_letter: null,
-        personal_data_sheet: null,
-        work_experience_sheet: null,
-        transcript_and_diploma: null,
-        eligibility_proof: null,
-        performance_rating: null,
-        training_certificates: null,
-        employment_certificate: null,
-    },
+    documents: {},
 });
 
 // Loading states for individual document uploads and form submission
-const documentUploadLoading = ref({
-    application_letter: false,
-    personal_data_sheet: false,
-    work_experience_sheet: false,
-    transcript_and_diploma: false,
-    eligibility_proof: false,
-    performance_rating: false,
-    training_certificates: false,
-    employment_certificate: false,
-});
+const documentUploadLoading = ref({});
 const formSubmitting = ref(false);
 
 // Add validation state
@@ -345,8 +315,9 @@ const previewDocumentUrl = ref(null);
 const currentPreviewDocument = ref(null);
 
 // Helper function to get document display name
-const getDocumentDisplayName = (docType) => {
-    return documentDisplayNames[docType] || docType;
+const getDocumentDisplayName = (docId) => {
+    // Implement your logic to get document display name based on docId
+    return docId;
 };
 
 // Update handlers for child components
@@ -379,51 +350,25 @@ const closeModal = () => {
     emit("close");
 };
 
-const handleDocumentUpdate = (docType, file) => {
-    // Clear validation error for this document type when a new file is uploaded
-    if (validationErrors.value.missingDocuments[docType]) {
-        delete validationErrors.value.missingDocuments[docType];
+const handleDocumentUpdate = (docId, file) => {
+    // Clear validation error for this document id when a new file is uploaded
+    if (validationErrors.value.missingDocuments[docId]) {
+        delete validationErrors.value.missingDocuments[docId];
     }
-
-    // Set loading state for this specific document type
-    documentUploadLoading.value[docType] = true;
-
-    // Verify the document type is valid
-    if (!Object.keys(form.documents).includes(docType)) {
-        console.error(`Invalid document type: ${docType}`);
-        documentUploadLoading.value[docType] = false;
-        return;
-    }
-
-    // Update only the specific document type
-    form.documents[docType] = file;
-
-    // Log for debugging to confirm which document is being updated
-    console.log(`Document updated: ${docType}`, file.name);
-
-    // Set loading to false after upload (upload is now handled in DocumentUploader)
-    documentUploadLoading.value[docType] = false;
+    documentUploadLoading.value[docId] = true;
+    form.documents[docId] = file;
+    documentUploadLoading.value[docId] = false;
 };
 
-const handleDocumentRemove = (docType) => {
-    console.log(`Starting removal for document type: ${docType}`);
-
-    // Create a clean copy of the current documents
+const handleDocumentRemove = (docId) => {
     const updatedDocuments = { ...form.documents };
-
-    // Remove only the specific document
-    updatedDocuments[docType] = null;
-
-    // Update the entire documents object to ensure reactivity
+    updatedDocuments[docId] = null;
     form.documents = updatedDocuments;
-
-    // Log for debugging
-    console.log(`Document removed: ${docType}`);
 };
 
-const handleDocumentUploadComplete = (docType, fileInfo) => {
+const handleDocumentUploadComplete = (docId, fileInfo) => {
     // Optionally, you can show a toast or mark the document as uploaded
-    console.log(`Upload complete for ${docType}`, fileInfo);
+    console.log(`Upload complete for ${docId}`, fileInfo);
     // You could update state here if needed for further UX improvement
 };
 
@@ -435,26 +380,16 @@ const validateEducation = () => {
 };
 
 const validateDocuments = () => {
-    console.log('Starting document validation');
-    // Get required documents from the DocumentUploadSection component
     const requiredDocuments = document.querySelectorAll('[data-required-document]');
-    console.log('Required documents found:', requiredDocuments.length);
-
     const missingDocuments = {};
     let isValid = true;
-
     requiredDocuments.forEach(doc => {
-        const docType = doc.getAttribute('data-required-document');
-        console.log('Checking document:', docType, form.documents[docType]);
-
-        if (!form.documents[docType] || !form.documents[docType].serverFile) {
-            console.log('Missing document:', docType);
-            missingDocuments[docType] = true;
+        const docId = doc.getAttribute('data-required-document');
+        if (!form.documents[docId] || !form.documents[docId].serverFile) {
+            missingDocuments[docId] = true;
             isValid = false;
         }
     });
-
-    console.log('Document validation result:', { isValid, missingDocuments });
     validationErrors.value.missingDocuments = missingDocuments;
     return isValid;
 };
@@ -526,40 +461,30 @@ const closeDocumentPreview = () => {
 const submitApplication = async () => {
     try {
         formSubmitting.value = true;
-
-        // Build FormData and send request (same as your original logic)
         const formData = new FormData();
         formData.append("job_listing_id", form.job_listing_id);
-
-        // Add education data
         form.education.forEach((edu, index) => {
             Object.keys(edu).forEach((key) => {
                 formData.append(`education[${index}][${key}]`, edu[key] || "");
             });
         });
-
-        // Add training data
         form.trainings.forEach((training, index) => {
             Object.keys(training).forEach((key) => {
                 formData.append(`trainings[${index}][${key}]`, training[key] || "");
             });
         });
-
-        // Add experience data
         form.experiences.forEach((exp, index) => {
             Object.keys(exp).forEach((key) => {
                 formData.append(`experiences[${index}][${key}]`, exp[key] || "");
             });
         });
-
-        // Add document references (send serverFile.id or serverFile.hash, not the file itself)
-        Object.keys(form.documents).forEach((docType) => {
-            const doc = form.documents[docType];
+        // Add document references using required_document_id
+        Object.keys(form.documents).forEach((docId) => {
+            const doc = form.documents[docId];
             if (doc && doc.serverFile) {
-                formData.append(`documents[${docType}]`, doc.serverFile.id || doc.serverFile.hash);
+                formData.append(`documents[${docId}]`, doc.serverFile.id || doc.serverFile.hash);
             }
         });
-
         const response = await axios.post(route("job-application.store"), formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -567,7 +492,6 @@ const submitApplication = async () => {
                 "X-Requested-With": "XMLHttpRequest"
             }
         });
-
         formSubmitting.value = false;
         closeConfirmationModal();
         closeModal();

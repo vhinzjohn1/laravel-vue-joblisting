@@ -15,6 +15,8 @@ class RequiredDocument extends Model
 
     protected $fillable = [
         'document_name',
+        'description',
+        'is_required',
     ];
 
     public function jobListings()
