@@ -519,7 +519,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { Head, usePage, router } from "@inertiajs/vue3";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
 import Header from "@/Components/Header/Header.vue";
@@ -570,4 +570,9 @@ const handleApplicationSubmitted = (responseData) => {
     closeApplicationModal();
     job.value = responseData.job;
 };
+
+// Remove job_listing_id from localStorage on mount to prevent redirect loops
+onMounted(() => {
+    localStorage.removeItem('job_listing_id');
+});
 </script>

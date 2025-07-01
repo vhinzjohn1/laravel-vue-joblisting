@@ -89,7 +89,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
@@ -97,6 +97,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('welcome');
+        // Use Inertia::location to force a full page reload to the root (welcome blade)
+        return Inertia::location('/');
     }
 }

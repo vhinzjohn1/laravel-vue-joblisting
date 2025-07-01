@@ -24,12 +24,6 @@ class ApplicantDashboardController extends Controller
         // Get application statistics
         $stats = [
             'total_applications' => Application::where('user_id', $user->user_id)->count(),
-            'pending_applications' => Application::where('user_id', $user->user_id)
-                ->where('status', 'Pending')
-                ->count(),
-            'successful_applications' => Application::where('user_id', $user->user_id)
-                ->where('status', 'Accepted')
-                ->count(),
             'upcoming_interviews' => ScheduleParticipant::where('user_id', $user->user_id)
                 ->whereHas('schedule', function ($query) {
                     $query->where('schedule_date', '>=', now());
@@ -54,14 +48,15 @@ class ApplicantDashboardController extends Controller
             ->get();
 
         // Get recommended jobs based on user's previous applications
-        $recommendedJobs = JobListing::where('status', 'active')
+        $recommendedJobs = JobListing::where('status', 'Active')
             ->whereNotIn('job_listing_id', function ($query) use ($user) {
                 $query->select('job_listing_id')
                     ->from('applications')
                     ->where('user_id', $user->user_id);
+
             })
-            ->latest()
-            ->take(5)
+            ->where('closing_date', '>', now())
+            ->take(3)
             ->get();
 
         return Inertia::render('Applicant/ApplicantDashboard', [

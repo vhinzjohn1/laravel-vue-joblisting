@@ -310,7 +310,7 @@ onUnmounted(() => {
                         <!-- Email verification status -->
                         <div v-if="!isEmailVerified" class="mt-2">
                             <p class="text-sm text-red-600">
-                                Your email is not verified.
+                                Your email is not verified. Verify your email to continue.
                                 <button
                                     type="button"
                                     @click="resendVerificationEmail"

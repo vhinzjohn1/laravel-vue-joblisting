@@ -306,7 +306,10 @@ const navigateToSection = (section) => {
         'job_listings': 'job-listing.index',
         'upcoming_interviews': 'schedules.index',
         'schedules': 'schedules.index',
-        'total_candidates': 'applications.index'
+        'total_candidates': 'applications.index',
+        'total_jobs': 'job-listing.index',
+        'total_applicants': 'applications.index',
+        'scheduled_interviews': 'schedules.index'
     };
 
     if (routes[section]) {

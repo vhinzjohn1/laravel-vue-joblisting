@@ -66,6 +66,20 @@ const handleCaptchaVerified = (verified) => {
                 form.reset('password');
                 showCaptcha.value = false;
                 isCaptchaVerified.value = false;
+                // Check if there's a job_listing_id in localStorage
+                const jobData = localStorage.getItem('job_listing_id');
+                if (jobData) {
+                    try {
+                        const jobs = JSON.parse(jobData);
+                        if (jobs.length > 0) {
+                            // Redirect to the most recent job application
+                            const latestJob = jobs[jobs.length - 1];
+                            window.location.href = `/job-application/${latestJob.job_listing_id}`;
+                        }
+                    } catch (e) {
+                        console.error('Error parsing job data from localStorage:', e);
+                    }
+                }
             },
             onError: (errors) => {
                 console.log('Login errors:', errors);

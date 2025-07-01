@@ -1,6 +1,7 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
 import { ref, onMounted, defineProps } from "vue";
+import Badge from "@/Components/Badge.vue";
 
 const mobileMenuClasses = ref("translate-x-full");
 const isSmallScreen = ref(false);
@@ -109,6 +110,7 @@ const props = defineProps({
         <!-- Main Content -->
         <div class="flex-grow pt-16">
             <slot />
+            <Badge />
         </div>
 
         <footer class="px-4 py-4 mt-auto bg-gray-100 border-t">

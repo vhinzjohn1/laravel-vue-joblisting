@@ -29,9 +29,21 @@ class WelcomeController extends Controller
             }
             return redirect()->route(auth()->user()->role_name . '.index');
         }
+        $batches = \App\Models\Batch::with(['jobListings' => function ($query) {
+            $query->with([
+                'position.salaryGrade',
+                'position.minimumRequirement',
+                'requiredDocuments',
+            ])
+            ->where('status', '=', 'Active')
+            ->where('closing_date', '>', now());
+        }])
+        ->where('status', '=', 'Active')
+        ->get();
         return view('welcome', [
             'canLogin'    => Route::has('login'),
             'canRegister' => Route::has('register'),
+            'batches'     => $batches,
         ]);
     }
 

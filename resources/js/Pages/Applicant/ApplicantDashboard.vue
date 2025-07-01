@@ -8,12 +8,13 @@
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
           <div
             v-for="(value, key) in stats"
             :key="key"
-            class="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform duration-300"
+            class="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform duration-300 cursor-pointer"
             data-aos="fade-up"
+            @click="navigateToSection(key)"
           >
             <div class="flex items-center justify-between">
               <div>
@@ -80,7 +81,7 @@
             </h3>
             <div class="space-y-4">
               <div
-                
+
                 v-for="interview in upcomingInterviews"
                 :key="interview.id"
                 class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -134,11 +135,7 @@
                     {{ new Date(job.created_at).toLocaleDateString() }}
                   </span>
                   <Link
-                    :href="
-                      route('job-application.create', {
-                        job: job.id,
-                      })
-                    "
+                    :href="`/job-application/${job.job_listing_id}`"
                     class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                   >
                     Apply Now
@@ -155,7 +152,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import ApplicantLayout from "@/Layouts/Applicant/ApplicantLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import { Link } from "@inertiajs/vue3";
@@ -168,6 +165,15 @@ const props = defineProps({
 });
 
 console.log("props", props.upcomingInterviews);
+
+// Navigation functions for statistics cards
+const navigateToSection = (section) => {
+  if (section === 'total_applications') {
+    router.visit(route('my-applications.index'));
+  } else if (section === 'upcoming_interviews') {
+    router.visit(route('my-schedules.index'));
+  }
+};
 
 onMounted(() => {
   // Add AOS initialization if needed

@@ -100,11 +100,32 @@ const completeProfile = () => {
                 icon: "success",
                 color: "#000000",
                 confirmButtonColor: "#22c55e",
-                confirmButtonText: "Go to Job Listings",
+                confirmButtonText: "Apply for Job",
                 allowOutsideClick: () => false,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = route("job-application.index");
+                    // Check if there's a job_listing_id in localStorage
+                    const jobData = localStorage.getItem('job_listing_id');
+                    if (jobData) {
+                        try {
+                            const jobs = JSON.parse(jobData);
+                            if (jobs.length > 0) {
+                                // Redirect to the most recent job application
+                                const latestJob = jobs[jobs.length - 1];
+                                window.location.href = `/job-application/${latestJob.job_listing_id}`;
+                            } else {
+                                // Fallback to job listings if no specific job
+                                window.location.href = route("job-application.index");
+                            }
+                        } catch (e) {
+                            console.error('Error parsing job data from localStorage:', e);
+                            // Fallback to job listings if error
+                            window.location.href = route("job-application.index");
+                        }
+                    } else {
+                        // Fallback to job listings if no job data
+                        window.location.href = route("job-application.index");
+                    }
                 }
             });
         })
