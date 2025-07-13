@@ -5,6 +5,7 @@ namespace App\Http\Controllers\HR;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\ApplicationStatusHistory;
+use App\Models\JobListing;
 use App\Traits\NotificationTrait;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,7 +16,7 @@ class ManageApplicationController extends Controller
 
     /**
      * List of application statuses
-     * 
+     *
      * @var array
      */
     protected $statuses = [
@@ -30,23 +31,60 @@ class ManageApplicationController extends Controller
     ];
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of job listings with applicant counts.
      */
     public function index()
     {
-        // Get all applications with related data
-        $applications = Application::with([
-            'jobListing' => function ($query) {
-                $query->with(['position']);
-            },
-            'user' => function ($query) {
-                $query->with('userDetail');
+        // Get all job listings with applicant counts and related data
+        $jobListings = JobListing::with([
+            'position',
+            'creator',
+            'applications' => function ($query) {
+                $query->select('job_listing_id', 'status');
             }
         ])
+            ->where('status', '!=', 'Archived')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($jobListing) {
+                // Add applicant count and status breakdown
+                $applications = $jobListing->applications;
+                $jobListing->applicant_count = $applications->count();
+                $jobListing->status_breakdown = $applications->groupBy('status')->map->count();
+
+                return $jobListing;
+            });
 
         return Inertia::render('HR/ManageApplication/ManageApplications', [
+            'jobListings' => $jobListings,
+            'statuses' => $this->statuses
+        ]);
+    }
+
+    /**
+     * Display applications for a specific job listing.
+     */
+    public function showJobApplications(string $jobListingId)
+    {
+        // Get the job listing with applications
+        $jobListing = JobListing::with([
+            'position',
+            'creator',
+            'applications' => function ($query) {
+                $query->with([
+                    'user' => function ($query) {
+                        $query->with('userDetail');
+                    }
+                ]);
+            }
+        ])
+            ->findOrFail($jobListingId);
+
+        // Get applications for this job listing
+        $applications = $jobListing->applications;
+
+        return Inertia::render('HR/ManageApplication/JobApplications', [
+            'jobListing' => $jobListing,
             'applications' => $applications,
             'statuses' => $this->statuses
         ]);

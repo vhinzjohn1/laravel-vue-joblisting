@@ -183,12 +183,16 @@
                             <input
                                 type="datetime-local"
                                 v-model="form.schedule_date"
+                                :max="getMaxDateForSchedule()"
                                 class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 required
                             />
                             <p class="mt-1 text-xs text-gray-500">
                                 Make sure your local timezone is correct. The
                                 system will handle timezone conversion.
+                            </p>
+                            <p v-if="selectedJobListing && getJobListingClosingDate()" class="mt-1 text-xs text-orange-600">
+                                Job closing date: {{ formatDate(getJobListingClosingDate()) }}
                             </p>
                         </div>
                         <div v-if="editingSchedule">
@@ -799,6 +803,22 @@ const removeParticipant = (index) => {
 };
 
 const handleSubmit = () => {
+    // Validate schedule date against job closing date
+    if (form.value.schedule_date && selectedJobListing.value) {
+        const scheduleDate = new Date(form.value.schedule_date);
+        const jobListing = props.jobListings.find(
+            (job) => job.job_listing_id === selectedJobListing.value
+        );
+
+        if (jobListing && jobListing.closing_date) {
+            const closingDate = new Date(jobListing.closing_date);
+            if (scheduleDate > closingDate) {
+                showToast("Schedule date cannot be after the job closing date (" + formatDate(jobListing.closing_date) + ")", false);
+                return;
+            }
+        }
+    }
+
     processing.value = true;
 
     isLoading.value = true;
@@ -831,7 +851,12 @@ const handleSubmit = () => {
             showToast("add");
         },
         onError: (error) => {
-            showToast("add", false);
+            // Handle specific validation errors
+            if (error.schedule_date) {
+                showToast(error.schedule_date[0], false);
+            } else {
+                showToast("add", false);
+            }
             processing.value = false;
             isLoading.value = false;
         },
@@ -1013,6 +1038,36 @@ const availableGroupStatuses = computed(() => {
 
     return Array.from(statuses);
 });
+
+// Function to get the maximum date for the schedule input
+const getMaxDateForSchedule = () => {
+    if (!selectedJobListing.value) return "";
+
+    const jobListing = props.jobListings.find(
+        (job) => job.job_listing_id === selectedJobListing.value
+    );
+
+    if (!jobListing || !jobListing.closing_date) return "";
+
+    const closingDate = new Date(jobListing.closing_date);
+    // Set time to 23:59:59 to include the entire day
+    closingDate.setHours(23, 59, 59, 999);
+
+    return formatDateForInput(closingDate);
+};
+
+// Function to get the job listing closing date
+const getJobListingClosingDate = () => {
+    if (!selectedJobListing.value) return null;
+
+    const jobListing = props.jobListings.find(
+        (job) => job.job_listing_id === selectedJobListing.value
+    );
+
+    if (!jobListing || !jobListing.closing_date) return null;
+
+    return jobListing.closing_date;
+};
 </script>
 
 <style scoped>

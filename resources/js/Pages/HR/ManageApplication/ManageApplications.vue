@@ -32,6 +32,17 @@
                                         class="fas fa-sync-alt text-gray-500 cursor-pointer hover:text-green-500"
                                     ></i>
 
+                                    <!-- Search Input -->
+                                    <div class="relative">
+                                        <input
+                                            v-model="searchQuery"
+                                            type="text"
+                                            placeholder="Search job listings..."
+                                            class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        />
+                                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    </div>
+
                                     <CustomSelect
                                         v-model="statusFilter"
                                         :options="statuses"
@@ -39,27 +50,13 @@
                                         placeholder="All Statuses"
                                         class="w-full sm:w-72"
                                     />
-
-                                    <CustomSelect
-                                        v-model="jobTitleFilter"
-                                        :options="jobListings"
-                                        :displayFormat="
-                                            (option) =>
-                                                option.job_listing_id === ''
-                                                    ? option.title
-                                                    : option.title
-                                        "
-                                        valueKey="job_listing_id"
-                                        placeholder="All Job Titles"
-                                        class="w-72"
-                                    />
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-body p-4">
                         <div
-                            v-if="applications.length === 0"
+                            v-if="jobListings.length === 0"
                             class="text-center py-8"
                         >
                             <div class="text-gray-400 mb-2">
@@ -79,53 +76,93 @@
                                 </svg>
                             </div>
                             <h3 class="text-lg font-medium text-gray-900">
-                                No applications found
+                                No job listings found
                             </h3>
                             <p class="text-gray-500 mt-1">
-                                There are no job applications in the system yet.
+                                There are no job listings in the system yet.
                             </p>
                         </div>
 
                         <div v-else>
                             <div class="overflow-x-auto">
-                                <DataTable
-                                    :data="filteredApplications"
-                                    :columns="[
-                                        {
-                                            key: 'user.user_detail.firstname',
-                                            title: 'First Name',
-                                        },
-                                        {
-                                            key: 'user.user_detail.lastname',
-                                            title: 'Last Name',
-                                        },
-                                        {
-                                            key: 'user.email',
-                                            title: 'Email',
-                                        },
-                                        {
-                                            key: 'job_listing.title',
-                                            title: 'Job Title',
-                                        },
-                                        {
-                                            key: 'job_listing.position.position_name',
-                                            title: 'Position Name',
-                                        },
-                                        {
-                                            key: 'created_at',
-                                            title: 'Applied Date',
-                                        },
-                                        {
-                                            key: 'status',
-                                            title: 'Status',
-                                        },
-                                    ]"
-                                    action="view"
-                                    :row-click="'application_id'"
-                                    @row-click="
-                                        ({ value }) => viewDetails(value)
-                                    "
-                                />
+                                <table class="min-w-full border-collapse">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                                                Job Title
+                                            </th>
+                                            <th class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                                                Position Name
+                                            </th>
+                                            <th class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                                                Total Applicants
+                                            </th>
+                                            <th class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                                                Status Breakdown
+                                            </th>
+                                            <th class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                                                Closing Date
+                                            </th>
+                                            <th class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                                                Job Status
+                                            </th>
+                                            <th class="px-4 py-2 border-b border-gray-200 text-gray-700 font-medium text-left">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for="job in filteredJobListings"
+                                            :key="job.job_listing_id"
+                                            @click="viewJobApplications(job.job_listing_id)"
+                                            class="hover:bg-gray-50 cursor-pointer"
+                                        >
+                                            <td class="px-4 py-2 border-b border-gray-200">
+                                                {{ job.title }}
+                                            </td>
+                                            <td class="px-4 py-2 border-b border-gray-200">
+                                                {{ job.position?.position_name || 'N/A' }}
+                                            </td>
+                                            <td class="px-4 py-2 border-b border-gray-200">
+                                                <span class="font-semibold text-blue-600">
+                                                    {{ job.applicant_count }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-2 border-b border-gray-200">
+                                                <div class="flex flex-wrap gap-1">
+                                                    <span
+                                                        v-for="(count, status) in job.status_breakdown"
+                                                        :key="status"
+                                                        class="px-2 py-1 text-xs rounded-full"
+                                                        :class="getStatusBadgeClass(status)"
+                                                    >
+                                                        {{ status }}: {{ count }}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-2 border-b border-gray-200">
+                                                {{ formatDate(job.closing_date) }}
+                                            </td>
+                                            <td class="px-4 py-2 border-b border-gray-200">
+                                                <span
+                                                    class="px-2 py-1 text-xs rounded-full"
+                                                    :class="getJobStatusClass(job.status)"
+                                                >
+                                                    {{ job.status }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-2 border-b border-gray-200">
+                                                <button
+                                                    @click.stop="viewJobApplications(job.job_listing_id)"
+                                                    class="px-4 py-1 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 transition-colors text-sm font-medium"
+                                                >
+                                                    View Applications
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -141,10 +178,9 @@ import { Head, router } from "@inertiajs/vue3";
 import HRLayout from "@/Layouts/HR/HRLayout.vue";
 import Header from "@/Components/Header/Header.vue";
 import CustomSelect from "@/Components/CustomSelect.vue";
-import DataTable from "@/Components/DataTable.vue";
 
 const props = defineProps({
-    applications: {
+    jobListings: {
         type: Array,
         required: true,
     },
@@ -154,68 +190,44 @@ const props = defineProps({
     },
 });
 
-const applications = ref(props.applications);
+const jobListings = ref(props.jobListings);
 const searchQuery = ref("");
 const statusFilter = ref("");
-const jobTitleFilter = ref("");
 const statuses = ref(props.statuses);
-
-// Create a unique list of job listings
-const jobListings = ref(
-    [...new Map(
-        props.applications
-            .filter(app => app.job_listing) // Filter out any null job_listings
-            .map(app => [app.job_listing.job_listing_id, app.job_listing])
-    ).values()]
-);
 
 const resetFilters = () => {
     statusFilter.value = "";
-    jobTitleFilter.value = "";
     searchQuery.value = "";
 };
 
-const viewDetails = (applicationId) => {
-    // Instead of showing modal, redirect to the application details page
-    router.visit(route("applications.show", applicationId));
+const viewJobApplications = (jobListingId) => {
+    // Redirect to the job applications page
+    router.visit(route("applications.job", jobListingId));
 };
 
-const filteredApplications = computed(() => {
-    let filtered = applications.value;
+const filteredJobListings = computed(() => {
+    let filtered = jobListings.value;
 
     // Apply status filter
     if (statusFilter.value) {
-        filtered = filtered.filter((app) => app.status === statusFilter.value);
-    }
-
-    // Apply job title filter
-    if (jobTitleFilter.value) {
-        filtered = filtered.filter(
-            (app) => app.job_listing?.job_listing_id === jobTitleFilter.value,
-        );
+        filtered = filtered.filter((job) => {
+            // Check if any application has the selected status
+            return job.status_breakdown && job.status_breakdown[statusFilter.value] > 0;
+        });
     }
 
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter((application) => {
-            // Safely access nested properties
-            const jobTitle = application.job_listing?.title || "";
-            const positionName =
-                application.job_listing?.position?.position_name || "";
-            const userEmail = application.user?.email || "";
-            const status = application.status || "";
-            const firstName = application.user?.user_detail?.firstname || "";
-            const lastName = application.user?.user_detail?.lastname || "";
+        filtered = filtered.filter((job) => {
+            const title = job.title || "";
+            const positionName = job.position?.position_name || "";
+            const status = job.status || "";
 
             return (
-                jobTitle.toLowerCase().includes(query) ||
+                title.toLowerCase().includes(query) ||
                 positionName.toLowerCase().includes(query) ||
-                userEmail.toLowerCase().includes(query) ||
-                status.toLowerCase().includes(query) ||
-                firstName.toLowerCase().includes(query) ||
-                lastName.toLowerCase().includes(query) ||
-                `${firstName} ${lastName}`.toLowerCase().includes(query)
+                status.toLowerCase().includes(query)
             );
         });
     }
@@ -223,7 +235,30 @@ const filteredApplications = computed(() => {
     return filtered;
 });
 
-console.log("Filtered Applications:", filteredApplications.value);
+const getStatusBadgeClass = (status) => {
+    const statusClasses = {
+        'Pending': 'bg-yellow-100 text-yellow-800',
+        'Qualified': 'bg-green-100 text-green-800',
+        'Disqualified': 'bg-red-100 text-red-800',
+        'Competency Exam': 'bg-blue-100 text-blue-800',
+        'Not Selected': 'bg-gray-100 text-gray-800',
+        'Lack Requirements': 'bg-orange-100 text-orange-800',
+        'Interview': 'bg-purple-100 text-purple-800',
+        'Accepted': 'bg-emerald-100 text-emerald-800'
+    };
+    return statusClasses[status] || 'bg-gray-100 text-gray-800';
+};
+
+const getJobStatusClass = (status) => {
+    const statusClasses = {
+        'Active': 'bg-green-100 text-green-800',
+        'Inactive': 'bg-gray-100 text-gray-800',
+        'Archived': 'bg-red-100 text-red-800'
+    };
+    return statusClasses[status] || 'bg-gray-100 text-gray-800';
+};
+
+console.log("Filtered Job Listings:", filteredJobListings.value);
 
 const formatDate = (dateString) => {
     if (!dateString) return "N/A";

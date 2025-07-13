@@ -66,6 +66,37 @@ class ScheduleController extends Controller
 
         $validated = $request->validate($rules);
 
+        // Additional validation: Check if schedule date is after any job listing's closing date
+        $scheduleDate = new \DateTime($validated['schedule_date']);
+
+        if ($useGroupStatus) {
+            // For group status, check the specific job listing
+            $jobListing = JobListing::find($validated['job_listing_id']);
+            if ($jobListing && $jobListing->closing_date) {
+                $closingDate = new \DateTime($jobListing->closing_date);
+                if ($scheduleDate > $closingDate) {
+                    return back()->withErrors([
+                        'schedule_date' => "Schedule date cannot be after the job closing date ({$jobListing->closing_date})"
+                    ])->withInput();
+                }
+            }
+        } else {
+            // For individual participants, check all their job listings
+            $participantApplicationIds = collect($request->participants)->pluck('application_id');
+            $applications = Application::with('jobListing')->whereIn('application_id', $participantApplicationIds)->get();
+
+            foreach ($applications as $application) {
+                if ($application->jobListing && $application->jobListing->closing_date) {
+                    $closingDate = new \DateTime($application->jobListing->closing_date);
+                    if ($scheduleDate > $closingDate) {
+                        return back()->withErrors([
+                            'schedule_date' => "Schedule date cannot be after the job closing date ({$application->jobListing->closing_date}) for {$application->jobListing->title}"
+                        ])->withInput();
+                    }
+                }
+            }
+        }
+
         $schedule = Schedule::create([
             'title' => $validated['title'],
             'description' => $validated['description'],

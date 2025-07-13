@@ -20,13 +20,13 @@
                                 <button
                                     @click="
                                         $inertia.get(
-                                            route('applications.index'),
+                                            route('applications.job', application.job_listing.job_listing_id),
                                         )
                                     "
                                     class="flex items-center text-gray-600 hover:text-gray-900"
                                 >
                                     <i class="fas fa-arrow-left mr-2"></i>
-                                    Back to Applications
+                                    Back to Job Applications
                                 </button>
                             </div>
 

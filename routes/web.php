@@ -75,6 +75,7 @@ Route::middleware(['auth', 'role:hr,admin'])->group(function () {
     Route::put('job-listing/bulk-update', [ManageJobListingController::class, 'bulkUpdate'])->name('job-listing.bulk-update');
     Route::resource('job-listing', ManageJobListingController::class);
     Route::resource('applications', ManageApplicationController::class);
+    Route::get('applications/job/{jobListingId}', [ManageApplicationController::class, 'showJobApplications'])->name('applications.job');
     Route::resource('job-position', JobPositionController::class);
     Route::resource('groups', GroupScheduleController::class);
     Route::resource('selection-lineup', SelectionLineupController::class);
