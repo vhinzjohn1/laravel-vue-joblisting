@@ -165,9 +165,9 @@ const handleCaptchaVerified = (verified) => {
                     </div>
 
                     <div class="flex justify-between items-center">
-                        <p class="flex items-center pt-4 text-md">
+                        <p class="flex items-center pt-4 text-md gap-2">
                             Don't have an account yet?
-                            <Link :href="route('register')" class="text-green-800 transition-colors hover:text-green-500">Register</Link>
+                            <Link :href="route('register')" class="text-green-800 transition-colors hover:text-green-500 text-md">Register</Link>
                         </p>
                     </div>
                 </form>

@@ -5,93 +5,69 @@
             <Header title="Job Listings" />
         </template>
 
-        <div>
-            <!-- Batches Section -->
-            <Collapsible :initially-open="false">
-                <template #header>
-                    <div class="flex items-center justify-between w-full">
-                        <h1 class="text-2xl font-bold uppercase tracking-wider">
-                            Batches
-                        </h1>
-                        <div class="flex gap-2">
-                            <PrimaryButton @click.stop="showAddBatchModal = true">
-                                Add Batch
-                            </PrimaryButton>
-                        </div>
+        <!-- Batches Section -->
+        <!-- Removed; moved to HR/ManageBatches/ManageBatches.vue -->
+
+        <div class="max-w-full mt-3">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <div
+                        v-if="batches.length === 0"
+                        class="text-center py-8 text-gray-500"
+                    >
+                        No batches found, please add one to proceed
                     </div>
-                </template>
 
-                <div class="bg-white px-4 rounded-lg shadow-md">
-                    <BatchCustomTable
-                        :items="filteredBatches"
-                        @edit="editBatch"
-                        @delete="deleteBatch"
-                        @bulk-archive="handleBulkArchiveBatches"
-                        :show-delete="true"
-                    />
-                </div>
-            </Collapsible>
-            <div class="max-w-full mt-3">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
+                    <div v-else class="space-y-3">
+
+                        <h1 class="text-xl font-bold uppercase tracking-wider text-center">
+                            Job Listing Batches
+                        </h1>
                         <div
-                            v-if="batches.length === 0"
-                            class="text-center py-8 text-gray-500"
-                        >
-                            No batches found, please add one to proceed
-                        </div>
+                            class="mx-auto w-24 h-1 bg-green-600 rounded-full"
+                        ></div>
+                        <!-- Job listing Batches List (Collapsible) -->
+                        <div v-for="batch in filteredBatches" :key="batch.batch_id" class="mt-4">
 
-                        <div v-else class="space-y-3">
-
-                            <h1 class="text-xl font-bold uppercase tracking-wider text-center">
-                                Job Listing Batches
-                            </h1>
-                            <div
-                                class="mx-auto w-24 h-1 bg-green-600 rounded-full"
-                            ></div>
-                            <!-- Job listing Batches List (Collapsible) -->
-                            <div v-for="batch in filteredBatches" :key="batch.batch_id" class="mt-4">
-
-                                <Collapsible
-                                    :title="`${batch.batch_name} - ${batch.batch_code}`"
-                                    :initially-open="false"
-                                    :id="batch.batch_id"
-                                >
-                                    <template #header>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div>
-                                                <h3 class="text-lg font-semibold">{{ batch.batch_name }} - {{ batch.batch_code }}</h3>
-                                                <p class="text-sm text-gray-500">
-                                                    {{ batch.job_listings.length }} job listings
-                                                </p>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm text-gray-800">
-                                                    {{ new Date(batch.post_date).toLocaleDateString() }} -
-                                                    {{ new Date(batch.deadline).toLocaleDateString() }}
-                                                </span>
-                                                <PrimaryButton @click.stop="() => {
-                                                    selectedBatch = batch;
-                                                    showAddModal = true;
-                                                    newJob.closing_date = batch.deadline;
-                                                }">
-                                                    <i class="fa fa-plus"></i>
-                                                </PrimaryButton>
-                                            </div>
+                            <Collapsible
+                                :title="`${batch.batch_name} - ${batch.batch_code}`"
+                                :initially-open="false"
+                                :id="batch.batch_id"
+                            >
+                                <template #header>
+                                    <div class="flex items-center justify-between w-full">
+                                        <div>
+                                            <h3 class="text-lg font-semibold">{{ batch.batch_name }} - {{ batch.batch_code }}</h3>
+                                            <p class="text-sm text-gray-500">
+                                                {{ batch.job_listings.length }} job listings
+                                            </p>
                                         </div>
-                                    </template>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm text-gray-800">
+                                                {{ new Date(batch.post_date).toLocaleDateString() }} -
+                                                {{ new Date(batch.deadline).toLocaleDateString() }}
+                                            </span>
+                                            <PrimaryButton @click.stop="() => {
+                                                selectedBatch = batch;
+                                                showAddModal = true;
+                                                newJob.closing_date = batch.deadline;
+                                            }">
+                                                <i class="fa fa-plus"></i>
+                                            </PrimaryButton>
+                                        </div>
+                                    </div>
+                                </template>
 
-                                    <JobListingTable
-                                        :items="batch.job_listings"
-                                        :is-plantilla="true"
-                                        @edit="editJob"
-                                        @view="viewJob"
-                                        @bulk-edit="handleBulkEdit"
-                                        @bulk-delete="handleBulkDelete"
-                                        @bulk-archive="handleBulkArchive"
-                                    />
-                                </Collapsible>
-                            </div>
+                                <JobListingTable
+                                    :items="batch.job_listings"
+                                    :is-plantilla="true"
+                                    @edit="editJob"
+                                    @view="viewJob"
+                                    @bulk-edit="handleBulkEdit"
+                                    @bulk-delete="handleBulkDelete"
+                                    @bulk-archive="handleBulkArchive"
+                                />
+                            </Collapsible>
                         </div>
                     </div>
                 </div>
@@ -151,104 +127,7 @@
         </Collapsible>
 
         <!-- Add Batch Modal -->
-        <Modal
-            :show="showAddBatchModal"
-            @close="() => {
-                showAddBatchModal = false;
-                resetBatchForm();
-            }"
-            title="Create New Batch"
-            max-width="2xl"
-        >
-            <form @submit.prevent="createBatch">
-                <div class="p-5">
-                    <div class="grid grid-cols-1 gap-4">
-                       <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Batch Name *
-                                </label>
-                                <TextInput
-                                    v-model="newBatch.batch_name"
-                                    required
-                                />
-                            </div>
-
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Batch Code *
-                                </label>
-                                <TextInput
-                                    v-model="newBatch.batch_code"
-                                    value="defaultBatchCode"
-                                    required
-                                />
-                            </div>
-                       </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Post Date *
-                                </label>
-                                <TextInput
-                                    type="date"
-                                    v-model="newBatch.post_date"
-                                    required
-                                />
-                            </div>
-
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Deadline *
-                                </label>
-                                <TextInput
-                                    type="date"
-                                    v-model="newBatch.deadline"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Status *
-                                </label>
-                                <CustomSelect
-                                    :options="[
-                                        { value: 'Active' },
-                                        { value: 'Draft' },
-                                        { value: 'Closed' }
-                                    ]"
-                                    v-model="newBatch.status"
-                                    :value-key="'value'"
-                                    :display-format="(option) => option.value"
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-4 mt-6 p-4 border-t">
-                    <button
-                        type="button"
-                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"
-                        @click="showAddBatchModal = false"
-                    >
-                        Cancel
-                    </button>
-                    <PrimaryButton
-                        type="submit"
-                        :loading="isLoading"
-                        :disabled="isLoading"
-                    >
-                        Create Batch
-                    </PrimaryButton>
-                </div>
-            </form>
-        </Modal>
+        <!-- Removed; moved to HR/ManageBatches/ManageBatches.vue -->
 
         <!-- Add Job Modal -->
         <Modal
@@ -456,7 +335,7 @@
                                             :id="'doc-' + doc.required_document_id"
                                             v-model="newJob.required_documents"
                                             :value="doc.required_document_id"
-                                            class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                            class="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
                                         >
                                         <label :for="'doc-' + doc.required_document_id" class="ml-2 text-sm text-gray-700">
                                             {{ doc.document_name }}
@@ -768,7 +647,7 @@
                                             :id="'doc-' + doc.required_document_id"
                                             v-model="editingJob.required_documents"
                                             :value="doc.required_document_id"
-                                            class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                            class="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
                                         >
                                         <label :for="'doc-' + doc.required_document_id" class="ml-2 text-sm text-gray-700">
                                             {{ doc.document_name }}
@@ -871,103 +750,7 @@
         </Modal>
 
         <!-- Edit Batch Modal -->
-        <Modal
-            :show="showEditBatchModal"
-            @close="() => {
-                showEditBatchModal = false;
-                resetBatchForm();
-            }"
-            title="Edit Batch"
-            max-width="2xl"
-        >
-            <form @submit.prevent="updateBatch">
-                <div class="p-5">
-                    <div class="grid grid-cols-1 gap-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Batch Name *
-                                </label>
-                                <TextInput
-                                    v-model="editingBatch.batch_name"
-                                    required
-                                />
-                            </div>
-
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Batch Code *
-                                </label>
-                                <TextInput
-                                    v-model="editingBatch.batch_code"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Post Date *
-                                </label>
-                                <TextInput
-                                    type="date"
-                                    v-model="editingBatch.post_date"
-                                    required
-                                />
-                            </div>
-
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Deadline *
-                                </label>
-                                <TextInput
-                                    type="date"
-                                    v-model="editingBatch.deadline"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Status *
-                                </label>
-                                <CustomSelect
-                                    :options="[
-                                        { value: 'Active' },
-                                        { value: 'Draft' },
-                                        { value: 'Closed' }
-                                    ]"
-                                    v-model="editingBatch.status"
-                                    :value-key="'value'"
-                                    :display-format="(option) => option.value"
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-4 mt-6 p-4 border-t">
-                    <button
-                        type="button"
-                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-200"
-                        @click="showEditBatchModal = false"
-                    >
-                        Cancel
-                    </button>
-                    <PrimaryButton
-                        type="submit"
-                        :loading="isLoading"
-                        :disabled="isLoading"
-                    >
-                        Update Batch
-                    </PrimaryButton>
-                </div>
-            </form>
-        </Modal>
+        <!-- Removed; moved to HR/ManageBatches/ManageBatches.vue -->
 
         <!-- Add debug info to display selected position values -->
         <div v-if="showAddModal || showEditModal" class="hidden">
@@ -990,7 +773,7 @@ import TextArea from "@/Components/TextArea.vue";
 import Modal from "@/Components/Modal.vue";
 import JobListingTable from "@/Components/JobListingCustomTable.vue";
 import Collapsible from "@/Components/Collapsible.vue";
-import BatchCustomTable from '@/Components/BatchCustomTable.vue';
+// Removed: import BatchCustomTable from '@/Components/BatchCustomTable.vue';
 
 // Fetching Props that was sent by controller
 const batches = ref(usePage().props.batches || []);
@@ -1569,6 +1352,18 @@ const handlePositionSelect = (option) => {
     console.log("Selected Position:", selectedPosition.value);
 };
 
+// Helper function to check if a job is closed by its closing date
+const isJobClosedByDate = (job) => {
+    if (!job || !job.closing_date) {
+        return false;
+    }
+    const closingDate = new Date(job.closing_date);
+    closingDate.setHours(23, 59, 59, 999); // Set to end of day
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+    return closingDate < today;
+};
+
 // Format date function (can be kept here or moved to a utility if used elsewhere)
 const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -1580,8 +1375,41 @@ const formatDate = (dateString) => {
 const handleBulkEdit = ({ items, status }) => {
     isLoading.value = true;
 
+    const jobListingIdsToUpdate = [];
+    const cannotUpdateTitles = [];
+
+    items.forEach(item => {
+        if (isJobClosedByDate(item) && (status === 'Active' || status === 'Draft')) {
+            cannotUpdateTitles.push(item.title);
+        } else {
+            jobListingIdsToUpdate.push(item.job_listing_id);
+        }
+    });
+
+    if (cannotUpdateTitles.length > 0) {
+        Swal.fire({
+            position: "top-end",
+            icon: "warning",
+            title: "Cannot Update Status!",
+            text: `The following job listings cannot be set to 'Active' or 'Draft' as their closing date has passed: ${cannotUpdateTitles.join(', ')}`,
+            showConfirmButton: false,
+            timer: 5000,
+            toast: true,
+            customClass: {
+                popup: "bg-yellow-500 text-white",
+            },
+        });
+        isLoading.value = false;
+        return;
+    }
+
+    if (jobListingIdsToUpdate.length === 0) {
+        isLoading.value = false; // No valid items to update
+        return;
+    }
+
     axios.put(route('job-listing.bulk-update'), {
-        job_listing_ids: items.map(item => item.job_listing_id),
+        job_listing_ids: jobListingIdsToUpdate,
         status
     })
     .then((response) => {

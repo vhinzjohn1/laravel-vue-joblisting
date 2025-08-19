@@ -198,4 +198,25 @@ class BatchController extends Controller
             'batches' => $batches
         ]);
     }
+
+    public function page()
+    {
+        // Get batches with their job listings
+        $batches = Batch::with(['jobListings' => function ($query) {
+            $query->with([
+                'position' => function ($query) {
+                    $query->with(['salaryGrade', 'minimumRequirement']);
+                },
+                'creator',
+                'applications'
+            ])
+            ->where('status', '!=', 'Archived');
+        }])
+        ->where('status', '!=', 'Archived')
+        ->get();
+
+        return Inertia::render('HR/ManageBatches/ManageBatches', [
+            'batches' => $batches,
+        ]);
+    }
 }

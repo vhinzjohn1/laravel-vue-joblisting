@@ -80,7 +80,11 @@ Route::middleware(['auth', 'role:hr,admin'])->group(function () {
     Route::resource('groups', GroupScheduleController::class);
     Route::resource('selection-lineup', SelectionLineupController::class);
     Route::resource('archive', ArchiveController::class);
+
+    // Page route for batches management view (place BEFORE resource to avoid conflict with batches/{batch})
+    Route::get('batches/manage', [BatchController::class, 'page'])->name('batches.page');
     Route::resource('batches', BatchController::class);
+
     Route::resource('required-documents', RequiredDocumentController::class);
     Route::post('/batches/archive', [BatchController::class, 'archive'])->name('batches.archive');
 });

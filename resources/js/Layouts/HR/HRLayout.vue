@@ -56,7 +56,8 @@ onMounted(() => {
     } else if (
         route().current("job-position.index") ||
         route().current("required-documents.index") ||
-        route().current("archive.index")
+        route().current("archive.index") ||
+        route().current("batches.page")
     ) {
         activeDropdown.value = "masterlist";
     }
@@ -79,7 +80,9 @@ watch(
             activeDropdown.value = "reports";
         } else if (
             newRoute === "job-position.index" ||
-            newRoute === "required-documents.index"
+            newRoute === "required-documents.index" ||
+            newRoute === "archive.index" ||
+            newRoute === "batches.page"
         ) {
             activeDropdown.value = "masterlist";
         }
@@ -611,12 +614,14 @@ onMounted(async () => {
                                     'job-position.index',
                                     'required-documents.index',
                                     'archive.index',
+                                    'batches.page',
                                 ]),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActiveGroup([
                                         'job-position.index',
                                         'required-documents.index',
                                         'archive.index',
+                                        'batches.page',
                                     ]),
                             }"
                         >
@@ -628,6 +633,7 @@ onMounted(async () => {
                                             'job-position.index',
                                             'required-documents.index',
                                             'archive.index',
+                                            'batches.page',
                                         ]),
                                     }"
                                 >
@@ -641,6 +647,7 @@ onMounted(async () => {
                                             'job-position.index',
                                             'required-documents.index',
                                             'archive.index',
+                                            'batches.page',
                                         ]),
                                     }"
                                     >Masterlist</span
@@ -660,6 +667,7 @@ onMounted(async () => {
                                             'job-position.index',
                                             'required-documents.index',
                                             'archive.index',
+                                            'batches.page',
                                         ]),
                                     }"
                                 ></i>
@@ -720,6 +728,21 @@ onMounted(async () => {
                                             }"
                                         ></i>
                                         <span>Required Documents</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        id="batches-link"
+                                        :disabled="isTourActive"
+                                        :href="route('batches.page')"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium': isActive('batches.page'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white': !isActive('batches.page'),
+                                        }"
+                                    >
+                                        <i class="mr-2 fas fa-layer-group" :class="{ 'text-black': isActive('batches.page') }"></i>
+                                        <span>Batches</span>
                                     </Link>
                                 </li>
                                 <li>

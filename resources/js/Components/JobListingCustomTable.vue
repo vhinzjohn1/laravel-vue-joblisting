@@ -51,42 +51,47 @@
                                 type="checkbox"
                                 :checked="isAllSelected"
                                 @change="toggleSelectAll"
-                                class="form-checkbox h-4 w-4 text-blue-600"
+                                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                             >
                         </th>
                          <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('index')">No.
-                            <i v-if="sortColumn === 'index'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                             <i class="fas" :class="sortColumn === 'index' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                         </th>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('title')">Title
-                             <i v-if="sortColumn === 'title'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                             <i class="fas" :class="sortColumn === 'title' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                        </th>
+                        <!-- Applicants column header -->
+                        <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer text-center" @click="sortBy('applicationsCount')">Applicants
+                            <i class="fas" :class="sortColumn === 'applicationsCount' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                         </th>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('position.item_number')">Item Number
-                             <i v-if="sortColumn === 'position.item_number'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                             <i class="fas" :class="sortColumn === 'position.item_number' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                         </th>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('position.salary_grade.salary_grade')">Salary Grade
-                             <i v-if="sortColumn === 'position.salary_grade.salary_grade'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                             <i class="fas" :class="sortColumn === 'position.salary_grade.salary_grade' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                         </th>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('position.category')">Category
-                             <i v-if="sortColumn === 'position.category'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                             <i class="fas" :class="sortColumn === 'position.category' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                         </th>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0" colspan="4">Qualification Standards</th>
                          <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('closing_date')">Closing Date
-                              <i v-if="sortColumn === 'closing_date'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                              <i class="fas" :class="sortColumn === 'closing_date' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                          </th>
                          <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('created_at')">Date Created
-                              <i v-if="sortColumn === 'created_at'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                              <i class="fas" :class="sortColumn === 'created_at' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                          </th>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('status')">Status
-                             <i v-if="sortColumn === 'status'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                             <i class="fas" :class="sortColumn === 'status' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                         </th>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm sticky top-0 cursor-pointer" @click="sortBy('place_assigned')">Place of Assignment
-                             <i v-if="sortColumn === 'place_assigned'" :class="{'fa-sort-up': sortDirection === 'asc', 'fa-sort-down': sortDirection === 'desc'}" class="fas fa-sort"></i>
+                             <i class="fas" :class="sortColumn === 'place_assigned' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                         </th>
                     </tr>
                      <tr>
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for checkbox column -->
                          <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for No. column -->
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for title column -->
+                        <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for applicants column -->
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for item number column -->
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for salary grade column -->
                         <th class="border border-gray-300 px-4 py-2 bg-gray-100 font-medium text-sm"></th> <!-- Empty header for category column -->
@@ -111,7 +116,7 @@
                                 type="checkbox"
                                 :checked="isSelected(item)"
                                 @change="toggleSelect(item)"
-                                class="form-checkbox h-4 w-4 text-blue-600"
+                                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                             >
                         </td>
                          <td class="border border-gray-300 px-4 py-2 text-sm">
@@ -122,11 +127,20 @@
                                 <span>{{ item.title }}</span>
                                 <button
                                     @click="handleView(item)"
-                                    class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-0"
+                                    class="text-green-600 hover:text-green-800 focus:outline-none focus:ring-0"
                                 >
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                        </td>
+                        <!-- Applicants badge cell -->
+                        <td class="border border-gray-300 px-4 py-2 text-sm text-center">
+                            <span
+                                class="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                                :class="(item.applications?.length || 0) > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'"
+                            >
+                                {{ item.applications?.length || 0 }}
+                            </span>
                         </td>
                         <td class="border border-gray-300 px-4 py-2 text-sm">
                             {{ item.position?.item_number === '' ? 'CoS/Job Order' : item.position?.item_number || '-' }}
@@ -159,14 +173,14 @@
                             <span
                                 class="px-2 py-1 text-xs font-semibold rounded-full"
                                 :class="[
-                                    item.status === 'Active'
+                                    displayStatus(item) === 'Active'
                                         ? 'bg-green-100 text-green-700'
-                                        : item.status === 'Draft'
+                                        : displayStatus(item) === 'Draft'
                                         ? 'bg-yellow-100 text-yellow-700'
                                         : 'bg-red-100 text-red-700',
                                 ]"
                             >
-                                {{ item.status }}
+                                {{ displayStatus(item) }}
                             </span>
                         </td>
                         <td class="border border-gray-300 px-4 py-2 text-sm">
@@ -237,14 +251,14 @@
                                     <span
                                         class="px-2 py-1 text-xs font-semibold rounded-full"
                                         :class="[
-                                            viewingJob.status === 'Active'
+                                            displayStatus(viewingJob) === 'Active'
                                                 ? 'bg-green-100 text-green-700'
-                                                : viewingJob.status === 'Draft'
+                                                : displayStatus(viewingJob) === 'Draft'
                                                 ? 'bg-yellow-100 text-yellow-700'
                                                 : 'bg-red-100 text-red-700',
                                         ]"
                                     >
-                                        {{ viewingJob.status }}
+                                        {{ displayStatus(viewingJob) }}
                                     </span>
                                 </p>
                             </div>
@@ -329,7 +343,7 @@
                                 { value: 'Active' },
                                 { value: 'Draft' },
                                 { value: 'Closed' },
-                                ...(props.isPlantilla ? [] : [{ value: 'Archived' }])
+                                { value: 'Archived' }
                             ]"
                             :value-key="'value'"
                             :display-format="(option) => option.value"
@@ -411,9 +425,28 @@ const itemsPerPage = 10; // Define how many items per page
 const showViewModal = ref(false);
 const viewingJob = ref(null);
 
+const isJobClosedByDate = (job) => {
+    if (!job || !job.closing_date) {
+        return false;
+    }
+    const closingDate = new Date(job.closing_date);
+    closingDate.setHours(23, 59, 59, 999); // Set to end of day
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+    return closingDate < today;
+};
+
+const displayStatus = (item) => {
+    if (isJobClosedByDate(item)) {
+        return 'Closed';
+    }
+    return item.status;
+};
+
 // Computed properties
 const filteredItems = computed(() => {
-    let currentItems = props.items;
+    // Start with a cloned copy to avoid mutating props
+    let currentItems = Array.isArray(props.items) ? [...props.items] : [];
 
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
@@ -427,17 +460,26 @@ const filteredItems = computed(() => {
         );
     }
 
-    // Apply sorting
+    // Apply sorting on a non-readonly array
     if (sortColumn.value) {
+        // Map the "No." column to a stable key for sorting
+        const columnKey = sortColumn.value === 'index' ? 'job_listing_id' : sortColumn.value;
         currentItems.sort((a, b) => {
-            const aValue = getNestedValue(a, sortColumn.value);
-            const bValue = getNestedValue(b, sortColumn.value);
+            // Special handling for applications count sorting
+            if (sortColumn.value === 'applicationsCount') {
+                const aCount = Array.isArray(a.applications) ? a.applications.length : 0;
+                const bCount = Array.isArray(b.applications) ? b.applications.length : 0;
+                return sortDirection.value === 'asc' ? aCount - bCount : bCount - aCount;
+            }
+
+            const aValue = getNestedValue(a, columnKey);
+            const bValue = getNestedValue(b, columnKey);
 
             if (aValue === null || aValue === undefined) return sortDirection.value === 'asc' ? 1 : -1; // Handle null/undefined values
             if (bValue === null || bValue === undefined) return sortDirection.value === 'asc' ? -1 : 1; // Handle null/undefined values
 
             // Special handling for date comparison
-            if (sortColumn.value === 'closing_date' || sortColumn.value === 'created_at') {
+            if (columnKey === 'closing_date' || columnKey === 'created_at') {
                 const aDate = new Date(aValue);
                 const bDate = new Date(bValue);
                  if (aDate < bDate) return sortDirection.value === 'asc' ? -1 : 1;

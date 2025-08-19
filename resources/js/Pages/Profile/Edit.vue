@@ -157,7 +157,7 @@ const showSuccessAlert = (action) => {
                                         Password
                                     </button>
                                 </li>
-                                <li class="w-full sm:flex-1 md:w-full">
+                                <!-- <li class="w-full sm:flex-1 md:w-full">
                                     <button
                                         @click="activeTab = 'delete'"
                                         :class="[
@@ -169,7 +169,7 @@ const showSuccessAlert = (action) => {
                                     >
                                         Delete Account
                                     </button>
-                                </li>
+                                </li> -->
                             </ul>
                         </nav>
                     </div>
