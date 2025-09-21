@@ -23,7 +23,6 @@
                     :education-options="educationOptions"
                     :selected-educations="form.education"
                     @update:selected-educations="updateEducations"
-                    @select="onEducationSelect"
                 />
                 <p
                     v-if="showValidation && validationErrors.education"
@@ -37,7 +36,6 @@
                     :training-options="trainingOptions"
                     :selected-trainings="form.trainings"
                     @update:selected-trainings="updateTrainings"
-                    @select="onTrainingSelect"
                 />
 
                 <!-- Experience Section -->
@@ -45,7 +43,6 @@
                     :experience-options="experienceOptions"
                     :selected-experiences="form.experiences"
                     @update:selected-experiences="updateExperiences"
-                    @select="onExperienceSelect"
                 />
 
                 <!-- Document Upload Section -->
@@ -316,8 +313,11 @@ const currentPreviewDocument = ref(null);
 
 // Helper function to get document display name
 const getDocumentDisplayName = (docId) => {
-    // Implement your logic to get document display name based on docId
-    return docId;
+    if (!props.job || !props.job.required_documents) {
+        return docId; // Return docId as a fallback if required_documents is not available
+    }
+    const requiredDoc = props.job.required_documents.find(doc => doc.required_document_id == docId);
+    return requiredDoc ? requiredDoc.name : docId;
 };
 
 // Update handlers for child components
@@ -333,18 +333,7 @@ const updateExperiences = (experiences) => {
     form.experiences = experiences;
 };
 
-// Selection handlers
-const onEducationSelect = (selected) => {
-    // Now handled in the EducationSection component
-};
-
-const onTrainingSelect = (selected) => {
-    // Now handled in the TrainingSection component
-};
-
-const onExperienceSelect = (selected) => {
-    // Now handled in the ExperienceSection component
-};
+// Removed selection handlers as they are now handled within the child components
 
 const closeModal = () => {
     emit("close");

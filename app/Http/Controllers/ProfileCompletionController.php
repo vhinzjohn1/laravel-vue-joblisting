@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Auth\Events\Registered;
 
 class ProfileCompletionController extends Controller
 {
@@ -39,6 +40,11 @@ class ProfileCompletionController extends Controller
             // Update user's profile status
             $user->profile_completed = true;
             $user->save();
+
+            // Send email verification notification if not already verified
+            if (!$user->hasVerifiedEmail()) {
+                event(new Registered($user));
+            }
 
             // Return a successful json response
             return response()->json(['success' => true, 'message' => 'Profile completed successfully!'], 200);

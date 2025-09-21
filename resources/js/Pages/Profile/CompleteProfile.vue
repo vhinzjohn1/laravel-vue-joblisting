@@ -5,11 +5,12 @@ import ProfileDetailsForm from "./Partials/ProfileDetailsForm.vue";
 import EducationalBackgroundForm from "./Partials/EducationalBackgroundForm.vue";
 import TrainingCertificationsForm from "./Partials/TrainingCertificationsForm.vue";
 import WorkExperienceForm from "./Partials/WorkExperienceForm.vue";
+import EligibilityForm from "./Partials/EligibilityForm.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const user = usePage().props.auth.user;
 const currentStep = ref(1);
-const totalSteps = 4;
+const totalSteps = 5;
 const isLoading = ref(true);
 const showLogoutModal = ref(false);
 
@@ -39,9 +40,15 @@ const steps = [
     },
     {
         number: 4,
-        title: "Training & Certifications",
-        description: "Add your trainings and certifications",
+        title: "Training",
+        description: "Add your trainings",
         component: TrainingCertificationsForm,
+    },
+    {
+        number: 5,
+        title: "Eligibility",
+        description: "Add your eligibility details",
+        component: EligibilityForm,
     },
 ];
 
@@ -74,6 +81,7 @@ const isStepComplete = ref({
     2: false, // Educational Background
     3: false, // Work Experience
     4: false, // Training & Certifications
+    5: false, // Eligibility
 });
 
 // Handle completion of a step
@@ -100,32 +108,24 @@ const completeProfile = () => {
                 icon: "success",
                 color: "#000000",
                 confirmButtonColor: "#22c55e",
-                confirmButtonText: "Apply for Job",
+                confirmButtonText: "Login",
                 allowOutsideClick: () => false,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Check if there's a job_listing_id in localStorage
                     const jobData = localStorage.getItem('job_listing_id');
-                    if (jobData) {
-                        try {
-                            const jobs = JSON.parse(jobData);
-                            if (jobs.length > 0) {
-                                // Redirect to the most recent job application
-                                const latestJob = jobs[jobs.length - 1];
-                                window.location.href = `/job-application/${latestJob.job_listing_id}`;
-                            } else {
-                                // Fallback to job listings if no specific job
-                                window.location.href = route("job-application.index");
-                            }
-                        } catch (e) {
-                            console.error('Error parsing job data from localStorage:', e);
-                            // Fallback to job listings if error
-                            window.location.href = route("job-application.index");
-                        }
-                    } else {
-                        // Fallback to job listings if no job data
-                        window.location.href = route("job-application.index");
-                    }
+                    const jobs = JSON.parse(jobData);
+
+                    // Logout the user and redirect to login page
+                    router.post(route("logout"), {
+                        onSuccess: () => {
+                            window.location.href = route("login");
+                        },
+                        onError: (errors) => {
+                            console.error("Logout error:", errors);
+                            // Optionally, handle error or still attempt redirect
+                            window.location.href = route("login");
+                        },
+                    });
                 }
             });
         })
@@ -149,20 +149,31 @@ const determineInitialStep = async () => {
             educationResponse,
             experienceResponse,
             trainingResponse,
+            eligibilityResponse,
         ] = await Promise.all([
             axios.get(route("profile.user-details")),
             axios.get(route("profile-details.index", "education")),
             axios.get(route("profile-details.index", "experience")),
             axios.get(route("profile-details.index", "training")),
+            axios.get(route("user-eligibility.index")), // Changed from show to index
         ]);
 
         // Check data and set completion status
+        const fetchedUserDetails = userDetailsResponse.data.userDetails[0];
+        const fetchedUserCredentials = userDetailsResponse.data.userCredentials;
+        const isHR = user.role_name === 'hr';
+
+        const isProfileDetailsComplete = (
+            fetchedUserDetails &&
+            fetchedUserDetails.firstname && fetchedUserDetails.firstname.trim() !== "" &&
+            fetchedUserDetails.lastname && fetchedUserDetails.lastname.trim() !== "" &&
+            fetchedUserDetails.middle_name && fetchedUserDetails.middle_name.trim() !== "" &&
+            fetchedUserDetails.phone_number && fetchedUserDetails.phone_number.trim() !== "" &&
+            fetchedUserCredentials.email && fetchedUserCredentials.email.trim() !== ""
+        );
+
         // Profile Details
-        if (
-            !userDetailsResponse.data ||
-            !userDetailsResponse.data.firstname ||
-            !userDetailsResponse.data.lastname
-        ) {
+        if (!isProfileDetailsComplete) {
             currentStep.value = 1;
         }
         // Educational Background
@@ -176,19 +187,29 @@ const determineInitialStep = async () => {
             isStepComplete.value[1] = true;
             isStepComplete.value[2] = true;
         }
-        // Training & Certifications
+        // Training
         else if (trainingResponse.data.length === 0) {
             currentStep.value = 4;
             isStepComplete.value[1] = true;
             isStepComplete.value[2] = true;
             isStepComplete.value[3] = true;
-        } else {
-            // All steps have data
-            currentStep.value = 4;
+        }
+        // Eligibility
+        else if (eligibilityResponse.data.length === 0) { // Changed condition to check array length
+            currentStep.value = 5;
             isStepComplete.value[1] = true;
             isStepComplete.value[2] = true;
             isStepComplete.value[3] = true;
             isStepComplete.value[4] = true;
+        }
+        else {
+            // All steps have data
+            currentStep.value = 5;
+            isStepComplete.value[1] = true;
+            isStepComplete.value[2] = true;
+            isStepComplete.value[3] = true;
+            isStepComplete.value[4] = true;
+            isStepComplete.value[5] = true;
         }
     } catch (error) {
         console.error("Error fetching profile data:", error);

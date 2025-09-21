@@ -189,10 +189,14 @@
                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     >
                         <option value="" disabled>Select Education</option>
-                        <option value="High School Diploma">High School Diploma</option>
-                        <option value="Bachelor's degree">Bachelor's degree</option>
-                        <option value="Master's degree">Master's degree</option>
-                        <option value="Doctorate degree">Doctorate degree</option>
+                        <option value="Elementary Level">Elementary Level</option>
+                        <option value="Elementary Graduate">Elementary Graduate</option>
+                        <option value="High School Level">High School Level</option>
+                        <option value="High School Graduate">High School Graduate</option>
+                        <option value="College Level">College Level</option>
+                        <option value="College Graduate">College Graduate</option>
+                        <option value="Master's Degree">Master's Degree</option>
+                        <option value="Doctorate Degree">Doctorate Degree</option>
                     </select>
                     </div>
                     <div class="form-group">
@@ -368,10 +372,14 @@
                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     >
                         <option value="" disabled>Select Education</option>
-                        <option value="High School Diploma">High School Diploma</option>
-                        <option value="Bachelor's degree">Bachelor's degree</option>
-                        <option value="Master's degree">Master's degree</option>
-                        <option value="Doctorate degree">Doctorate degree</option>
+                        <option value="Elementary Level">Elementary Level</option>
+                        <option value="Elementary Graduate">Elementary Graduate</option>
+                        <option value="High School Level">High School Level</option>
+                        <option value="High School Graduate">High School Graduate</option>
+                        <option value="College Level">College Level</option>
+                        <option value="College Graduate">College Graduate</option>
+                        <option value="Master's Degree">Master's Degree</option>
+                        <option value="Doctorate Degree">Doctorate Degree</option>
                     </select>
                     </div>
                     <div class="form-group">

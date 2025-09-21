@@ -83,7 +83,7 @@ const handleCaptchaVerified = (verified) => {
             },
             onError: (errors) => {
                 console.log('Login errors:', errors);
-                showCaptcha.value = true;
+                showCaptcha.value = false; // Close CAPTCHA on error
                 isCaptchaVerified.value = false;
             },
         });
@@ -98,7 +98,7 @@ const handleCaptchaVerified = (verified) => {
         <!-- Main Content Wrapper centered -->
         <div class="flex justify-center p-4 md:mt-10">
             <FormContainer class="w-full max-w-md">
-                <h1 class="mb-6 text-3xl font-bold text-center">Login Page</h1>
+                <h1 class="mb-6 text-3xl font-bold text-ccomenter">Login Page</h1>
 
                 <form @submit.prevent="submit">
                     <div>

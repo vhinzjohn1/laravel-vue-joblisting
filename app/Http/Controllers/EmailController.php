@@ -165,27 +165,35 @@ class EmailController extends Controller
             return response()->json(['error' => 'User not authenticated'], 401);
         }
 
-        // Generate a signed verification URL
-        $verificationUrl = URL::temporarySignedRoute(
-            'custom-verification.verify',
-            now()->addMinutes(60),
-            ['id' => $user->user_id, 'hash' => sha1($user->email)]
-        );
+        try {
+            Log::info('sendVerificationEmail: User', $user->toArray());
 
-        // Create a notification for verification
-        $notification = Notification::create([
-            'user_id' => $user->user_id,
-            'type' => 'email_verification',
-            'message' => 'Please verify your email address by clicking the link below.',
-            'is_read' => false,
-            'data' => [
-                'verification_url' => $verificationUrl
-            ]
-        ]);
+            // Generate a signed verification URL
+            $verificationUrl = URL::temporarySignedRoute(
+                'custom-verification.verify',
+                now()->addMinutes(60),
+                ['id' => $user->user_id, 'hash' => sha1($user->email)]
+            );
 
-        // Send email in background
-        $this->sendEmailInBackground($notification, $user);
-        return response()->json(['message' => 'Verification email will be sent in the background']);
+            // Create a notification for verification
+            $notification = Notification::create([
+                'user_id' => $user->user_id,
+                'type' => 'email_verification',
+                'message' => 'Please verify your email address by clicking the link below.',
+                'is_read' => false,
+                'data' => [
+                    'verification_url' => $verificationUrl
+                ]
+            ]);
+
+            // Send email in background
+            $this->sendEmailInBackground($notification, $user);
+            Log::info('Verification email dispatched successfully.', ['user_id' => $user->user_id]);
+            return response()->json(['message' => 'Verification email will be sent in the background']);
+        } catch (\Exception $e) {
+            Log::error('Error sending verification email: ' . $e->getMessage(), ['user_id' => $user->user_id, 'exception' => $e]);
+            return response()->json(['error' => 'Failed to send verification email.'], 500);
+        }
     }
 
     /**

@@ -19,7 +19,6 @@ const form = useForm({
     lastname: "",
     middle_name: "",
     phone_number: "",
-    eligibility: "",
     email: "",
     email_verified_at: user.email_verified_at
 });
@@ -36,9 +35,7 @@ function areFetchedFieldsFilled(details) {
         details.lastname && details.lastname.trim() !== "" &&
         details.middle_name && details.middle_name.trim() !== "" &&
         details.phone_number && details.phone_number !== "" &&
-        (!isHR || (details.eligibility && details.eligibility.trim() !== "")) &&
-        form.email && form.email.trim() !== "" &&
-        isEmailVerified.value
+        form.email && form.email.trim() !== ""
     );
 }
 
@@ -55,7 +52,6 @@ const fetchUserDetails = async () => {
             form.lastname = details?.lastname || "";
             form.middle_name = details?.middle_name || "";
             form.phone_number = details?.phone_number || "";
-            form.eligibility = details?.eligibility || "";
             form.email = userCredentials.value.email || "";
             form.email_verified_at = userCredentials.value.email_verified_at || "";
         }
@@ -68,16 +64,23 @@ const saveProfileDetails = async () => {
     isLoading.value = true;
     const isHR = user.role_name === 'hr';
 
+    console.log('This is the form data', form.data());
+
+    // Stop polling during save operation
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+    }
+
     // Don't submit if required fields are not filled
     if (
         !form.firstname ||
         !form.lastname ||
         !form.middle_name ||
         !form.phone_number ||
-        (!isHR && !form.eligibility) ||
-        !form.email ||
-        !isEmailVerified.value
+        !form.email
     ) {
+        // Restart polling if not submitting due to validation
+        pollingInterval = setInterval(pollEmailVerificationStatus, 5000);
         return;
     }
 
@@ -86,10 +89,17 @@ const saveProfileDetails = async () => {
         showSuccessAlert();
         isLoading.value = false;
         isFormValid.value = true;
-        emit("step-completed");
+        emit("step-completed"); // Re-added this line
+        fetchUserDetails(); // Call fetchUserDetails after successful save
+        if (!isEmailVerified.value) {
+            resendVerificationEmail();
+        }
     } catch (error) {
         console.error("Error saving profile details:", error);
         isLoading.value = false;
+    } finally {
+        // Always restart polling after the save operation, regardless of success or failure
+        pollingInterval = setInterval(pollEmailVerificationStatus, 5000);
     }
 };
 
@@ -146,9 +156,7 @@ const showValidationToast = () => {
     if (!form.lastname) missingFields.push('Last Name');
     if (!form.middle_name) missingFields.push('Middle Name');
     if (!form.phone_number) missingFields.push('Phone Number');
-    if (user.role_name !== 'hr' && !form.eligibility) missingFields.push('Eligibility');
     if (!form.email) missingFields.push('Email');
-    if (!isEmailVerified.value) missingFields.push('Email Verification');
 
     Swal.fire({
         position: "top-end",
@@ -206,11 +214,12 @@ onUnmounted(() => {
                             for="firstname"
                             value="First Name"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <TextInput
                             id="firstname"
                             type="text"
-                            class="block mt-1 w-full"
+                            class="block mt-1 w-full uppercase"
                             v-model="form.firstname"
                             required
                             placeholder="Enter your first name"
@@ -226,11 +235,12 @@ onUnmounted(() => {
                             for="lastname"
                             value="Last Name"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <TextInput
                             id="lastname"
                             type="text"
-                            class="block mt-1 w-full"
+                            class="block mt-1 w-full uppercase"
                             v-model="form.lastname"
                             required
                             placeholder="Enter your last name"
@@ -246,11 +256,12 @@ onUnmounted(() => {
                             for="middle_name"
                             value="Middle Name"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <TextInput
                             id="middle_name"
                             type="text"
-                            class="block mt-1 w-full"
+                            class="block mt-1 w-full uppercase"
                             v-model="form.middle_name"
                             placeholder="Enter Middle Name"
                         />
@@ -265,6 +276,7 @@ onUnmounted(() => {
                             for="phone_number"
                             value="Phone Number"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <div class="flex relative mt-1">
                             <TextInput
@@ -273,11 +285,11 @@ onUnmounted(() => {
                                 class="block w-full rounded-none rounded-r-md"
                                 v-model="form.phone_number"
                                 maxlength="10"
-                                pattern="[0-9]{10}"
+                                pattern="^9[0-9]{9}$"
                                 isPhoneNumber
                                 placeholder="9351234567"
                                 required
-                                @input="form.phone_number = form.phone_number.replace(/[^0-9]/g, '').slice(0, 10)"
+                                @input="form.phone_number = form.phone_number.replace(/[^0-9]/g, '').slice(0, 10); if (form.phone_number.length > 0 && form.phone_number[0] !== '9') form.phone_number = '9' + form.phone_number.substring(1);"
                             />
                         </div>
                         <InputError
@@ -292,6 +304,7 @@ onUnmounted(() => {
                             for="email"
                             value="Email"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <div class="flex relative mt-1">
                             <TextInput
@@ -310,7 +323,7 @@ onUnmounted(() => {
                         <!-- Email verification status -->
                         <div v-if="!isEmailVerified" class="mt-2">
                             <p class="text-sm text-red-600">
-                                Your email is not verified. Verify your email to continue.
+                                Your email is not verified. Please verify your email.
                                 <button
                                     type="button"
                                     @click="resendVerificationEmail"
@@ -327,37 +340,6 @@ onUnmounted(() => {
                         </div>
                     </div>
 
-                    <div class="md:col-span-2" v-if="user.role_name !== 'hr'">
-                        <InputLabel
-                            for="eligibility"
-                            value="Eligibility"
-                            class="font-medium text-gray-700"
-                        />
-                        <select
-                            id="eligibility"
-                            v-model="form.eligibility"
-                            placeholder="e.g., Professional License, Civil Service Eligibility"
-                            class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                        >
-                            <option value="" selected disabled hidden>
-                            </option>
-                            <option value="None">None</option>
-                            <option value="Career Service (Professional)">
-                                Career Service (Professional)
-                            </option>
-                            <option value="Career Service (Sub-Professional)">
-                                Career Service (Sub-Professional)
-                            </option>
-                            <option value="RA 1080 (Board/Bar/Court)">
-                                RA 1080 (Board/Bar/Court)
-                            </option>
-                            <option value="PD 907">PD 907</option>
-                        </select>
-                        <InputError
-                            class="mt-2"
-                            :message="form.errors.eligibility"
-                        />
-                    </div>
                 </div>
             </div>
 
@@ -365,14 +347,14 @@ onUnmounted(() => {
                 <PrimaryButton
                     type="submit"
                     :loading="isLoading"
-                    :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || (user.role_name !== 'hr' && !form.eligibility) || !form.email || !isEmailVerified"
+                    :disabled="form.processing || !form.firstname || !form.lastname || !form.middle_name || !form.phone_number || !form.email"
                     :class="[
                         'px-6 py-2',
-                        form.firstname && form.lastname && form.middle_name && form.phone_number && (user.role_name === 'hr' || form.eligibility) && form.email && isEmailVerified
+                        form.firstname && form.lastname && form.middle_name && form.phone_number && form.email
                             ? 'bg-green-700 hover:bg-green-800'
                             : 'bg-green-300 cursor-not-allowed',
                     ]"
-                    @click="!form.firstname || !form.lastname || !form.middle_name || !form.phone_number || (user.role_name !== 'hr' && !form.eligibility) || !form.email || !isEmailVerified ? showValidationToast() : null"
+                    @click="!form.firstname || !form.lastname || !form.middle_name || !form.phone_number || !form.email ? showValidationToast() : null"
                 >
                     Save Profile Details
                 </PrimaryButton>

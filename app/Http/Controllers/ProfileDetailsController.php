@@ -55,6 +55,39 @@ class ProfileDetailsController extends Controller
     }
 
     /**
+     * Update a profile detail entry
+     */
+    public function update(Request $request, $type, $id)
+    {
+        $validated = $this->validateRequest($request, $type);
+
+        $model = match ($type) {
+            'education' => EducationalBackground::where('education_id', $id),
+            'training' => Training::where('training_id', $id),
+            'experience' => WorkExperience::where('experience_id', $id),
+            default => abort(404),
+        };
+
+        $entry = $model->where('user_id', auth()->id())->firstOrFail();
+
+        // Handle file upload for training certificates if a new one is provided
+        if ($type === 'training' && $request->hasFile('certificate_url')) {
+            // Delete old certificate if it exists
+            if ($entry->certificate_url) {
+                Storage::disk('public')->delete($entry->certificate_url);
+            }
+            $path = $request->file('certificate_url')->store('certificates', 'public');
+            $validated['certificate_url'] = $path;
+        } else if ($type === 'training' && !$request->hasFile('certificate_url') && !isset($validated['certificate_url'])) {
+            // If no new file, and no certificate_url was sent (meaning it was cleared), then set to null
+            $validated['certificate_url'] = null;
+        }
+
+        $entry->update($validated);
+        return response()->json($entry);
+    }
+
+    /**
      * Delete a profile detail entry
      */
     public function destroy($type, $id)

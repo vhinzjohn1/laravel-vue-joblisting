@@ -37,7 +37,7 @@
             :data-required-document="doc.required_document_id"
             :title="doc.document_name.toUpperCase()"
             :description="doc.description"
-            :document-type="doc.required_document_id"
+            :document-type="String(doc.required_document_id)"
             :document="documents[doc.required_document_id]"
             :is-loading="documentUploadLoading[doc.required_document_id]"
             @update:document="file => $emit('update:document', doc.required_document_id, file)"

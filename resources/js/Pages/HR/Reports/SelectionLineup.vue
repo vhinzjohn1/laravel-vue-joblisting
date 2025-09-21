@@ -81,7 +81,6 @@ const startEditing = (applicant) => {
         education: applicant.education,
         training: applicant.training,
         experience: applicant.experience,
-        eligibility: applicant.eligibility
     };
     isEditing.value = true;
 };
@@ -185,6 +184,10 @@ const cancelEditing = () => {
                                 {
                                     key: 'closing_date',
                                     title: 'Closing Date',
+                                },
+                                {
+                                    key: 'applications_count',
+                                    title: 'No. of Applications',
                                 },
                             ]"
                             action="view"
@@ -454,13 +457,10 @@ const cancelEditing = () => {
                                             <td
                                                 class="border border-gray-300 px-4 py-2"
                                             >
-                                                <input
-                                                    v-if="isEditing && editedData.selection_id === applicant.selection_id"
-                                                    v-model="editedData.eligibility"
-                                                    type="text"
-                                                    class="w-full p-1 border rounded"
-                                                />
-                                                <span v-else>{{ applicant.eligibility }}</span>
+                                                <span
+                                                    v-if="!isEditing || editedData.selection_id !== applicant.selection_id"
+                                                    >{{ applicant.eligibility }}</span
+                                                >
                                             </td>
                                             <td
                                                 class="border border-gray-300 px-4 py-2 no-print"

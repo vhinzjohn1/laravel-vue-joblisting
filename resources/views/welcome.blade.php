@@ -80,8 +80,8 @@
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Training</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Experience</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Eligibility</th>
+                                        <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Date Posted</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Closing Date</th>
-                                        <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Date Created</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Place of Assignment</th>
                                     </tr>
                                 </thead>
@@ -100,8 +100,8 @@
                                                     <td class="border px-3 py-2 text-sm">{{ $job->position->minimumRequirement->training_hours ? $job->position->minimumRequirement->training_hours . ' hours' : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->position->minimumRequirement->years_experience ? $job->position->minimumRequirement->years_experience . ' year(s)' : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->position->minimumRequirement->eligibility ?? '-' }}</td>
-                                                    <td class="border px-3 py-2 text-sm">{{ $job->closing_date ? \Carbon\Carbon::parse($job->closing_date)->format('M d, Y') : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->created_at ? \Carbon\Carbon::parse($job->created_at)->format('M d, Y') : '-' }}</td>
+                                                    <td class="border px-3 py-2 text-sm">{{ $job->closing_date ? \Carbon\Carbon::parse($job->closing_date)->format('M d, Y') : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->place_assigned ?? '-' }}</td>
                                                 </tr>
                                             @endforeach
@@ -131,8 +131,8 @@
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Training</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Experience</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Eligibility</th>
+                                        <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Date Posted</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Closing Date</th>
-                                        <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Date Created</th>
                                         <th class="border px-3 py-2 bg-gray-100 font-medium text-sm">Place of Assignment</th>
                                     </tr>
                                 </thead>
@@ -151,8 +151,8 @@
                                                     <td class="border px-3 py-2 text-sm">{{ $job->position->minimumRequirement->training_hours ? $job->position->minimumRequirement->training_hours . ' hours' : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->position->minimumRequirement->years_experience ? $job->position->minimumRequirement->years_experience . ' year(s)' : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->position->minimumRequirement->eligibility ?? '-' }}</td>
-                                                    <td class="border px-3 py-2 text-sm">{{ $job->closing_date ? \Carbon\Carbon::parse($job->closing_date)->format('M d, Y') : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->created_at ? \Carbon\Carbon::parse($job->created_at)->format('M d, Y') : '-' }}</td>
+                                                    <td class="border px-3 py-2 text-sm">{{ $job->closing_date ? \Carbon\Carbon::parse($job->closing_date)->format('M d, Y') : '-' }}</td>
                                                     <td class="border px-3 py-2 text-sm">{{ $job->place_assigned ?? '-' }}</td>
                                                 </tr>
                                             @endforeach
@@ -295,6 +295,7 @@
                         <div><p class="text-sm text-gray-600">Category</p><p class="font-medium" id="modal-category"></p></div>
                         <div><p class="text-sm text-gray-600">Item Number</p><p class="font-medium" id="modal-item-number"></p></div>
                         <div><p class="text-sm text-gray-600">Salary Grade</p><p class="font-medium" id="modal-salary-grade"></p></div>
+                        <div><p class="text-sm text-gray-600">Date Posted</p><p class="font-medium" id="modal-date-posted"></p></div>
                         <div><p class="text-sm text-gray-600">Closing Date</p><p class="font-medium" id="modal-closing-date"></p></div>
                         <div><p class="text-sm text-gray-600">Status</p><p class="font-medium" id="modal-status"></p></div>
                         <div><p class="text-sm text-gray-600">Place of Assignment</p><p class="font-medium" id="modal-place-assigned"></p></div>
@@ -333,6 +334,9 @@
         let itemNumber = get(job, 'position.item_number', '');
         document.getElementById('modal-item-number').textContent = (itemNumber === '' ? 'CoS/Job Order' : itemNumber || '-');
         document.getElementById('modal-salary-grade').textContent = get(job, 'position.salary_grade.salary_grade');
+        document.getElementById('modal-date-posted').textContent = job.created_at
+            ? new Date(job.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+            : '-';
         document.getElementById('modal-closing-date').textContent = job.closing_date
             ? new Date(job.closing_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
             : '-';

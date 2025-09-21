@@ -40,6 +40,26 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        $user = $request->user();
+
+        // If the user is an applicant, check their profile completion and email verification status
+        if ($user && $user->role_name === 'applicant') {
+            if ($user->profile_completed && is_null($user->email_verified_at)) {
+                // If profile is complete but email is not verified, log out and redirect with an error
+                Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                throw ValidationException::withMessages([
+                    'login' => 'Your email address is not verified. Please check your email for a verification link.',
+                ]);
+            } elseif (!$user->profile_completed) {
+                // If profile is not complete, redirect to the complete profile page
+                $request->session()->regenerate();
+                return redirect()->route('complete-profile');
+            }
+        }
+
         $request->session()->regenerate();
 
         return redirect()->intended(RouteServiceProvider::HOME);
@@ -64,7 +84,7 @@ class AuthenticatedSessionController extends Controller
 
         // Efficient user lookup: use raw query for performance
         $user = DB::table('users')
-            ->select('user_id', 'password', 'email', 'username')
+            ->select('user_id', 'password', 'email', 'username', 'email_verified_at')
             ->where('email', $login)
             ->orWhere('username', $login)
             ->first();
@@ -98,6 +118,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         // Use Inertia::location to force a full page reload to the root (welcome blade)
-        return Inertia::location('/');
+        return Inertia::location('/login');
     }
 }

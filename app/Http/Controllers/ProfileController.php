@@ -13,6 +13,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\UserDetail;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -36,36 +37,19 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $user = $request->user();
+        $user = Auth::user();
 
-        // Update user table data (only username and email)
-        $user->fill([
-            'username' => $request->username,
-            'email' => $request->email,
-        ]);
+        $user->fill($request->validated());
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
-        // Validate the request
-        $request->validate([
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-        ]);
-
         $user->save();
 
-        // Update or create user details (all other fields)
         UserDetail::updateOrCreate(
             ['user_id' => $user->user_id],
-            [
-                'firstname' => $request->firstname,
-                'lastname' => $request->lastname,
-                'middle_name' => $request->middle_name,
-                'phone_number' => $request->phone_number,
-                'eligibility' => $request->eligibility,
-            ]
+            $request->safe()->only(['firstname', 'lastname', 'middle_name', 'phone_number'])
         );
 
         return Redirect::route('profile.edit');
@@ -132,34 +116,39 @@ class ProfileController extends Controller
      */
     public function storeUserDetails(Request $request)
     {
+        Log::info('storeUserDetails: Incoming request data', $request->all());
+
         $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'phone_number' => 'nullable|max:25',
-            'eligibility' => 'nullable|string|max:255',
+            'email' => 'required|string|email|max:255',
         ]);
 
         $user = auth()->user();
+        Log::info('storeUserDetails: Authenticated user', $user->toArray());
 
         // Update email in the users table if it has changed
         if ($request->filled('email') && $request->email !== $user->email) {
             $user->email = $request->email;
             $user->email_verified_at = null; // Reset email verification if email changed
             $user->save();
+            Log::info('storeUserDetails: User email updated', $user->toArray());
         }
 
         // Find or create user details
-        $userDetails = \App\Models\UserDetail::firstOrNew(['user_id' => $user->user_id]);
+        $userDetails = UserDetail::firstOrNew(['user_id' => $user->user_id]);
+        Log::info('storeUserDetails: UserDetail before update', $userDetails->toArray());
 
         // Update details
         $userDetails->firstname = $request->firstname;
         $userDetails->lastname = $request->lastname;
         $userDetails->middle_name = $request->middle_name;
         $userDetails->phone_number = $request->phone_number;
-        $userDetails->eligibility = $request->eligibility;
 
         $userDetails->save();
+        Log::info('storeUserDetails: UserDetail after update', $userDetails->toArray());
 
         return response()->json([
             'success' => true,

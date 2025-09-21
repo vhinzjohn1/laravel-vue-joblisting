@@ -57,7 +57,8 @@ onMounted(() => {
         route().current("job-position.index") ||
         route().current("required-documents.index") ||
         route().current("archive.index") ||
-        route().current("batches.page")
+        route().current("batches.page") ||
+        route().current("eligibility.index")
     ) {
         activeDropdown.value = "masterlist";
     }
@@ -82,7 +83,8 @@ watch(
             newRoute === "job-position.index" ||
             newRoute === "required-documents.index" ||
             newRoute === "archive.index" ||
-            newRoute === "batches.page"
+            newRoute === "batches.page" ||
+            newRoute === "eligibility.index"
         ) {
             activeDropdown.value = "masterlist";
         }
@@ -410,6 +412,21 @@ onMounted(async () => {
                 </Link>
             </div>
 
+            <!-- User Profile Section -->
+            <Link
+                :href="route('profile.edit')"
+                :class="{'py-3': sidebarOpen, 'py-4': !sidebarOpen}"
+                class="flex items-center w-full px-4 mt-2 text-white user-profile-section"
+            >
+                <div class="flex justify-center items-center flex-shrink-0 w-10 h-10 bg-[#023d17] rounded-full">
+                    <span class="text-lg font-semibold text-white">{{ $page.props.auth.user.username.charAt(0) }}</span>
+                </div>
+                <div v-if="sidebarOpen" class="ml-3 overflow-hidden whitespace-nowrap">
+                    <div class="text-sm font-semibold">{{ $page.props.auth.user.username }}</div>
+                    <div class="text-xs text-gray-400">{{ $page.props.auth.user.role_name }}</div>
+                </div>
+            </Link>
+
             <!-- Navigation -->
             <nav class="overflow-y-auto flex-1 py-5">
                 <ul class="px-2 space-y-2">
@@ -615,6 +632,7 @@ onMounted(async () => {
                                     'required-documents.index',
                                     'archive.index',
                                     'batches.page',
+                                    'eligibility.index',
                                 ]),
                                 'text-gray-300 hover:bg-[#034b1c] hover:text-white':
                                     !isActiveGroup([
@@ -622,6 +640,7 @@ onMounted(async () => {
                                         'required-documents.index',
                                         'archive.index',
                                         'batches.page',
+                                        'eligibility.index',
                                     ]),
                             }"
                         >
@@ -634,6 +653,7 @@ onMounted(async () => {
                                             'required-documents.index',
                                             'archive.index',
                                             'batches.page',
+                                            'eligibility.index',
                                         ]),
                                     }"
                                 >
@@ -648,6 +668,7 @@ onMounted(async () => {
                                             'required-documents.index',
                                             'archive.index',
                                             'batches.page',
+                                            'eligibility.index',
                                         ]),
                                     }"
                                     >Masterlist</span
@@ -668,6 +689,7 @@ onMounted(async () => {
                                             'required-documents.index',
                                             'archive.index',
                                             'batches.page',
+                                            'eligibility.index',
                                         ]),
                                     }"
                                 ></i>
@@ -743,6 +765,21 @@ onMounted(async () => {
                                     >
                                         <i class="mr-2 fas fa-layer-group" :class="{ 'text-black': isActive('batches.page') }"></i>
                                         <span>Batches</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        id="eligibility-link"
+                                        :disabled="isTourActive"
+                                        :href="route('eligibility.index')"
+                                        class="flex items-center px-3 py-2 text-sm rounded-md transition-all duration-200 dropdown-link"
+                                        :class="{
+                                            'bg-[#ffc001] text-black font-medium': isActive('eligibility.index'),
+                                            'text-gray-300 hover:bg-[#034b1c] hover:text-white': !isActive('eligibility.index'),
+                                        }"
+                                    >
+                                        <i class="mr-2 fas fa-user-check" :class="{ 'text-black': isActive('eligibility.index') }"></i>
+                                        <span>Eligibility</span>
                                     </Link>
                                 </li>
                                 <li>

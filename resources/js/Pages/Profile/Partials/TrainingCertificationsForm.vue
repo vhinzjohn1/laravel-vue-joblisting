@@ -7,6 +7,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
 import {
     TrashIcon,
+    PencilIcon,
     AcademicCapIcon,
     CalendarIcon,
 } from "@heroicons/vue/24/outline";
@@ -14,6 +15,7 @@ import {
 const trainings = ref([]);
 const showModal = ref(false);
 const isLoading = ref(true);
+const editingTraining = ref(null); // New ref to hold the training being edited
 
 const form = useForm({
     title: "",
@@ -39,19 +41,66 @@ const fetchTrainings = async () => {
     }
 };
 
-const addTraining = async () => {
+const openAddModal = () => {
+    editingTraining.value = null;
+    form.reset();
+    showModal.value = true;
+};
+
+const editTraining = (training) => {
+    editingTraining.value = training;
+    form.title = training.title;
+    form.description = training.description;
+    form.institution = training.institution;
+    form.duration_hours = training.duration_hours;
+    form.certificate_url = null; // Certificate file input should be reset or handled separately
+    showModal.value = true;
+};
+
+const saveTraining = async () => {
     try {
-        const response = await axios.post(
-            route("profile-details.store", "training"),
-            form.data(),
-            {
-                preserveScroll: true,
-            },
-        );
-        trainings.value.push(response.data);
+        const formData = new FormData();
+        for (const key in form.data()) {
+            if (key === 'certificate_url' && form[key] === null) {
+                // Skip if no new file is selected, to retain existing one on update if not explicitly cleared
+                continue;
+            }
+            formData.append(key, form[key]);
+        }
+
+        if (editingTraining.value) {
+            // Update existing training
+            await axios.post(
+                route("profile-details.update", ["training", editingTraining.value.training_id]),
+                formData,
+                {
+                    preserveScroll: true,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'X-HTTP-Method-Override': 'PUT' // Laravel workaround for PUT with FormData
+                    },
+                },
+            );
+            showSuccessAlert("update");
+        } else {
+            // Add new training
+            await axios.post(
+                route("profile-details.store", "training"),
+                formData,
+                {
+                    preserveScroll: true,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                },
+            );
+            showSuccessAlert("add");
+        }
+
         form.reset();
         showModal.value = false;
-        showSuccessAlert("add");
+        editingTraining.value = null; // Reset editing state
+        fetchTrainings(); // Refresh the list
 
         if (trainings.value.length > 0) {
             emit("step-completed");
@@ -137,10 +186,10 @@ onMounted(() => {
     <section>
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-semibold text-gray-800">
-                Trainings & Certifications
+                Trainings
             </h3>
             <PrimaryButton
-                @click="showModal = true"
+                @click="openAddModal"
                 class="flex gap-2 items-center bg-green-700 hover:bg-green-800"
             >
                 <span class="hidden sm:inline">Add Training</span>
@@ -176,13 +225,13 @@ onMounted(() => {
                 <AcademicCapIcon class="w-16 h-16 text-gray-400" />
             </div>
             <h3 class="mt-4 text-lg font-medium text-gray-900">
-                No Trainings or Certifications Added Yet
+                No Trainings Added Yet
             </h3>
             <p class="mt-2 text-gray-600">
-                Add your professional trainings and certifications.
+                Add your professional trainings.
             </p>
             <button
-                @click="showModal = true"
+                @click="openAddModal"
                 class="inline-flex items-center px-4 py-2 mt-4 text-xs font-semibold tracking-widest text-white uppercase bg-green-700 rounded-md border border-transparent transition hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25"
             >
                 Add Training
@@ -260,7 +309,14 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div class="flex items-center space-x-2">
+                        <button
+                            @click="editTraining(training)"
+                            class="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            title="Edit"
+                        >
+                            <PencilIcon class="w-5 h-5" />
+                        </button>
                         <button
                             @click="deleteTraining(training.training_id)"
                             class="text-red-500 hover:text-red-700 focus:outline-none"
@@ -273,20 +329,21 @@ onMounted(() => {
             </div>
         </div>
 
-        <!-- Add Training Modal -->
+        <!-- Add/Edit Training Modal -->
         <Modal
-            :title="'Add Training or Certification'"
+            :title="editingTraining ? 'Edit Training/Certification' : 'Add Training/Certification'"
             :show="showModal"
-            @close="showModal = false"
+            @close="showModal = false; editingTraining = null; form.reset()"
             max-width="md"
         >
             <div class="p-6">
-                <form @submit.prevent="addTraining" class="space-y-5">
+                <form @submit.prevent="saveTraining" class="space-y-5">
                     <div>
                         <InputLabel
                             for="title"
                             value="Title"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <input
                             id="title"
@@ -304,6 +361,7 @@ onMounted(() => {
                             for="institution"
                             value="Institution"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <input
                             id="institution"
@@ -321,7 +379,7 @@ onMounted(() => {
                             for="duration_hours"
                             value="Duration (hours)"
                             class="font-medium text-gray-700"
-
+                            required
                         />
                         <input
                             id="duration_hours"
@@ -337,7 +395,7 @@ onMounted(() => {
                     <div class="flex gap-3 justify-end items-center mt-6">
                         <button
                             type="button"
-                            @click="showModal = false"
+                            @click="showModal = false; editingTraining = null; form.reset()"
                             class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase rounded-md border border-gray-300 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25"
                         >
                             Cancel
@@ -346,7 +404,7 @@ onMounted(() => {
                             :disabled="form.processing"
                             class="bg-green-700 hover:bg-green-800"
                         >
-                            Save Training
+                            {{ editingTraining ? 'Update Training' : 'Save Training' }}
                         </PrimaryButton>
                     </div>
                 </form>

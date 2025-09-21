@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -16,6 +16,7 @@ import {
 const educations = ref([]);
 const showModal = ref(false);
 const isLoading = ref(true);
+const editingEducation = ref(null); // New ref to hold the education being edited
 
 const form = useForm({
     level: "",
@@ -41,19 +42,50 @@ const fetchEducations = async () => {
     }
 };
 
-const addEducation = async () => {
+const openAddModal = () => {
+    editingEducation.value = null;
+    form.reset();
+    showModal.value = true;
+};
+
+const editEducation = (education) => {
+    editingEducation.value = education;
+    form.level = education.level;
+    form.school_name = education.school_name;
+    form.degree_course = education.degree_course;
+    form.year_graduated = education.year_graduated;
+    form.honors_received = education.honors_received || "None";
+    showModal.value = true;
+};
+
+const saveEducation = async () => {
     try {
-        const response = await axios.post(
-            route("profile-details.store", "education"),
-            form.data(),
-            {
-                preserveScroll: true,
-            },
-        );
-        educations.value.push(response.data);
+        if (editingEducation.value) {
+            // Update existing education
+            await axios.put(
+                route("profile-details.update", ["education", editingEducation.value.education_id]),
+                form.data(),
+                {
+                    preserveScroll: true,
+                },
+            );
+            showSuccessAlert("update");
+        } else {
+            // Add new education
+            await axios.post(
+                route("profile-details.store", "education"),
+                form.data(),
+                {
+                    preserveScroll: true,
+                },
+            );
+            showSuccessAlert("add");
+        }
+
         form.reset();
         showModal.value = false;
-        showSuccessAlert("add");
+        editingEducation.value = null; // Reset editing state
+        fetchEducations(); // Refresh the list
 
         if (educations.value.length > 0) {
             emit("step-completed");
@@ -85,6 +117,25 @@ const deleteEducation = async (id) => {
         showSuccessAlert("delete");
     }
 };
+
+// Computed property for dynamic honors options
+const honorsOptions = computed(() => {
+    const level = form.level;
+    if (["College Graduate", "Master's Degree", "Doctorate Degree"].includes(level)) {
+        return ["None", "Cum Laude", "Magna Cum Laude", "Summa Cum Laude"];
+    } else if (["High School Graduate", "Elementary Graduate"].includes(level)) {
+        return ["None", "With Honors", "With High Honors", "With Highest Honors", "Valedictorian", "Salutatorian"];
+    } else {
+        return ["None"];
+    }
+});
+
+// Watcher to reset honors_received when level changes or modal is closed
+watch(() => form.level, (newLevel) => {
+    if (!editingEducation.value) { // Only reset if not editing
+        form.honors_received = "None";
+    }
+});
 
 // Show success alert function
 const showSuccessAlert = (action) => {
@@ -134,7 +185,7 @@ onMounted(() => {
                 Educational Background
             </h3>
             <PrimaryButton
-                @click="showModal = true"
+                @click="openAddModal"
                 class="flex gap-2 items-center bg-green-700 hover:bg-green-800"
             >
                 <span class="hidden sm:inline">Add Education</span>
@@ -176,7 +227,7 @@ onMounted(() => {
                 Start by adding your educational qualifications.
             </p>
             <button
-                @click="showModal = true"
+                @click="openAddModal"
                 class="inline-flex items-center px-4 py-2 mt-4 text-xs font-semibold tracking-widest text-white uppercase bg-green-700 rounded-md border border-transparent transition hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25"
             >
                 Add Education
@@ -224,7 +275,7 @@ onMounted(() => {
                                         {{ education.level }}
                                     </span>
                                     <span
-                                        v-if="education.honors_received"
+                                        v-if="education.honors_received && education.honors_received !== 'None'"
                                         class="inline-flex items-center px-2.5 py-0.5 ml-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-full"
                                     >
                                         {{ education.honors_received }}
@@ -233,7 +284,14 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div class="flex items-center space-x-2">
+                        <button
+                            @click="editEducation(education)"
+                            class="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            title="Edit"
+                        >
+                            <PencilIcon class="w-5 h-5" />
+                        </button>
                         <button
                             @click="deleteEducation(education.education_id)"
                             class="text-red-500 hover:text-red-700 focus:outline-none"
@@ -246,20 +304,21 @@ onMounted(() => {
             </div>
         </div>
 
-        <!-- Add Education Modal -->
+        <!-- Add/Edit Education Modal -->
         <Modal
-            :title="'Add Educational Background'"
+            :title="editingEducation ? 'Edit Educational Background' : 'Add Educational Background'"
             :show="showModal"
-            @close="showModal = false"
+            @close="showModal = false; editingEducation = null; form.reset()"
             max-width="md"
         >
             <div class="p-6">
-                <form @submit.prevent="addEducation" class="space-y-5">
+                <form @submit.prevent="saveEducation" class="space-y-5">
                     <div>
                         <InputLabel
                             for="level"
                             value="Level"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <select
                             id="level"
@@ -268,10 +327,14 @@ onMounted(() => {
                             required
                         >
                             <option value="" disabled>Select Level</option>
-                            <option value="High School Diploma">High School Diploma</option>
-                            <option value="Bachelor's degree">Bachelor's degree</option>
-                            <option value="Master's degree">Master's degree</option>
-                            <option value="Doctorate degree">Doctorate degree</option>
+                            <option value="Elementary Level">Elementary Level</option>
+                            <option value="Elementary Graduate">Elementary Graduate</option>
+                            <option value="High School Level">High School Level</option>
+                            <option value="High School Graduate">High School Graduate</option>
+                            <option value="College Level">College Level</option>
+                            <option value="College Graduate">College Graduate</option>
+                            <option value="Master's Degree">Master's Degree</option>
+                            <option value="Doctorate Degree">Doctorate Degree</option>
                         </select>
                         <InputError :message="form.errors.level" />
                     </div>
@@ -281,6 +344,7 @@ onMounted(() => {
                             for="school_name"
                             value="School Name"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <input
                             id="school_name"
@@ -298,6 +362,7 @@ onMounted(() => {
                             for="degree_course"
                             value="Degree/Course"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <input
                             id="degree_course"
@@ -315,6 +380,7 @@ onMounted(() => {
                             for="year_graduated"
                             value="Year Graduated"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <input
                             id="year_graduated"
@@ -325,6 +391,8 @@ onMounted(() => {
                             class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-700 focus:ring focus:ring-green-300 focus:ring-opacity-50"
                             placeholder="2025"
                             required
+                            maxlength="4"
+                            @input="form.year_graduated = String(form.year_graduated).slice(0, 4)"
                         />
                         <InputError :message="form.errors.year_graduated" />
                     </div>
@@ -342,17 +410,14 @@ onMounted(() => {
                             placeholder="e.g., Cum Laude, Magna Cum Laude"
                         >
                             <option value="" disabled>Select Honors</option>
-                            <option value="None">None</option>
-                            <option value="Cum Laude">Cum Laude</option>
-                            <option value="Magna Cum Laude">Magna Cum Laude</option>
-                            <option value="Summa Cum Laude">Summa Cum Laude</option>
+                            <option v-for="honor in honorsOptions" :key="honor" :value="honor">{{ honor }}</option>
                         </select>
                         <InputError :message="form.errors.honors_received" />
                     </div>
                     <div class="flex gap-3 justify-end items-center mt-6">
                         <button
                             type="button"
-                            @click="showModal = false"
+                            @click="showModal = false; editingEducation = null; form.reset()"
                             class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase rounded-md border border-gray-300 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25"
                         >
                             Cancel
@@ -361,7 +426,7 @@ onMounted(() => {
                             :disabled="form.processing"
                             class="bg-green-700 hover:bg-green-800"
                         >
-                            Save Education
+                            {{ editingEducation ? 'Update Education' : 'Save Education' }}
                         </PrimaryButton>
                     </div>
                 </form>

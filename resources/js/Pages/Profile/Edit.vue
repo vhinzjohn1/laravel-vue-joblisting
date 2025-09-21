@@ -7,6 +7,7 @@ import UpdatePasswordForm from "./Partials/UpdatePasswordForm.vue";
 import EducationalBackgroundForm from "./Partials/EducationalBackgroundForm.vue";
 import TrainingCertificationsForm from "./Partials/TrainingCertificationsForm.vue";
 import WorkExperienceForm from "./Partials/WorkExperienceForm.vue";
+import EligibilityForm from "./Partials/EligibilityForm.vue";
 import ProfileDetailsForm from "./Partials/ProfileDetailsForm.vue";
 import { Head, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
@@ -128,7 +129,7 @@ const showSuccessAlert = (action) => {
                                                 : 'text-gray-600 hover:bg-gray-50',
                                         ]"
                                     >
-                                        Training & Certifications
+                                        Training
                                     </button>
                                 </li>
                                 <li v-if="user.role_name !== 'hr' && user.role_name !== 'admin'" class="w-full sm:flex-1 md:w-full">
@@ -142,6 +143,19 @@ const showSuccessAlert = (action) => {
                                         ]"
                                     >
                                         Work Experience
+                                    </button>
+                                </li>
+                                <li v-if="user.role_name !== 'hr' && user.role_name !== 'admin'" class="w-full sm:flex-1 md:w-full">
+                                    <button
+                                        @click="activeTab = 'eligibility'"
+                                        :class="[
+                                            'w-full text-left px-4 py-2 rounded-lg transition-colors',
+                                            activeTab === 'eligibility'
+                                                ? 'bg-gray-100 text-gray-900'
+                                                : 'text-gray-600 hover:bg-gray-50',
+                                        ]"
+                                    >
+                                        Eligibility
                                     </button>
                                 </li>
                                 <li class="w-full sm:flex-1 md:w-full">
@@ -214,7 +228,7 @@ const showSuccessAlert = (action) => {
                             </div>
                         </div>
 
-                        <!-- Training & Certifications -->
+                        <!-- Training -->
                         <div
                             v-if="activeTab === 'training' && user.role_name !== 'hr'"
                             class="bg-white shadow sm:rounded-lg"
@@ -238,6 +252,20 @@ const showSuccessAlert = (action) => {
                             >
                                 <div class="p-1">
                                     <WorkExperienceForm />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Eligibility -->
+                        <div
+                            v-if="activeTab === 'eligibility' && user.role_name !== 'hr'"
+                            class="bg-white shadow sm:rounded-lg"
+                        >
+                            <div
+                                class="p-4 sm:p-8 bg-white shadow sm:rounded-lg"
+                            >
+                                <div class="p-1">
+                                    <EligibilityForm />
                                 </div>
                             </div>
                         </div>

@@ -20,100 +20,51 @@
                 </svg>
                 Work Experience
             </h6>
-            <CustomSelect
-                v-if="experienceOptions.length > 0"
-                class="w-full sm:w-64"
-                placeholder="Existing experience"
-                :options="experienceOptions"
-                :displayFormat="
-                    (option) => `${option.position} at ${option.company_name}`
-                "
-                valueKey="experience_id"
-                @select="onExperienceSelect"
-            />
-            <div v-else class="text-sm text-gray-500 w-full sm:w-64 text-right">
-                Select from existing experience
+            <div class="text-sm text-gray-500 w-full sm:w-64 text-right">
+                Select from your existing experience
             </div>
         </div>
 
-        <!-- List of selected experiences -->
-        <div v-if="selectedExperiences.length > 0" class="mb-4 space-y-3">
-            <div v-for="(experience, index) in selectedExperiences" :key="experience.experience_id || index" class="bg-green-50 rounded-lg p-4 border border-green-200">
-                <div class="flex justify-between">
-                    <div>
-                        <h3 class="text-base font-medium text-gray-900">
-                            {{ experience.position }}
-                        </h3>
-                        <div class="mt-1 text-sm text-gray-600">
-                            <p>
-                                <span class="font-medium">Company:</span>
-                                {{ experience.company_name }}
-                            </p>
-                            <p>
-                                <span class="font-medium">Period:</span>
-                                {{
-                                    formatDateDisplay(
-                                        experience.start_date,
-                                    )
-                                }}
-                                —
-                                {{
-                                    experience.is_current_job
-                                        ? "Present"
-                                        : formatDateDisplay(
-                                              experience.end_date,
-                                          )
-                                }}
-                            </p>
-                        </div>
-                        <div class="mt-2 text-sm">
-                            <p
-                                class="text-gray-700 line-clamp-2"
-                                :title="experience.responsibilities"
-                            >
-                                <span class="font-medium"
-                                    >Responsibilities:</span
-                                >
-                                {{ experience.responsibilities }}
-                            </p>
-                        </div>
+        <!-- List of all experience options with checkboxes -->
+        <div v-if="experienceOptions.length > 0" class="mb-4 space-y-3">
+            <div v-for="experience in experienceOptions" :key="experience.experience_id"
+                class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm flex items-start gap-3">
+                <input
+                    type="checkbox"
+                    :id="`experience-${experience.experience_id}`"
+                    :value="experience"
+                    :checked="isExperienceSelected(experience)"
+                    @change="toggleExperience(experience)"
+                    class="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <label :for="`experience-${experience.experience_id}`" class="flex-1 block text-sm">
+                    <h3 class="text-base font-medium text-gray-900">{{ experience.position }}</h3>
+                    <div class="mt-1 text-sm text-gray-600">
+                        <p><span class="font-medium">Company:</span> {{ experience.company_name }}</p>
+                        <p>
+                            <span class="font-medium">Period:</span>
+                            {{ formatDateDisplay(experience.start_date) }} —
+                            {{ experience.is_current_job ? "Present" : formatDateDisplay(experience.end_date) }}
+                        </p>
                     </div>
-                    <button
-                        @click="removeExperience(index)"
-                        type="button"
-                        class="text-xs text-gray-600 hover:text-gray-800 flex items-center h-6"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                        Remove
-                    </button>
-                </div>
-                <div class="mt-2 text-xs text-green-700">
-                    <span>Selected from your profile</span>
-                </div>
+                    <div class="mt-2 text-sm">
+                        <p class="text-gray-700 line-clamp-2" :title="experience.responsibilities">
+                            <span class="font-medium">Responsibilities:</span>
+                            {{ experience.responsibilities }}
+                        </p>
+                    </div>
+                </label>
             </div>
         </div>
 
-        <!-- Empty state when no experience is selected -->
+        <!-- Empty state when no experience is available -->
         <div
             v-else
             class="text-center py-6 bg-gray-50 rounded-lg border border-gray-200"
         >
-            <p class="text-gray-800">No work experience selected</p>
+            <p class="text-gray-800">No work experience available in your profile.</p>
             <p class="text-sm text-gray-700 mt-1">
-                Please select from the dropdown above
+                Please update your profile to add work experience records.
             </p>
         </div>
     </div>
@@ -121,7 +72,7 @@
 
 <script setup>
 import { defineProps, defineEmits } from "vue";
-import CustomSelect from "@/Components/CustomSelect.vue";
+// import CustomSelect from "@/Components/CustomSelect.vue"; // Removed CustomSelect
 
 const props = defineProps({
     experienceOptions: {
@@ -134,7 +85,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["update:selectedExperiences", "select"]);
+const emit = defineEmits(["update:selectedExperiences"]);
 
 // Format date for display
 const formatDateDisplay = (dateString) => {
@@ -147,26 +98,21 @@ const formatDateDisplay = (dateString) => {
     });
 };
 
-const onExperienceSelect = (selected) => {
-
-    // If the selected option is "Select from existing education", do not continue
-    if (selected.experience_id === "") {
-        return;
-    }
-    // Check if already exists in the array
-    const exists = props.selectedExperiences.some(
-        exp => exp.experience_id === selected.experience_id
-    );
-
-    if (!exists) {
-        const updatedExperiences = [...props.selectedExperiences, selected];
-        emit("update:selectedExperiences", updatedExperiences);
-    }
+const isExperienceSelected = (experience) => {
+    return props.selectedExperiences.some(selected => selected.experience_id === experience.experience_id);
 };
 
-const removeExperience = (index) => {
+const toggleExperience = (experience) => {
     const updatedExperiences = [...props.selectedExperiences];
-    updatedExperiences.splice(index, 1);
+    const index = updatedExperiences.findIndex(selected => selected.experience_id === experience.experience_id);
+
+    if (index === -1) {
+        // Add experience
+        updatedExperiences.push(experience);
+    } else {
+        // Remove experience
+        updatedExperiences.splice(index, 1);
+    }
     emit("update:selectedExperiences", updatedExperiences);
 };
 </script>

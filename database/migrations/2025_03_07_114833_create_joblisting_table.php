@@ -69,7 +69,6 @@ return new class extends Migration
             $table->string('lastname')->nullable();
             $table->string('middle_name')->nullable();
             $table->string('phone_number')->nullable();
-            $table->string('eligibility')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
@@ -83,7 +82,6 @@ return new class extends Migration
             'lastname'       => 'Balinas',
             'middle_name'    => 'Hinoay',
             'phone_number'   => '0912345678',
-            'eligibility'    => "None",
             'created_at'     => now(),
             'updated_at'     => now(),
         ]);
@@ -102,6 +100,26 @@ return new class extends Migration
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
 
+        // Create Eligibility table
+        Schema::create('eligibility', function (Blueprint $table) {
+            $table->id('eligibility_id');
+            $table->string('eligibility_name');
+            $table->string('eligibility_description')->nullable();
+            $table->string('eligibility_type')->nullable();
+            $table->timestamps();
+        });
+
+        // Create User Eligibility table
+        Schema::create('user_eligibility', function (Blueprint $table) {
+            $table->id('user_eligibility_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('eligibility_id');
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+            $table->foreign('eligibility_id')->references('eligibility_id')->on('eligibility')->onDelete('cascade');
+        });
+
         // Seed applicant educational background
         DB::table('educational_backgrounds')->insert([
             'user_id'         => $applicantId,
@@ -111,6 +129,22 @@ return new class extends Migration
             'year_graduated'  => '2018',
             'created_at'      => now(),
             'updated_at'      => now(),
+        ]);
+
+        // Seed eligibility for the applicant
+        $careerServiceEligibilityId = DB::table('eligibility')->insertGetId([
+            'eligibility_name' => 'Career Service (Professional)',
+            'eligibility_description' => 'Professional eligibility for government service.',
+            'eligibility_type' => 'Civil Service',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('user_eligibility')->insert([
+            'user_id' => $applicantId,
+            'eligibility_id' => $careerServiceEligibilityId,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         // Create trainings table
@@ -649,18 +683,24 @@ return new class extends Migration
         Schema::dropIfExists('applications');
         Schema::dropIfExists('job_listings');
         Schema::dropIfExists('job_listing_batches');
+        Schema::dropIfExists('group_schedule_members');
+        Schema::dropIfExists('group_schedules');
+        Schema::dropIfExists('job_listing_required_documents'); // Drop this pivot table first
+        Schema::dropIfExists('required_documents'); // Then this table
+        Schema::dropIfExists('user_eligibility'); // Drop this pivot table before eligibility
+        Schema::dropIfExists('eligibility'); // Then this table
         Schema::dropIfExists('positions');
         Schema::dropIfExists('salary_grades');
-        Schema::dropIfExists('roles');
         Schema::dropIfExists('user_details');
         Schema::dropIfExists('users');
-        Schema::dropIfExists('test');
         Schema::dropIfExists('minimum_requirements');
         Schema::dropIfExists('work_experiences');
         Schema::dropIfExists('trainings');
         Schema::dropIfExists('educational_backgrounds');
-        Schema::dropIfExists('group_schedule_members');
-        Schema::dropIfExists('group_schedules');
         Schema::dropIfExists('temporary_files');
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('failed_jobs');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('personal_access_tokens');
     }
 };

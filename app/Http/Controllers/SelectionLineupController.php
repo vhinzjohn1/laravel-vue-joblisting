@@ -9,6 +9,8 @@ use App\Models\UserDetail;
 use App\Models\EducationalBackground;
 use App\Models\WorkExperience;
 use App\Models\Training;
+use App\Models\UserEligibility;
+use App\Models\Eligibility;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 class SelectionLineupController extends Controller
@@ -21,6 +23,7 @@ class SelectionLineupController extends Controller
     public function index()
     {
         $jobListings = JobListing::with(['position', 'position.salaryGrade'])
+            ->withCount('applications') // Add this line to count applications
             ->where('status', 'Active')
             ->get();
 
@@ -47,11 +50,21 @@ class SelectionLineupController extends Controller
         // Get all applications for this job listing
         $applications = JobApplication::where('job_listing_id', $id)->get();
 
+        // Get all user eligibilities for the applicants
+        $userEligibilities = UserEligibility::whereIn('user_id', $applications->pluck('user_id'))
+            ->with('eligibility')
+            ->get()
+            ->groupBy('user_id');
+
         // Get selection lineup data for these applications
         $selectionLineups = SelectionLineup::whereIn('application_id', $applications->pluck('application_id'))
             ->get()
-            ->map(function($lineup) use ($applications) {
+            ->map(function($lineup) use ($applications, $userEligibilities) {
                 $application = $applications->firstWhere('application_id', $lineup->application_id);
+                $eligibilityNames = $userEligibilities->get($application->user_id)
+                    ?->pluck('eligibility.eligibility_name')
+                    ->implode(', ');
+
                 return [
                     'selection_id' => $lineup->selection_id,
                     'application_id' => $lineup->application_id,
@@ -59,7 +72,7 @@ class SelectionLineupController extends Controller
                     'education' => $lineup->education,
                     'training' => $lineup->training,
                     'experience' => $lineup->experience,
-                    'eligibility' => $lineup->eligibility,
+                    'eligibility' => $eligibilityNames ?: 'N/A',
                     'status' => $application ? $application->status : 'Pending'
                 ];
             });
@@ -80,7 +93,6 @@ class SelectionLineupController extends Controller
             'education' => 'required|string',
             'training' => 'required|string',
             'experience' => 'required|string',
-            'eligibility' => 'required|string',
         ]);
 
         try {
@@ -92,7 +104,6 @@ class SelectionLineupController extends Controller
                 'education' => $request->education,
                 'training' => $request->training,
                 'experience' => $request->experience,
-                'eligibility' => $request->eligibility,
             ]);
 
             return response()->json([

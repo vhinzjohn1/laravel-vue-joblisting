@@ -7,6 +7,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Modal from "@/Components/Modal.vue";
 import {
     TrashIcon,
+    PencilIcon, // Import PencilIcon
     BriefcaseIcon,
     BuildingOfficeIcon,
     CalendarIcon,
@@ -15,6 +16,7 @@ import {
 const experiences = ref([]);
 const showModal = ref(false);
 const isLoading = ref(true);
+const editingExperience = ref(null); // New ref for editing state
 
 const form = useForm({
     position: "",
@@ -83,26 +85,58 @@ watch(
             form.end_date = "";
         }
         validateDates();
-    }
+    },
 );
 
-const addExperience = async () => {
+const openAddModal = () => {
+    editingExperience.value = null;
+    form.reset();
+    showModal.value = true;
+};
+
+const editExperience = (experience) => {
+    editingExperience.value = experience;
+    form.position = experience.position;
+    form.company_name = experience.company_name;
+    form.start_date = experience.start_date;
+    form.end_date = experience.end_date;
+    form.is_current_job = experience.is_current_job;
+    form.responsibilities = experience.responsibilities;
+    showModal.value = true;
+};
+
+const saveExperience = async () => {
     if (!validateDates()) {
         return;
     }
 
     try {
-        const response = await axios.post(
-            route("profile-details.store", "experience"),
-            form.data(),
-            {
-                preserveScroll: true,
-            },
-        );
-        experiences.value.push(response.data);
+        if (editingExperience.value) {
+            // Update existing experience
+            await axios.put(
+                route("profile-details.update", ["experience", editingExperience.value.experience_id]),
+                form.data(),
+                {
+                    preserveScroll: true,
+                },
+            );
+            showSuccessAlert("update");
+        } else {
+            // Add new experience
+            await axios.post(
+                route("profile-details.store", "experience"),
+                form.data(),
+                {
+                    preserveScroll: true,
+                },
+            );
+            showSuccessAlert("add");
+        }
+
         form.reset();
         showModal.value = false;
-        showSuccessAlert("add");
+        editingExperience.value = null; // Reset editing state
+        fetchExperiences(); // Refresh the list
 
         // Emit completion event if at least one experience record exists
         if (experiences.value.length > 0) {
@@ -193,7 +227,7 @@ onMounted(() => {
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-semibold text-gray-800">Work Experience</h3>
             <PrimaryButton
-                @click="showModal = true"
+                @click="openAddModal"
                 class="flex gap-2 items-center bg-green-700 hover:bg-green-800"
             >
                 <span class="hidden sm:inline">Add Experience</span>
@@ -235,7 +269,7 @@ onMounted(() => {
                 Start by adding your professional work experience.
             </p>
             <button
-                @click="showModal = true"
+                @click="openAddModal"
                 class="inline-flex items-center px-4 py-2 mt-4 text-xs font-semibold tracking-widest text-white uppercase bg-green-700 rounded-md border border-transparent transition hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25"
             >
                 Add Experience
@@ -300,7 +334,14 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div class="flex items-center space-x-2">
+                        <button
+                            @click="editExperience(experience)"
+                            class="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            title="Edit"
+                        >
+                            <PencilIcon class="w-5 h-5" />
+                        </button>
                         <button
                             @click="deleteExperience(experience.experience_id)"
                             class="text-red-500 hover:text-red-700 focus:outline-none"
@@ -313,20 +354,21 @@ onMounted(() => {
             </div>
         </div>
 
-        <!-- Add Experience Modal -->
+        <!-- Add/Edit Experience Modal -->
         <Modal
-            :title="'Add Work Experience'"
+            :title="editingExperience ? 'Edit Work Experience' : 'Add Work Experience'"
             :show="showModal"
-            @close="showModal = false"
+            @close="showModal = false; editingExperience = null; form.reset()"
             max-width="md"
         >
             <div class="p-6">
-                <form @submit.prevent="addExperience" class="space-y-5">
+                <form @submit.prevent="saveExperience" class="space-y-5">
                     <div>
                         <InputLabel
                             for="position"
                             value="Position"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <input
                             id="position"
@@ -344,6 +386,7 @@ onMounted(() => {
                             for="company_name"
                             value="Company Name"
                             class="font-medium text-gray-700"
+                            required
                         />
                         <input
                             id="company_name"
@@ -362,6 +405,7 @@ onMounted(() => {
                                 for="start_date"
                                 value="Start Date"
                                 class="font-medium text-gray-700"
+                                required
                             />
                             <input
                                 id="start_date"
@@ -379,6 +423,7 @@ onMounted(() => {
                                 for="end_date"
                                 value="End Date"
                                 class="font-medium text-gray-700"
+                                required
                             />
                             <input
                                 id="end_date"
@@ -431,7 +476,7 @@ onMounted(() => {
                     <div class="flex gap-3 justify-end items-center mt-6">
                         <button
                             type="button"
-                            @click="showModal = false"
+                            @click="showModal = false; editingExperience = null; form.reset()"
                             class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase rounded-md border border-gray-300 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-25"
                         >
                             Cancel
@@ -440,7 +485,7 @@ onMounted(() => {
                             :disabled="form.processing || hasDateError"
                             class="bg-green-700 hover:bg-green-800"
                         >
-                            Save Experience
+                            {{ editingExperience ? 'Update Experience' : 'Save Experience' }}
                         </PrimaryButton>
                     </div>
                 </form>
